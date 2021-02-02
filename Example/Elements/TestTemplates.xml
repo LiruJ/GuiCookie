@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Templates>
+  <!--Lists-->
+  <TestList Components="Frame, DirectionalLayout" Controller="TestList"/>
+  <TestListItem Size="100%, 5%">
+    <TextBox Name="Key" Size="70%, 100%" TextAnchor="5%, 50%" TextPivot="0%, 50%" Style="Inlay"/>
+    <TextBox Name="Value" Size="25%, 100%" Position="70%, 0%" TextAnchor="5%, 50%" TextPivot="0%, 50%" Style="Inlay"/>
+    <TextButton Name="RemoveButton" Size="5%, 100%" Position="95%, 0%" Style="Remove"/>
+  </TestListItem>
+  
+  <TestDraggable Components="Frame, Draggable, TextBlock"/>
+  <DropTest Components="Frame, DropTarget, DirectionalLayout"/>
+</Templates>
