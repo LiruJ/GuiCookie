@@ -34,6 +34,7 @@ namespace Example
         {
             // TODO: Add your initialization logic here
 
+            Window.Title = "GuiCookie Example Project";
             Window.AllowUserResizing = true;
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
