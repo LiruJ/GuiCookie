@@ -99,7 +99,7 @@ namespace GuiCookie.DataStructures
         public static bool TryParse(string input, out Sides sides)
         {
             // If the given string is empty, return with an empty padding.
-            if (input == string.Empty) { sides = new Sides(0, SideMask.None); return false; }
+            if (string.IsNullOrWhiteSpace(input)) { sides = new Sides(0, SideMask.None); return false; }
 
             // Split the input into sides.
             string[] paddingSides = input.Split(',');
@@ -114,7 +114,7 @@ namespace GuiCookie.DataStructures
             if (paddingSides.Length == 1) { sides = new Sides(top, topRelative ? SideMask.All : SideMask.None); return true; }
 
             // Parse the right side.
-            if (!Relative.TryParse(paddingSides[0], out float right, out bool rightRelative)) { sides = new Sides(0, SideMask.None); return false; }
+            if (!Relative.TryParse(paddingSides[1], out float right, out bool rightRelative)) { sides = new Sides(0, SideMask.None); return false; }
 
             // If there are 2 given sides, use them for the vertical and horizontal sides.
             if (paddingSides.Length == 2)
@@ -129,7 +129,7 @@ namespace GuiCookie.DataStructures
             }
 
             // Parse the bottom side.
-            if (!Relative.TryParse(paddingSides[0], out float bottom, out bool bottomRelative)) { sides = new Sides(0, SideMask.None); return false; }
+            if (!Relative.TryParse(paddingSides[2], out float bottom, out bool bottomRelative)) { sides = new Sides(0, SideMask.None); return false; }
 
             // If there are 3 given sides, use them for the top, bottom, and horizontal sides.
             if (paddingSides.Length == 3)
@@ -145,7 +145,7 @@ namespace GuiCookie.DataStructures
             }
 
             // Parse the left side.
-            if (!Relative.TryParse(paddingSides[0], out float left, out bool leftRelative)) { sides = new Sides(0, SideMask.None); return false; }
+            if (!Relative.TryParse(paddingSides[3], out float left, out bool leftRelative)) { sides = new Sides(0, SideMask.None); return false; }
 
             // Set the bitflag based on which sides are relative.
             if (rightRelative) relativeSides |= SideMask.Right;
