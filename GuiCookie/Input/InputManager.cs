@@ -194,7 +194,7 @@ namespace GuiCookie.Input
                     }
 
                     // If the element has a component of the given type, return it.
-                    if (element.TryGetComponent<T>(out component)) return component;
+                    if (element.TryGetComponent(out component)) return component;
                 }
             }
 

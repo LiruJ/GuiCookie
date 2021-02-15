@@ -191,8 +191,7 @@ namespace GuiCookie.Elements
         internal void internalOnCreated(Root root, ElementManager elementManager, StyleManager styleManager, Template template, ElementContainer parent, Style style, Dictionary<Type, Component> components)
         {
             // Ensure this function has not been called before.
-            if ((InitialisationState & InitialisationState.Created) == InitialisationState.Created)
-                throw new Exception("OnCreated has already run for this element, yet it is being called internally again.");
+            if ((InitialisationState & InitialisationState.Created) == InitialisationState.Created) return;
 
             // Initialise dependencies.
             Root = root;
@@ -240,8 +239,7 @@ namespace GuiCookie.Elements
         internal void internalOnFullSetup()
         {
             // Ensure this function has not been called before.
-            if ((InitialisationState & InitialisationState.Setup) == InitialisationState.Setup)
-                throw new Exception("OnFullSetup has already run for this element, yet it is being called internally again.");
+            if ((InitialisationState & InitialisationState.Setup) == InitialisationState.Setup) return;
 
             // Call the overrideable function.
             OnFullSetup();
@@ -263,8 +261,7 @@ namespace GuiCookie.Elements
         internal void internalOnPostFullSetup()
         {
             // Ensure this function has not been called before.
-            if ((InitialisationState & InitialisationState.PostSetup) == InitialisationState.PostSetup)
-                throw new Exception("OnPostFullSetup has already run for this element, yet it is being called internally again.");
+            if ((InitialisationState & InitialisationState.PostSetup) == InitialisationState.PostSetup) return;
 
             // Call the overrideable function.
             OnPostFullSetup();
