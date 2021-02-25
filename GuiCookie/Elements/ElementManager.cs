@@ -100,17 +100,18 @@ namespace GuiCookie.Elements
         /// <param name="templateName"> The name of the template to use. </param>
         /// <param name="attributes"> The attributes to pass to the main <see cref="Element"/> along with the base <see cref="Template"/>, or null if just the base <see cref="Template"/> is to be used. </param>
         /// <param name="parent"> The <see cref="Element"/> to parent the new <see cref="Element"/> to. </param>
+        /// <param name="inputs"> Any items to be passed through to the constructor of the <see cref="Element"/>. </param>
         /// <returns> The created <see cref="Element"/>. </returns>
-        public Element CreateElementFromTemplateName(string templateName, AttributeCollection attributes = null, Element parent = null)
-            => createElementFromTemplate(templateManager.GetTemplateFromName(templateName), null, attributes, parent);
+        public Element CreateElementFromTemplateName(string templateName, AttributeCollection attributes = null, Element parent = null, params object[] inputs)
+            => createElementFromTemplate(templateManager.GetTemplateFromName(templateName), null, attributes, parent, false, inputs);
 
-        public Element CreateElementFromTemplate(Template template, AttributeCollection attributes = null, Element parent = null)
-            => createElementFromTemplate(template, null, attributes, parent);
+        public Element CreateElementFromTemplate(Template template, AttributeCollection attributes = null, Element parent = null, params object[] inputs)
+            => createElementFromTemplate(template, null, attributes, parent, false, inputs);
 
-        private Element createElementFromTemplate(Template template, Template parentTemplate = null, AttributeCollection attributes = null, Element parent = null, bool isChild = false)
+        private Element createElementFromTemplate(Template template, Template parentTemplate = null, AttributeCollection attributes = null, Element parent = null, bool isChild = false, params object[] inputs)
         {
             // Create the element from the template with no children.
-            Element element = createElementFromTemplateNoChildren(template, parentTemplate, attributes, parent);
+            Element element = createElementFromTemplateNoChildren(template, parentTemplate, attributes, parent, inputs);
 
             // If the template has children, create them too.
             if (template.Children.Count > 0)
@@ -128,7 +129,7 @@ namespace GuiCookie.Elements
             return element;
         }
 
-        private Element createElementFromTemplateNoChildren(Template template, Template parentTemplate, AttributeCollection attributes, Element parent)
+        private Element createElementFromTemplateNoChildren(Template template, Template parentTemplate, AttributeCollection attributes, Element parent, params object[] inputs)
         {
             // If the parent template exists and defines a template with the same name as the new element, use that template instead of the given one.
             string identifierName = attributes?.GetAttributeOrDefault(nameAttributeName, null);
@@ -142,7 +143,7 @@ namespace GuiCookie.Elements
             Style style = string.IsNullOrWhiteSpace(styleName) ? styleManager.DefaultStyle : styleManager.GetStyleFromName(styleName);
 
             // Create the element.
-            Element element = elementCache.CreateInstance(elementTemplate.ControllerName, serviceProvider);
+            Element element = elementCache.CreateInstance(elementTemplate.ControllerName, serviceProvider, inputs);
 
             // Create the components, which internally initialises each one.
             Dictionary<Type, Component> components = componentManager.CreateComponents(elementTemplate.ComponentNames, element);

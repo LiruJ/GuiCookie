@@ -1,4 +1,5 @@
-﻿using Example.Elements;
+﻿using Example.DataStructures;
+using Example.Elements;
 using GuiCookie;
 using GuiCookie.Elements;
 using System;
@@ -49,7 +50,7 @@ namespace Example
 
             for (int i = 0; i < 10; i++)
             {
-                testList.Add(new DataStructures.TestListItem(random.Next(0, 9999), $"Item {testList.ChildCount + 1}"));
+                testList.Add(new ListItemData(random.Next(0, 9999), $"Item {testList.ChildCount + 1}"));
             }
         }
     }

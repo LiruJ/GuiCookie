@@ -35,13 +35,9 @@ namespace Example.Elements
         #endregion
 
         #region List Functions
-        public void Add(TestListItem testListItem)
+        public void Add(ListItemData testListItem)
         {
-
-            Element listItem = elementManager.CreateElementFromTemplateName("TestListItem", null, this);
-            listItem.GetChildByName<TextBox>("Key").Text = testListItem.Key;
-            listItem.GetChildByName<TextBox>("Value").Text = testListItem.Value.ToString();
-            listItem.GetChildByName<TextButton>("RemoveButton").ConnectLeftClick(listItem.Destroy);
+            elementManager.CreateElementFromTemplateName("TestListItem", null, this, testListItem);
         }
         #endregion
     }
