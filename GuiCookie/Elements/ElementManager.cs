@@ -116,7 +116,7 @@ namespace GuiCookie.Elements
             // If the template has children, create them too.
             if (template.Children.Count > 0)
                 foreach (Template childTemplate in template.Children)
-                    createElementFromTemplate(childTemplate, template, null, element, true);
+                    createElementFromTemplate(childTemplate, template, null, element, true, inputs);
 
             // If this element is the parent that was originally called, perform setup on it. This will then go through the added children.
             if (!isChild)
