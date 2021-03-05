@@ -47,6 +47,9 @@ namespace GuiCookie.Components
 
         public Space TextPivot { get; set; }
 
+        /// <summary> The current colour of the current font. </summary>
+        public Color? Colour => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.Colour : null;
+
         /// <summary> The direction </summary>
         public DirectionMask ResizeDirection
         {
@@ -102,6 +105,10 @@ namespace GuiCookie.Components
                     (ResizeDirection & DirectionMask.Horizontal) == DirectionMask.Horizontal ? (int)Math.Ceiling(TextSize.X) : Bounds.ContentSize.X,
                     (ResizeDirection & DirectionMask.Vertical) == DirectionMask.Vertical ? (int)Math.Ceiling(TextSize.Y) : Bounds.ContentSize.Y);
         }
+        #endregion
+
+        #region Calculation Functions
+        public Vector2 CalculateSize(string text) => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.SpriteFont.MeasureString(text) : Vector2.Zero;
         #endregion
 
         #region Draw Functions

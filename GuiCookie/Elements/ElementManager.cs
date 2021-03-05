@@ -140,7 +140,7 @@ namespace GuiCookie.Elements
 
             // Get the style name from the element template attributes, if the style is missing, use the default.
             string styleName = elementTemplate.Attributes.GetAttributeOrDefault(styleAttributeName, string.Empty);
-            Style style = string.IsNullOrWhiteSpace(styleName) ? styleManager.DefaultStyle : styleManager.GetStyleFromName(styleName);
+            Style style = string.IsNullOrWhiteSpace(styleName) ? styleManager.DefaultStyle.CreateCopy() : styleManager.GetStyleFromName(styleName);
 
             // Create the element.
             Element element = elementCache.CreateInstance(elementTemplate.ControllerName, serviceProvider, inputs);
