@@ -48,7 +48,11 @@ namespace GuiCookie.Components
         public Space TextPivot { get; set; }
 
         /// <summary> The current colour of the current font. </summary>
-        public Color? Colour => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.Colour : null;
+        public Color? Colour 
+        {
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.Colour : null;
+            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.Colour = value; }
+        }
 
         /// <summary> The direction </summary>
         public DirectionMask ResizeDirection
