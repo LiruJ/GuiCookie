@@ -94,14 +94,12 @@ namespace GuiCookie.Components
 
         private void recalculateTextSizeProperties()
         {
+            // Calculate and save the text size.
+            TextSize = CalculateSize(Text);
+
             // If the element's bounds have not been set up yet, do nothing.
             if ((Element.InitialisationState & InitialisationState.Setup) != InitialisationState.Setup)
                 return;
-
-            // Calculate and save the text size.
-            TextSize = !string.IsNullOrWhiteSpace(Text) && fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font fontVariant)
-                ? fontVariant.SpriteFont.MeasureString(Text)
-                : Vector2.Zero;
 
             // If the text size should resize the containing element, do so.
             if (ResizeDirection != DirectionMask.None && TextSize.X > 0 && TextSize.Y > 0)
@@ -112,7 +110,9 @@ namespace GuiCookie.Components
         #endregion
 
         #region Calculation Functions
-        public Vector2 CalculateSize(string text) => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.SpriteFont.MeasureString(text) : Vector2.Zero;
+        public Vector2 CalculateSize(string text) => !string.IsNullOrWhiteSpace(text) && fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) 
+            ? font.SpriteFont.MeasureString(text) 
+            : Vector2.Zero;
         #endregion
 
         #region Draw Functions

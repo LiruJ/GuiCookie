@@ -146,7 +146,7 @@ namespace GuiCookie.Elements
             Element element = elementCache.CreateInstance(elementTemplate.ControllerName, serviceProvider, inputs);
 
             // Create the components, which internally initialises each one.
-            Dictionary<Type, Component> components = componentManager.CreateComponents(elementTemplate.ComponentNames, element);
+            Dictionary<Type, Component> components = componentManager.CreateComponents(elementTemplate.ComponentNames, element, inputs);
 
             // Initialise the element internally.
             element.internalOnCreated(root, this, styleManager, elementTemplate, parent == null ? ElementContainer : parent.ElementContainer, style, components);

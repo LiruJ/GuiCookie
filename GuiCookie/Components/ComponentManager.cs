@@ -23,9 +23,9 @@ namespace GuiCookie.Components
         #endregion
 
         #region Creation Functions
-        public Component CreateComponent(string name) => componentCache.CreateInstance(name, serviceProvider);
+        public Component CreateComponent(string name, params object[] inputs) => componentCache.CreateInstance(name, serviceProvider, inputs);
 
-        public Dictionary<Type, Component> CreateComponents(IReadOnlyList<string> names, Element element)
+        public Dictionary<Type, Component> CreateComponents(IReadOnlyList<string> names, Element element, params object[] inputs)
         {
             // Create a new list to hold the components.
             Dictionary<Type, Component> components = new Dictionary<Type, Component>(names.Count);
@@ -34,7 +34,7 @@ namespace GuiCookie.Components
             foreach (string componentName in names)
             {
                 // Create the component.
-                Component component = CreateComponent(componentName);
+                Component component = CreateComponent(componentName, inputs);
 
                 // Internally initialise the component.
                 component.InternalInitialise(element);
