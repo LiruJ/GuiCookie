@@ -143,7 +143,7 @@ namespace GuiCookie
 
             // Split the string by comma, and load each value into the stylemanager.
             string[] styles = stylesString.Split(',');
-            foreach (string styleSheetName in styles) styleManager.LoadFromSheet(styleSheetName);
+            foreach (string styleSheetName in styles) styleManager.LoadFromSheet(styleSheetName.Trim());
         }
 
         /// <summary> Loads and saves the template sheets from the given <paramref name="mainNode"/> into the given <paramref name="templateManager"/>. </summary>
@@ -159,7 +159,7 @@ namespace GuiCookie
 
             // Split the string by comma, and load each value into the templatemanager.
             string[] templates = templatesString.Split(',');
-            foreach (string templateSheetName in templates) templateManager.LoadFromSheet(templateSheetName);
+            foreach (string templateSheetName in templates) templateManager.LoadFromSheet(templateSheetName.Trim());
         }
         #endregion
 

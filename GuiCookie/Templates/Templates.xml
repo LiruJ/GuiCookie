@@ -1,47 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Templates>
-  <!--Spatial templates-->
-  <Partition/>
-  <Pane Components="Frame"/>
-  <Square Components="Frame, AspectRatioFitter"/>
-  
-  <!--Sliders-->
-  <SliderBar Components="Frame, MouseHandler" Controller="SliderBar">
-    <SliderHandle Name="Handle"/>
-  </SliderBar>
+	<!--Spatial templates-->
+	<Partition/>
+	<Pane Components="Frame"/>
+	<Square Components="Frame, AspectRatioFitter"/>
 
-  <SliderHandle Components="Frame" Controller="SliderHandle" Pivot="50%"/>
+	<!--Sliders-->
+	<SliderBar Components="Frame, MouseHandler" Controller="SliderBar">
+		<SliderHandle Name="Handle"/>
+	</SliderBar>
 
-  <HorizontalSliderBar Base="SliderBar" Direction="Horizontal" Style="HorizontalSliderBar">
-    <SliderHandle Name="Handle" Size="10%, 100%" Style="HorizontalSliderHandle"/>
-  </HorizontalSliderBar>
+	<SliderHandle Components="Frame" Controller="SliderHandle" Pivot="50%"/>
 
-  <VerticalSliderBar Base="SliderBar" Direction="Vertical" Style="VerticalSliderBar">
-    <SliderHandle Name="Handle" Size="100%, 10%" Style="VerticalSliderHandle"/>
-  </VerticalSliderBar>
-  
-  <ProgressBar Components="Frame, ImageBlock" Controller="ProgressBar"/>
-  
-  <!--Panes-->
-  <ScrollPane Components="Frame" Size="160">
-    <HorizontalSliderBar Name="HorizontalSlider" Size="90%, 10%" Position="0%, 100%" Pivot="0%, 100%"/>
-    <VerticalSliderBar Name="VerticalSlider" Size="10%, 90%" Position="100%, 0%" Pivot="100%, 0%"/>
-    <Pane Name="ContentContainer" Size="90%">
-      <Partition Name="Content" Size="100%"/>
-    </Pane>
-  </ScrollPane>
-  
-  <!--Buttons-->
-  <Button Components="Frame, MouseHandler" Controller="Button"/>
-  <TextButton Components="Frame, TextBlock, MouseHandler" Controller="TextButton"/>
-  <ImageButton Components="Frame, ImageBlock, MouseHandler" Controller="ImageButton"/>
-  <TextFileButton Components="Frame, TextBlock, MouseHandler" Controller="TextFileButton"/>
+	<HorizontalSliderBar Base="SliderBar" Direction="Horizontal" Style="HorizontalSliderBar">
+		<SliderHandle Name="Handle" Size="10%, 100%" Style="HorizontalSliderHandle"/>
+	</HorizontalSliderBar>
 
-  <!--Boxes-->
-  <TextBox Components="Frame, TextBlock" Controller="TextBox"/>
-  <ImageBox Components="Frame, ImageBlock" Controller="ImageBox"/>
+	<VerticalSliderBar Base="SliderBar" Direction="Vertical" Style="VerticalSliderBar">
+		<SliderHandle Name="Handle" Size="100%, 10%" Style="VerticalSliderHandle"/>
+	</VerticalSliderBar>
 
-  <!--Layout controllers-->  
-  <Grid Components="GridLayout"/>  
-  <CellGrid Components="CellLayout, MouseHandler" Controller="CellGrid"/>
+	<ProgressBar Components="Frame, ImageBlock" Controller="ProgressBar"/>
+
+	<!--Panes-->
+	<ScrollPane Components="Frame" Size="160">
+		<HorizontalSliderBar Name="HorizontalSlider" Size="90%, 10%" Position="0%, 100%" Pivot="0%, 100%"/>
+		<VerticalSliderBar Name="VerticalSlider" Size="10%, 90%" Position="100%, 0%" Pivot="100%, 0%"/>
+		<Pane Name="ContentContainer" Size="90%">
+			<Partition Name="Content" Size="100%"/>
+		</Pane>
+	</ScrollPane>
+
+	<!--Buttons-->
+	<Button Components="Frame, MouseHandler" Controller="Button"/>
+	<TextButton Components="Frame, TextBlock, MouseHandler" Controller="TextButton"/>
+	<ImageButton Components="Frame, ImageBlock, MouseHandler" Controller="ImageButton"/>
+	<TextFileButton Components="Frame, TextBlock, MouseHandler" Controller="TextFileButton"/>
+
+	<!--Boxes and labels-->
+	<TextBox Components="Frame, TextBlock" Controller="TextBox"/>
+	<ImageBox Components="Frame, ImageBlock" Controller="ImageBox"/>
+	<BoxIcon Components="Frame, ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze"/>
+	
+	<TextLabel Components="TextBlock" Controller="TextBox"/>
+	<ImageLabel Components="ImageBlock" Controller="ImageBox"/>
+	<LabelIcon Components="ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze"/>
+
+	<!--Layout controllers-->
+	<Grid Components="GridLayout"/>
+	<CellGrid Components="CellLayout, MouseHandler" Controller="CellGrid"/>
 </Templates>

@@ -1,6 +1,7 @@
 ﻿using GuiCookie.DataStructures;
 using GuiCookie.Rendering;
 using GuiCookie.Styles;
+using LiruGameHelperMonoGame.Parsers;
 using Microsoft.Xna.Framework;
 using System;
 
@@ -13,6 +14,8 @@ namespace GuiCookie.Components
         private const string anchorAttributeName = "TextAnchor";
         private const string pivotAttributeName = "TextPivot";
         private const string resizeAttributeName = "ResizeDirection";
+        private const string shadowColourAttributeName = "ShadowColour";
+        private const string shadowOffsetAttributeName = "ShadowOffset";
         #endregion
 
         #region Fields
@@ -47,6 +50,10 @@ namespace GuiCookie.Components
 
         public Space TextPivot { get; set; }
 
+        public Vector2? DropShadowOffset { get; set; }
+
+        public Color DropShadowColour { get; set; } = Color.Black;
+
         /// <summary> The current colour of the current font. </summary>
         public Color? Colour 
         {
@@ -77,6 +84,10 @@ namespace GuiCookie.Components
             TextAnchor = Element.Attributes.GetAttributeOrDefault(anchorAttributeName, new Space(0.5f, Axes.Both), Space.TryParse);
             TextPivot = Element.Attributes.GetAttributeOrDefault(pivotAttributeName, new Space(0.5f, Axes.Both), Space.TryParse);
             ResizeDirection = Element.Attributes.GetEnumAttributeOrDefault(resizeAttributeName, DirectionMask.None);
+
+            // Set the drop shadow.
+            DropShadowOffset = Element.Attributes.GetAttributeOrDefault(shadowOffsetAttributeName, null) is string input && ToVector2.TryParse(input, out Vector2 output) ? output : (Vector2?)null;
+            DropShadowColour = Element.Attributes.GetAttributeOrDefault(shadowColourAttributeName, Color.Black);
         }
 
         public override void OnSetup()
@@ -126,6 +137,11 @@ namespace GuiCookie.Components
                 position.X = (float)Math.Floor(position.X);
                 position.Y = (float)Math.Floor(position.Y);
 
+                // If a drop shadow is to be drawn, draw it first.
+                if (DropShadowOffset.HasValue)
+                    guiCamera.DrawString(fontVariant.SpriteFont, Text, position + DropShadowOffset.Value, DropShadowColour);
+
+                // Draw the text itself.
                 guiCamera.DrawString(fontVariant.SpriteFont, Text, position, fontVariant.Colour ?? Color.Black);
             }
         }
