@@ -1,5 +1,6 @@
 ﻿using GuiCookie.Rendering;
 using GuiCookie.Styles;
+using LiruGameHelperMonoGame.Parsers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
@@ -22,6 +23,26 @@ namespace GuiCookie.Components
         private NineSliceDrawer nineSliceDrawer;
         #endregion
 
+        #region Properties
+        public Vector2? DropShadowOffset
+        {
+            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.DropShadowOffset : null;
+            set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.DropShadowOffset = value; }
+        }
+
+        public Color DropShadowColour
+        {
+            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.DropShadowColour : Color.Black;
+            set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.DropShadowColour = value; }
+        }
+
+        public Color? Tint
+        {
+            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.Tint : null;
+            set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.Tint = value; }
+        }
+        #endregion
+
         #region Constructors
         public Frame(StyleManager styleManager)
         {
@@ -34,6 +55,13 @@ namespace GuiCookie.Components
         public override void OnCreated()
         {
             nineSliceDrawer = styleManager.GetTextureCreator<NineSliceDrawer>();
+
+            // Set the drop shadow.
+            if (Element.Attributes.HasAttribute(SliceFrame.ShadowOffsetAttributeName)) DropShadowOffset = Element.Attributes.GetAttribute(SliceFrame.ShadowOffsetAttributeName, ToVector2.Parse);
+            if (Element.Attributes.HasAttribute(SliceFrame.ShadowColourAttributeName)) DropShadowColour = Element.Attributes.GetAttribute(SliceFrame.ShadowColourAttributeName, Colour.Parse);
+        
+            // Set the tint.
+            if (Element.Attributes.HasAttribute(SliceFrame.TintAttributeName)) Tint = Element.Attributes.GetAttribute(SliceFrame.TintAttributeName, Colour.Parse);
         }
         #endregion
 
@@ -125,12 +153,23 @@ namespace GuiCookie.Components
                 // If the current texture is null, do nothing.
                 if (currentTexture == null) return;
 
+                // If a shadow is to be drawn, do that first.
+                if (sliceFrame.DropShadowOffset.HasValue)
+                    guiCamera.DrawTextureAt(currentTexture, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadowOffset.Value.ToPoint(), Bounds.TotalSize), sliceFrame.DropShadowColour);
+
                 // Draw the texture.
-                guiCamera.DrawTextureAt(currentTexture, Bounds.AbsoluteTotalArea, sliceFrame.Colour ?? Color.White);
+                guiCamera.DrawTextureAt(currentTexture, Bounds.AbsoluteTotalArea, sliceFrame.FinalColour);
             }
             // Otherwise; draw on-demand.
             else
-                NineSliceDrawer.DrawFrameOnDemand(sliceFrame, Bounds.AbsoluteTotalArea, guiCamera, sliceFrame.Colour);
+            {
+                // If a shadow is to be drawn, do that first.
+                if (sliceFrame.DropShadowOffset.HasValue)
+                    NineSliceDrawer.DrawFrameOnDemand(sliceFrame, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadowOffset.Value.ToPoint(), Bounds.TotalSize), guiCamera, sliceFrame.DropShadowColour);
+
+                // Draw the frame.
+                NineSliceDrawer.DrawFrameOnDemand(sliceFrame, Bounds.AbsoluteTotalArea, guiCamera, sliceFrame.FinalColour);
+            }
         }
         #endregion
     }

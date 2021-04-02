@@ -29,25 +29,25 @@
   <!--The main content for the style-->
   <Styles>
     <Default>
-      <SliceFrame NineSlice="Thirds, 00001" Colour="#5F628A"/>
-      <Font Font="Default" Colour="#bbb"/>
+      <SliceFrame NineSlice="Thirds, 00001" Colour="#5F628A" ShadowOffset="-5"/>
+      <Font Font="Default" Colour="#bbb" ShadowOffset="-1"/>
 
       <Hovered>
-        <SliceFrame Colour="$HoveredBackground"/>
+        <SliceFrame Tint="#ccc"/>
         <Font Colour="#ddd"/>
       </Hovered>
       <Clicked>
-        <SliceFrame Colour="#44476C"/>
-        <Font Colour="#999"/>
+        <SliceFrame Tint="#aaa"/>
+        <Font Colour="#999" Offset="0, 2"/>
       </Clicked>
       <Disabled>
-        <SliceFrame Colour="#292B43"/>
+        <SliceFrame Tint="#222"/>
         <Font Colour="#444"/>
       </Disabled>
     </Default>
 
     <Button Base="Default">
-      <SliceFrame Image="Button"/>
+      <SliceFrame Image="Button"  ShadowOffset="-2, 2" ShadowColour="#4444"/>
 
       <Clicked>
         <SliceFrame Image="ButtonPressed"/>

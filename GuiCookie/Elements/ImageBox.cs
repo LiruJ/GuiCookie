@@ -1,6 +1,7 @@
 ﻿using GuiCookie.Components;
 using GuiCookie.DataStructures;
 using GuiCookie.Styles;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GuiCookie.Elements
@@ -13,6 +14,8 @@ namespace GuiCookie.Elements
         public ClippingMode ClippingMode { get => ImageBlock.ClippingMode; set => ImageBlock.ClippingMode = value; }
 
         public Texture2D Texture { get => ImageBlock.Texture; set => ImageBlock.Texture = value; }
+
+        public Color? Colour { get => ImageBlock.Colour; set => ImageBlock.Colour = value; }
 
         public Image Image { get => ImageBlock.Image; set => ImageBlock.Image = value; }
         #endregion

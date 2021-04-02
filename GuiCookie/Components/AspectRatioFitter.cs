@@ -47,6 +47,11 @@ namespace GuiCookie.Components
             // Set the ratio to the supplied attribute, or if none exists, it's calculated from the bound size.
             if (!ratio.HasValue) ratio = Element.Attributes.GetAttributeOrDefault(valueAttributeName, (float)Bounds.TotalSize.X / Bounds.TotalSize.Y);
         }
+
+        public override void OnPostSetup()
+        {
+            if (ratio.HasValue) ValidateSizeChanged();
+        }
         #endregion
 
         #region Size Functions
@@ -116,6 +121,7 @@ namespace GuiCookie.Components
             if (!validateSize(Bounds.TotalSize, out Point newSize))
             {
                 Bounds.TotalSize = newSize;
+                Bounds.recalculatePosition();
                 return false;
             }
             else return true;

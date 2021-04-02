@@ -2,15 +2,24 @@
 using LiruGameHelperMonoGame.Parsers;
 using Microsoft.Xna.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 
 namespace GuiCookie.Attributes
 {
-    public class AttributeCollection : IReadOnlyAttributes
+    public class AttributeCollection : IReadOnlyAttributes, IEnumerable<string>
     {
         #region Delegates
         public delegate bool TryParse<T>(string input, out T output);
+        #endregion
+
+        #region Indexers
+        public string this[string name]
+        {
+            get => rawAttributesByName.TryGetValue(name, out string value) ? value : null;
+            set => rawAttributesByName.Add(name, value);
+        }
         #endregion
 
         #region Fields
@@ -33,14 +42,14 @@ namespace GuiCookie.Attributes
             rawAttributesByName = new Dictionary<string, string>(capacity);
         }
 
+        public AttributeCollection(Dictionary<string, string> rawAttributesByName)
+        {
+            this.rawAttributesByName = new Dictionary<string, string>(rawAttributesByName ?? throw new ArgumentNullException(nameof(rawAttributesByName)));
+        }
+
         internal AttributeCollection(XmlNode elementNode)
         {
             foreach (XmlAttribute attribute in elementNode.Attributes) Add(attribute.Name, attribute.InnerText);
-        }
-
-        private AttributeCollection(Dictionary<string, string> rawAttributesByName)
-        {
-            this.rawAttributesByName = rawAttributesByName ?? throw new ArgumentNullException(nameof(rawAttributesByName));
         }
         #endregion
 
@@ -49,6 +58,9 @@ namespace GuiCookie.Attributes
         #endregion
 
         #region Get Functions
+        public IEnumerator<string> GetEnumerator() => Keys.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Keys).GetEnumerator();
+
         /// <summary> Attempts to parse the attribute with the given <paramref name="attributeName"/> using the given <paramref name="tryParser"/> function, returns <paramref name="defaultTo"/> if the key was not found or the function returned false. </summary>
         /// <typeparam name="T"> The type of object to parse. </typeparam>
         /// <param name="attributeName"> The name of the attribute to parse. </param>
@@ -58,6 +70,16 @@ namespace GuiCookie.Attributes
         /// <exception cref="ArgumentNullException"> The <paramref name="tryParser"/> was null. </exception>
         /// <exception cref="ArgumentException"> The <paramref name="attributeName"/> was null or whitespace. </exception>
         public T GetAttributeOrDefault<T>(string attributeName, T defaultTo, TryParse<T> tryParser)
+        {
+            // Ensure validity.
+            if (tryParser == null) throw new ArgumentNullException(nameof(tryParser));
+            if (string.IsNullOrWhiteSpace(attributeName))
+                throw new ArgumentException($"'{nameof(attributeName)}' cannot be null or whitespace", nameof(attributeName));
+
+            return HasAttribute(attributeName) && tryParser(rawAttributesByName[attributeName], out T output) ? output : defaultTo;
+        }
+
+        public T? GetAttributeOrDefault<T>(string attributeName, T? defaultTo, TryParse<T> tryParser) where T : struct
         {
             // Ensure validity.
             if (tryParser == null) throw new ArgumentNullException(nameof(tryParser));

@@ -70,9 +70,9 @@ namespace GuiCookie.Components
 
                 // If the dimension of the child's size is relative, make it absolute.
                 if (LayoutDirection == Direction.Horizontal && child.Bounds.ScaledSize.IsXRelative)
-                    child.Bounds.ScaledSize = new Space(child.Bounds.TotalSize.X, child.Bounds.ScaledSize.IsYRelative ? (float)child.Bounds.TotalSize.Y / Bounds.TotalSize.Y : child.Bounds.TotalSize.Y, child.Bounds.ScaledSize.Axes ^ Axes.X);
+                    child.Bounds.ScaledSize = new Space(child.Bounds.TotalSize.X, child.Bounds.ScaledSize.IsYRelative ? (float)child.Bounds.TotalSize.Y / Bounds.ContentSize.Y : child.Bounds.TotalSize.Y, child.Bounds.ScaledSize.Axes ^ Axes.X);
                 else if (LayoutDirection == Direction.Vertical && child.Bounds.ScaledSize.IsYRelative)
-                    child.Bounds.ScaledSize = new Space(child.Bounds.ScaledSize.IsXRelative ? (float)child.Bounds.TotalSize.X / Bounds.TotalSize.X : child.Bounds.TotalSize.X, child.Bounds.TotalSize.Y, child.Bounds.ScaledSize.Axes ^ Axes.Y);
+                    child.Bounds.ScaledSize = new Space(child.Bounds.ScaledSize.IsXRelative ? (float)child.Bounds.TotalSize.X / Bounds.ContentSize.X : child.Bounds.TotalSize.X, child.Bounds.TotalSize.Y, child.Bounds.ScaledSize.Axes ^ Axes.Y);
 
                 // Increment the position.
                 currentPosition += (int)Math.Floor(LayoutDirection == Direction.Horizontal ? child.Bounds.ScaledSize.GetScaledX(Bounds.ContentSize.X) : child.Bounds.ScaledSize.GetScaledY(Bounds.ContentSize.Y));

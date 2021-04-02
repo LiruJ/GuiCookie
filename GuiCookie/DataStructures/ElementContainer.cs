@@ -373,11 +373,13 @@ namespace GuiCookie.DataStructures
             // Remove any elements in the queue.
             foreach (ElementContainer child in removalQueue)
             {
-                if (child.Element.HasName && !childrenByName.Remove(child.Element.Name)) throw new Exception("Failed to remove child from named collection despite child being named.");
-
                 // If the child was removed from the main collection successfully, don't bother checking for it in the addition queue. If the child was not found in the main collection, remove it from the addition queue.
                 // This basically means that an element can be removed and added to the collection in the same frame and it will be re-added if it was already a child, or will not be added at all if it was not.
-                if (!children.Remove(child) && !additionQueue.Remove(child)) throw new Exception("Failed to remove child from collection.");
+                if (children.Remove(child))
+                {
+                    if (child.Element.HasName && !childrenByName.Remove(child.Element.Name)) throw new Exception("Failed to remove child from named collection despite child being named.");
+                }
+                else if (!additionQueue.Remove(child)) throw new Exception("Failed to remove child from collection.");
             }
             removalQueue.Clear();
 

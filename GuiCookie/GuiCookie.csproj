@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <Version>1.7.3.1</Version>
+	  <Version>1.7.3.6</Version>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
 

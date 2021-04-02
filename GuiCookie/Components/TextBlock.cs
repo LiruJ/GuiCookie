@@ -3,6 +3,7 @@ using GuiCookie.Rendering;
 using GuiCookie.Styles;
 using LiruGameHelperMonoGame.Parsers;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 
 namespace GuiCookie.Components
@@ -11,11 +12,7 @@ namespace GuiCookie.Components
     {
         #region Constants
         private const string textAttributeName = "Text";
-        private const string anchorAttributeName = "TextAnchor";
-        private const string pivotAttributeName = "TextPivot";
         private const string resizeAttributeName = "ResizeDirection";
-        private const string shadowColourAttributeName = "ShadowColour";
-        private const string shadowOffsetAttributeName = "ShadowOffset";
         #endregion
 
         #region Fields
@@ -46,13 +43,29 @@ namespace GuiCookie.Components
         /// <summary> The size in pixels that the text wants to use. </summary>
         public Vector2 TextSize { get; private set; }
 
-        public Space TextAnchor { get; set; }
+        public Space TextAnchor
+        {
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.TextAnchor : new Space(0.5f, Axes.Both);
+            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.TextAnchor = value; }
+        }
 
-        public Space TextPivot { get; set; }
+        public Space TextPivot
+        {
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.TextPivot : new Space(0.5f, Axes.Both);
+            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.TextPivot = value; }
+        }
 
-        public Vector2? DropShadowOffset { get; set; }
+        public Vector2? DropShadowOffset
+        {
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.DropShadowOffset : null;
+            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.DropShadowOffset = value; }
+        }
 
-        public Color DropShadowColour { get; set; } = Color.Black;
+        public Color DropShadowColour
+        {
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.DropShadowColour : Color.Black;
+            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.DropShadowColour = value; }
+        }
 
         /// <summary> The current colour of the current font. </summary>
         public Color? Colour 
@@ -61,7 +74,25 @@ namespace GuiCookie.Components
             set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.Colour = value; }
         }
 
-        /// <summary> The direction </summary>
+        public Color? Tint
+        {
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.Tint : null;
+            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.Tint = value; }
+        }
+
+        public Vector2 Offset
+        {
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.Offset : Vector2.Zero;
+            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.Offset = value; }
+        }
+
+        public SpriteFont SpriteFont
+        {
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.SpriteFont : null;
+            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.SpriteFont = value; }
+        }
+
+        /// <summary> The direction in which this text's element resizes. </summary>
         public DirectionMask ResizeDirection
         {
             get => resizeElement;
@@ -80,14 +111,31 @@ namespace GuiCookie.Components
             // Set the text.
             text = Element.Attributes.GetAttributeOrDefault(textAttributeName, string.Empty);
 
-            // Set the text anchor and pivot.
-            TextAnchor = Element.Attributes.GetAttributeOrDefault(anchorAttributeName, new Space(0.5f, Axes.Both), Space.TryParse);
-            TextPivot = Element.Attributes.GetAttributeOrDefault(pivotAttributeName, new Space(0.5f, Axes.Both), Space.TryParse);
+            // Set the resize direction.
             ResizeDirection = Element.Attributes.GetEnumAttributeOrDefault(resizeAttributeName, DirectionMask.None);
 
+            // Set the text anchor and pivot.
+            if (Element.Attributes.HasAttribute(Font.AnchorAttributeName)) TextAnchor = Element.Attributes.GetAttribute(Font.AnchorAttributeName, Space.Parse);
+            if (Element.Attributes.HasAttribute(Font.PivotAttributeName)) TextPivot = Element.Attributes.GetAttribute(Font.PivotAttributeName, Space.Parse);
+
             // Set the drop shadow.
-            DropShadowOffset = Element.Attributes.GetAttributeOrDefault(shadowOffsetAttributeName, null) is string input && ToVector2.TryParse(input, out Vector2 output) ? output : (Vector2?)null;
-            DropShadowColour = Element.Attributes.GetAttributeOrDefault(shadowColourAttributeName, Color.Black);
+            if (Element.Attributes.HasAttribute(Font.ShadowOffsetAttributeName)) DropShadowOffset = Element.Attributes.GetAttribute(Font.ShadowOffsetAttributeName, ToVector2.Parse);
+            if (Element.Attributes.HasAttribute(Font.ShadowColourAttributeName)) DropShadowColour = Element.Attributes.GetAttribute(Font.ShadowColourAttributeName, LiruGameHelperMonoGame.Parsers.Colour.Parse);
+
+            // Set the offet.
+            if (Element.Attributes.HasAttribute(Font.OffsetAttributeName)) Offset = Element.Attributes.GetAttribute(Font.OffsetAttributeName, ToVector2.Parse);
+
+            // Set the colour and tint.
+            if (Element.Attributes.HasAttribute(ResourceManager.ColourAttributeName)) Colour = Element.Attributes.GetAttribute(ResourceManager.ColourAttributeName, LiruGameHelperMonoGame.Parsers.Colour.Parse);
+            if (Element.Attributes.HasAttribute(Font.TintAttributeName)) Tint = Element.Attributes.GetAttribute(Font.TintAttributeName, LiruGameHelperMonoGame.Parsers.Colour.Parse);
+
+            if (Element.Attributes.HasAttribute(Font.FontAttributeName))
+            {
+                string fontName = Element.Attributes.GetAttributeOrDefault(Font.FontAttributeName, string.Empty);
+                SpriteFont = !string.IsNullOrWhiteSpace(fontName) ?
+                    Root.StyleManager.ResourceManager.FontsByName.TryGetValue(fontName, out SpriteFont spriteFont) ? spriteFont : throw new Exception($"Font resource named \"{fontName}\" does not exist.")
+                    : null;
+            }
         }
 
         public override void OnSetup()
@@ -133,16 +181,16 @@ namespace GuiCookie.Components
             if (!string.IsNullOrWhiteSpace(Text) && fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font fontVariant))
             {
                 // Calculate the position based on the anchor and pivot. Round this down to avoid blurry text.
-                Vector2 position = Bounds.AbsoluteContentPosition.ToVector2() + (TextAnchor.GetScaledSpace(Bounds.ContentSize.ToVector2()) - TextPivot.GetScaledSpace(TextSize));
+                Vector2 position = (Bounds.AbsoluteContentPosition.ToVector2() + (fontVariant.TextAnchor.GetScaledSpace(Bounds.ContentSize.ToVector2()) - fontVariant.TextPivot.GetScaledSpace(TextSize))) + fontVariant.Offset;
                 position.X = (float)Math.Floor(position.X);
                 position.Y = (float)Math.Floor(position.Y);
 
                 // If a drop shadow is to be drawn, draw it first.
                 if (DropShadowOffset.HasValue)
-                    guiCamera.DrawString(fontVariant.SpriteFont, Text, position + DropShadowOffset.Value, DropShadowColour);
+                    guiCamera.DrawString(fontVariant.SpriteFont, Text, position + fontVariant.DropShadowOffset.Value, fontVariant.DropShadowColour);
 
                 // Draw the text itself.
-                guiCamera.DrawString(fontVariant.SpriteFont, Text, position, fontVariant.Colour ?? Color.Black);
+                guiCamera.DrawString(fontVariant.SpriteFont, Text, position, fontVariant.FinalColour);
             }
         }
         #endregion

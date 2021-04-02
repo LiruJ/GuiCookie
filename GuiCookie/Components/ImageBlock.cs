@@ -35,6 +35,13 @@ namespace GuiCookie.Components
 
         public Texture2D Texture { get => Image.Texture; set => Image = new Image(value); }
 
+        /// <summary> The current colour of the current content. </summary>
+        public Color? Colour
+        {
+            get => contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content) ? content.Colour : null;
+            set { if (contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content)) content.Colour = value; }
+        }
+
         public Image Image { get; set; }
         #endregion
 

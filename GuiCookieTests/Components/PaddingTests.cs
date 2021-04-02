@@ -1,5 +1,6 @@
 ﻿using GuiCookie.DataStructures;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Xna.Framework;
 
 namespace GuiCookieTests.Components
 {
@@ -101,6 +102,22 @@ namespace GuiCookieTests.Components
             Assert.IsFalse(sides.IsBottomRelative, "Bottom was relative.");
             Assert.IsFalse(sides.IsRightRelative, "Right was relative.");
             Assert.IsFalse(sides.IsTopRelative, "Top was relative.");
+        }
+
+        [TestMethod]
+        public void AbsoluteAreaTest()
+        {
+            Sides sides = new Sides(10, SideMask.None);
+
+            Assert.AreEqual(sides.ScaleRectangle(new Rectangle(0, 0, 100, 100)), new Rectangle(10, 10, 80, 80), "Scaled area was incorrect.");
+        }
+
+        [TestMethod]
+        public void AbsoluteInverseAreaTest()
+        {
+            Sides sides = new Sides(10, SideMask.None);
+
+            Assert.AreEqual(sides.InverseScaleRectangle(new Rectangle(10, 10, 80, 80)), new Rectangle(0, 0, 100, 100), "Inverse scaled area was incorrect.");
         }
     }
 }

@@ -82,10 +82,11 @@ namespace GuiCookie.Styles
         private void loadStyles(XmlNode stylesNode)
         {
             // If the node is null, throw an exception.
-            if (stylesNode is null) throw new Exception($"The main node was missing a {stylesNodeName} node.");
+            if (stylesNode == null) throw new Exception($"The main node was missing a {stylesNodeName} node.");
 
             // Go over each style in the styles node and add it.
-            foreach (XmlNode styleNode in stylesNode.ChildNodes) add(new Style(ResourceManager, AttributeConstructorCache, styleNode));
+            foreach (XmlNode styleNode in stylesNode.ChildNodes) 
+                if (styleNode.NodeType != XmlNodeType.Comment) add(new Style(ResourceManager, AttributeConstructorCache, styleNode));
 
             // Go over the styles and combine any that require bases.
             foreach (Style style in stylesByName.Values) combineStyleWithBase(style);

@@ -23,5 +23,6 @@ namespace GuiCookie.Attributes
         Vector3 GetAttributeOrDefault(string attributeName, Vector3 defaultTo);
         Color GetAttributeOrDefault(string attributeName, Color defaultTo);
         Sides GetAttributeOrDefault(string attributeName, Sides defaultTo);
+        T? GetAttributeOrDefault<T>(string attributeName, T? defaultTo, AttributeCollection.TryParse<T> tryParser) where T : struct;
     }
 }
