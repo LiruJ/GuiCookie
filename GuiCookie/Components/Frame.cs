@@ -58,10 +58,10 @@ namespace GuiCookie.Components
 
             // Set the drop shadow.
             if (Element.Attributes.HasAttribute(SliceFrame.ShadowOffsetAttributeName)) DropShadowOffset = Element.Attributes.GetAttribute(SliceFrame.ShadowOffsetAttributeName, ToVector2.Parse);
-            if (Element.Attributes.HasAttribute(SliceFrame.ShadowColourAttributeName)) DropShadowColour = Element.Attributes.GetAttribute(SliceFrame.ShadowColourAttributeName, Colour.Parse);
+            if (Element.Attributes.HasAttribute(SliceFrame.ShadowColourAttributeName)) DropShadowColour = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, SliceFrame.ShadowColourAttributeName).Value;
         
             // Set the tint.
-            if (Element.Attributes.HasAttribute(SliceFrame.TintAttributeName)) Tint = Element.Attributes.GetAttribute(SliceFrame.TintAttributeName, Colour.Parse);
+            if (Element.Attributes.HasAttribute(SliceFrame.TintAttributeName)) Tint = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, SliceFrame.TintAttributeName);
         }
         #endregion
 

@@ -73,7 +73,7 @@ namespace GuiCookie.Styles
 
             // Set the drop shadow.
             DropShadowOffset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
-            DropShadowColour = attributes.GetAttributeOrDefault(ShadowColourAttributeName, Color.Black);
+            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName, Color.Black).Value;
 
             // Set the offset.
             Offset = attributes.GetAttributeOrDefault(OffsetAttributeName, Vector2.Zero);

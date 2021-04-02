@@ -120,14 +120,14 @@ namespace GuiCookie.Components
 
             // Set the drop shadow.
             if (Element.Attributes.HasAttribute(Font.ShadowOffsetAttributeName)) DropShadowOffset = Element.Attributes.GetAttribute(Font.ShadowOffsetAttributeName, ToVector2.Parse);
-            if (Element.Attributes.HasAttribute(Font.ShadowColourAttributeName)) DropShadowColour = Element.Attributes.GetAttribute(Font.ShadowColourAttributeName, LiruGameHelperMonoGame.Parsers.Colour.Parse);
+            if (Element.Attributes.HasAttribute(Font.ShadowColourAttributeName)) DropShadowColour = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, Font.ShadowColourAttributeName).Value;
 
             // Set the offet.
             if (Element.Attributes.HasAttribute(Font.OffsetAttributeName)) Offset = Element.Attributes.GetAttribute(Font.OffsetAttributeName, ToVector2.Parse);
 
             // Set the colour and tint.
-            if (Element.Attributes.HasAttribute(ResourceManager.ColourAttributeName)) Colour = Element.Attributes.GetAttribute(ResourceManager.ColourAttributeName, LiruGameHelperMonoGame.Parsers.Colour.Parse);
-            if (Element.Attributes.HasAttribute(Font.TintAttributeName)) Tint = Element.Attributes.GetAttribute(Font.TintAttributeName, LiruGameHelperMonoGame.Parsers.Colour.Parse);
+            if (Element.Attributes.HasAttribute(ResourceManager.ColourAttributeName)) Colour = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, ResourceManager.ColourAttributeName);
+            if (Element.Attributes.HasAttribute(Font.TintAttributeName)) Tint = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, Font.TintAttributeName);
 
             if (Element.Attributes.HasAttribute(Font.FontAttributeName))
             {

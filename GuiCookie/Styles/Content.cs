@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Attributes;
+using LiruGameHelperMonoGame.Parsers;
 using Microsoft.Xna.Framework;
 using System;
 
@@ -8,13 +9,28 @@ namespace GuiCookie.Styles
     {
         #region Constants
         private const string nameAttributeName = "Name";
+
+        public const string ShadowColourAttributeName = "ShadowColour";
+        public const string ShadowOffsetAttributeName = "ShadowOffset";
+
+        public const string TintAttributeName = "Tint";
         #endregion        
 
         #region Properties
         public string Name { get; }
 
-        /// <summary> The tint applied to content (image blocks, etc.). </summary>
+        /// <summary> The main colour applied to content (image blocks, etc.). </summary>
         public Color? Colour { get; set; }
+
+        public Color? Tint { get; set; }
+
+        public Color FinalColour => Colour.HasValue && Tint.HasValue
+            ? new Color(Colour.Value.ToVector4() * Tint.Value.ToVector4())
+            : Colour ?? Tint ?? Color.White;
+
+        public Vector2? DropShadowOffset { get; set; }
+
+        public Color DropShadowColour { get; set; }
         #endregion
 
         #region Constructors
@@ -22,9 +38,14 @@ namespace GuiCookie.Styles
         {
             // Set the colour.
             Colour = resourceManager.GetColourOrDefault(attributes, ResourceManager.ColourAttributeName);
+            Tint = resourceManager.GetColourOrDefault(attributes, TintAttributeName, null);
 
             // Set the name.
             Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
+
+            // Set the drop shadow.
+            DropShadowOffset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
+            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName, Color.Black).Value;
         }
 
         private Content(Content original)
@@ -32,7 +53,12 @@ namespace GuiCookie.Styles
             if (original == null) throw new ArgumentNullException(nameof(original));
 
             Name = original.Name;
+
             Colour = original.Colour;
+            Tint = original.Tint;
+
+            DropShadowOffset = original.DropShadowOffset;
+            DropShadowColour = original.DropShadowColour;
         }
         #endregion
 
