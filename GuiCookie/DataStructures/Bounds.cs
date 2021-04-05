@@ -267,6 +267,7 @@ namespace GuiCookie.DataStructures
             if (ElementContainer.Element != null && !ElementContainer.Element.validateSizeChanged()) return;
 
             ElementContainer.Element?.onSizeChanged();
+            recalculatePosition();
         }
         #endregion
     }

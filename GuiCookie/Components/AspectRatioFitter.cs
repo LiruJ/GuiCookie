@@ -121,7 +121,6 @@ namespace GuiCookie.Components
             if (!validateSize(Bounds.TotalSize, out Point newSize))
             {
                 Bounds.TotalSize = newSize;
-                Bounds.recalculatePosition();
                 return false;
             }
             else return true;
