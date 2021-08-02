@@ -40,15 +40,15 @@ namespace GuiCookie.Styles
 
         public Vector2? DropShadowOffset { get; set; }
 
-        public Color DropShadowColour { get; set; }
+        public Color? DropShadowColour { get; set; }
         #endregion
 
         #region Constructors
         public SliceFrame(ResourceManager resourceManager, IReadOnlyAttributes attributes)
         {
             // Set the colour, slice, and cache texture.
-            Colour = resourceManager.GetColourOrDefault(attributes, ResourceManager.ColourAttributeName, null);
-            Tint = resourceManager.GetColourOrDefault(attributes, TintAttributeName, null);
+            Colour = resourceManager.GetColourOrDefault(attributes, ResourceManager.ColourAttributeName);
+            Tint = resourceManager.GetColourOrDefault(attributes, TintAttributeName);
             CacheTexture = attributes.GetAttributeOrDefault("Cached", (bool?)null, bool.TryParse);
             NineSlice = attributes.GetAttributeOrDefault("NineSlice", (NineSlice?)null, DataStructures.NineSlice.TryParse);
 
@@ -63,7 +63,7 @@ namespace GuiCookie.Styles
 
             // Set the drop shadow.
             DropShadowOffset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
-            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName, Color.Black).Value;
+            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName);
         }
 
         private SliceFrame(SliceFrame original)
@@ -97,10 +97,14 @@ namespace GuiCookie.Styles
 
             // Ensure the attribute is a SliceFrame.
             if (!(baseAttribute is SliceFrame baseSliceFrame)) throw new ArgumentException($"Cannot combine with attribute as it is not a SliceFrame. {baseAttribute}");
-
+            
+            // Override the properties.
             if (Image == null) Image = baseSliceFrame.Image;
             if (NineSlice == null) NineSlice = baseSliceFrame.NineSlice;
             if (Colour == null) Colour = baseSliceFrame.Colour;
+            if (Tint == null) Tint = baseSliceFrame.Tint;
+            if (DropShadowOffset == null) DropShadowOffset = baseSliceFrame.DropShadowOffset;
+            if (DropShadowColour == null) DropShadowColour = baseSliceFrame.DropShadowColour;
             if (CacheTexture == null) CacheTexture = baseSliceFrame.CacheTexture;
         }
         #endregion

@@ -30,7 +30,7 @@ namespace GuiCookie.Styles
 
         public Vector2? DropShadowOffset { get; set; }
 
-        public Color DropShadowColour { get; set; }
+        public Color? DropShadowColour { get; set; }
         #endregion
 
         #region Constructors
@@ -38,14 +38,14 @@ namespace GuiCookie.Styles
         {
             // Set the colour.
             Colour = resourceManager.GetColourOrDefault(attributes, ResourceManager.ColourAttributeName);
-            Tint = resourceManager.GetColourOrDefault(attributes, TintAttributeName, null);
+            Tint = resourceManager.GetColourOrDefault(attributes, TintAttributeName);
 
             // Set the name.
             Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
 
             // Set the drop shadow.
             DropShadowOffset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
-            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName, Color.Black).Value;
+            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName);
         }
 
         private Content(Content original)
@@ -78,8 +78,11 @@ namespace GuiCookie.Styles
             // Ensure the attribute is a content.
             if (!(baseAttribute is Content baseContent)) throw new ArgumentException($"Cannot combine with attribute as it is not a content. {baseAttribute}");
 
-            // Override the colour.
+            // Override the properties.
             if (Colour == null) Colour = baseContent.Colour;
+            if (Tint == null) Tint = baseContent.Tint;
+            if (DropShadowOffset == null) DropShadowOffset = baseContent.DropShadowOffset;
+            if (DropShadowColour == null) DropShadowColour = baseContent.DropShadowColour;
         }
         #endregion
     }

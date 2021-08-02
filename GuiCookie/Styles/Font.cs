@@ -39,16 +39,16 @@ namespace GuiCookie.Styles
             ? new Color(Colour.Value.ToVector4() * Tint.Value.ToVector4())
             : Colour ?? Tint ?? Color.Black;
 
-        public Space TextAnchor { get; set; }
+        public Space? TextAnchor { get; set; }
 
-        public Space TextPivot { get; set; }
+        public Space? TextPivot { get; set; }
 
         public Vector2? DropShadowOffset { get; set; }
 
-        public Color DropShadowColour { get; set; }
+        public Color? DropShadowColour { get; set; }
 
         /// <summary> The amount of pixels to offset the final position by. This is useful for things like buttons that appear to be pushed inwards. </summary>
-        public Vector2 Offset { get; set; }
+        public Vector2? Offset { get; set; }
         #endregion
 
         #region Constructors
@@ -68,15 +68,15 @@ namespace GuiCookie.Styles
             Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
 
             // Set the text anchor and pivot.
-            TextAnchor = attributes.GetAttributeOrDefault(AnchorAttributeName, new Space(0.5f, Axes.Both), Space.TryParse);
-            TextPivot = attributes.GetAttributeOrDefault(PivotAttributeName, new Space(0.5f, Axes.Both), Space.TryParse);
-
+            TextAnchor = attributes.GetAttributeOrDefault(AnchorAttributeName, (Space?)null, Space.TryParse);
+            TextPivot = attributes.GetAttributeOrDefault(PivotAttributeName, (Space?)null, Space.TryParse);
+            
             // Set the drop shadow.
             DropShadowOffset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
-            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName, Color.Black).Value;
+            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName);
 
             // Set the offset.
-            Offset = attributes.GetAttributeOrDefault(OffsetAttributeName, Vector2.Zero);
+            Offset = attributes.GetAttributeOrDefault(OffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
         }
 
         private Font(Font original)
@@ -114,9 +114,13 @@ namespace GuiCookie.Styles
             // Ensure the attribute is a font.
             if (!(baseAttribute is Font baseFont)) throw new ArgumentException($"Cannot combine with attribute as it is not a font. {baseAttribute}");
 
-            // Override the base's font and colour.
+            // Override the base's properties.
             if (SpriteFont == null) SpriteFont = baseFont.SpriteFont;
             if (Colour == null) Colour = baseFont.Colour;
+            if (Tint == null) Tint = baseFont.Tint;
+            if (Offset == null) Offset = baseFont.Offset;
+            if (DropShadowOffset == null) DropShadowOffset = baseFont.DropShadowOffset;
+            if (DropShadowColour == null) DropShadowColour = baseFont.DropShadowColour;
         }
         #endregion
     }

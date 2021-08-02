@@ -40,7 +40,9 @@ namespace GuiCookie.Styles
         public void DrawFrameCached(SliceFrame sliceFrame, Point size, ref Texture2D texture)
         {
             // If the given texture is null, create a new one.
-            if (texture == null) texture = new RenderTarget2D(graphicsDevice, size.X, size.Y);
+            if (texture == null) 
+                texture = graphicsDevice.Adapter.QueryRenderTargetFormat(graphicsDevice.GraphicsProfile, SurfaceFormat.Color, DepthFormat.None, 0, out SurfaceFormat supportedFormat, out DepthFormat supportedDepth, out int supportedSample) ?
+                    new RenderTarget2D(graphicsDevice, size.X, size.Y) : new RenderTarget2D(graphicsDevice, size.X, size.Y, false, supportedFormat, supportedDepth, supportedSample, RenderTargetUsage.DiscardContents);
 
             // Set the render target to the given texture.
             if (!(texture is RenderTarget2D renderTarget)) throw new ArgumentException("Given texture was not a render target.");

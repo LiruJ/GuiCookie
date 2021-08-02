@@ -49,9 +49,9 @@ namespace GuiCookie.Components
             set { if (contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content)) content.DropShadowOffset = value; }
         }
 
-        public Color DropShadowColour
+        public Color? DropShadowColour
         {
-            get => contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content) ? content.DropShadowColour : Color.Black;
+            get => contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content) ? content.DropShadowColour : null;
             set { if (contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content)) content.DropShadowColour = value; }
         }
 
@@ -179,8 +179,8 @@ namespace GuiCookie.Components
             }
 
             // Draw the shadow first, if one exists.
-            if (content != null && content.DropShadowOffset.HasValue)
-                guiCamera.DrawTextureAt(Image.Texture, new Rectangle(target.Location + content.DropShadowOffset.Value.ToPoint(), target.Size), source, content.DropShadowColour);
+            if (content != null && content.DropShadowOffset.HasValue && content.DropShadowColour.HasValue)
+                guiCamera.DrawTextureAt(Image.Texture, new Rectangle(target.Location + content.DropShadowOffset.Value.ToPoint(), target.Size), source, content.DropShadowColour.Value);
 
             // Draw the image at the calculated target with the calculated source.
             guiCamera.DrawTextureAt(Image.Texture, target, source, content?.FinalColour ?? Color.White);

@@ -9,6 +9,7 @@ using GuiCookie.Templates;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 
@@ -64,7 +65,7 @@ namespace GuiCookie
         {
             // Bind the window changing size.
             gameWindow.ClientSizeChanged += screenResized;
-
+            
             // Set dependencies.
             InputManager = inputManager;
             DragAndDropManager = dragAndDropManager;
@@ -80,7 +81,7 @@ namespace GuiCookie
             // Load the sheet.
             XmlDocument guiSheet = new XmlDocument();
             guiSheet.Load(guiSheetPath);
-
+            
             // Select the main node, if it does not exist, throw an exception.
             XmlNode mainNode = guiSheet.SelectSingleNode(mainNodeName) ?? throw new Exception($"Gui sheet's main node must be named {mainNodeName}.");
 
@@ -89,7 +90,7 @@ namespace GuiCookie
 
             // Initialise the bounds to the size of the window and the parsed padding.
             Bounds = new Bounds(elementManager.ElementContainer, gameWindow.ClientBounds.Size, attributes);
-
+            
             // Load the built-in templates.
             templateManager.LoadDefault();
 

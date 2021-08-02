@@ -9,6 +9,10 @@ namespace GuiCookie.Components
 {
     public class Frame : Component
     {
+        #region Constants
+        private const string frameImageAttributeName = "FrameImage";
+        #endregion
+
         #region Dependencies
         private readonly StyleManager styleManager;
         #endregion
@@ -24,16 +28,28 @@ namespace GuiCookie.Components
         #endregion
 
         #region Properties
+        public Image? FrameImage
+        {
+            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.Image : null;
+            set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.Image = value; }
+        }
+
         public Vector2? DropShadowOffset
         {
             get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.DropShadowOffset : null;
             set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.DropShadowOffset = value; }
         }
 
-        public Color DropShadowColour
+        public Color? DropShadowColour
         {
-            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.DropShadowColour : Color.Black;
+            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.DropShadowColour : null;
             set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.DropShadowColour = value; }
+        }
+
+        public Color? Colour
+        {
+            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.Colour : null;
+            set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.Colour = value; }
         }
 
         public Color? Tint
@@ -55,6 +71,11 @@ namespace GuiCookie.Components
         public override void OnCreated()
         {
             nineSliceDrawer = styleManager.GetTextureCreator<NineSliceDrawer>();
+
+            // Set the frame image.
+            if (Element.Attributes.HasAttribute(frameImageAttributeName)) 
+                FrameImage = Root.StyleManager.ResourceManager.ImagesByName.TryGetValue(Element.Attributes.GetAttribute(frameImageAttributeName), out Image image) ?
+                    image : throw new System.Exception($"Image with name {Element.Attributes.GetAttribute(frameImageAttributeName)} has not been loaded.");
 
             // Set the drop shadow.
             if (Element.Attributes.HasAttribute(SliceFrame.ShadowOffsetAttributeName)) DropShadowOffset = Element.Attributes.GetAttribute(SliceFrame.ShadowOffsetAttributeName, ToVector2.Parse);
@@ -154,8 +175,8 @@ namespace GuiCookie.Components
                 if (currentTexture == null) return;
 
                 // If a shadow is to be drawn, do that first.
-                if (sliceFrame.DropShadowOffset.HasValue)
-                    guiCamera.DrawTextureAt(currentTexture, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadowOffset.Value.ToPoint(), Bounds.TotalSize), sliceFrame.DropShadowColour);
+                if (sliceFrame.DropShadowOffset.HasValue && sliceFrame.DropShadowColour.HasValue)
+                    guiCamera.DrawTextureAt(currentTexture, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadowOffset.Value.ToPoint(), Bounds.TotalSize), sliceFrame.DropShadowColour.Value);
 
                 // Draw the texture.
                 guiCamera.DrawTextureAt(currentTexture, Bounds.AbsoluteTotalArea, sliceFrame.FinalColour);
@@ -164,8 +185,8 @@ namespace GuiCookie.Components
             else
             {
                 // If a shadow is to be drawn, do that first.
-                if (sliceFrame.DropShadowOffset.HasValue)
-                    NineSliceDrawer.DrawFrameOnDemand(sliceFrame, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadowOffset.Value.ToPoint(), Bounds.TotalSize), guiCamera, sliceFrame.DropShadowColour);
+                if (sliceFrame.DropShadowOffset.HasValue && sliceFrame.DropShadowColour.HasValue)
+                    NineSliceDrawer.DrawFrameOnDemand(sliceFrame, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadowOffset.Value.ToPoint(), Bounds.TotalSize), guiCamera, sliceFrame.DropShadowColour.Value);
 
                 // Draw the frame.
                 NineSliceDrawer.DrawFrameOnDemand(sliceFrame, Bounds.AbsoluteTotalArea, guiCamera, sliceFrame.FinalColour);

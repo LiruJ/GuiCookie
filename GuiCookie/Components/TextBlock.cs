@@ -43,15 +43,15 @@ namespace GuiCookie.Components
         /// <summary> The size in pixels that the text wants to use. </summary>
         public Vector2 TextSize { get; private set; }
 
-        public Space TextAnchor
+        public Space? TextAnchor
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.TextAnchor : new Space(0.5f, Axes.Both);
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.TextAnchor : null;
             set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.TextAnchor = value; }
         }
 
-        public Space TextPivot
+        public Space? TextPivot
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.TextPivot : new Space(0.5f, Axes.Both);
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.TextPivot : null;
             set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.TextPivot = value; }
         }
 
@@ -61,9 +61,9 @@ namespace GuiCookie.Components
             set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.DropShadowOffset = value; }
         }
 
-        public Color DropShadowColour
+        public Color? DropShadowColour
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.DropShadowColour : Color.Black;
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.DropShadowColour : null;
             set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.DropShadowColour = value; }
         }
 
@@ -80,9 +80,9 @@ namespace GuiCookie.Components
             set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.Tint = value; }
         }
 
-        public Vector2 Offset
+        public Vector2? Offset
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.Offset : Vector2.Zero;
+            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.Offset : null;
             set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.Offset = value; }
         }
 
@@ -180,14 +180,19 @@ namespace GuiCookie.Components
             // Ensure there is text and a font to draw.
             if (!string.IsNullOrWhiteSpace(Text) && fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font fontVariant))
             {
+                // Get the anchor and pivot, defaulting to the centre.
+                Space textAnchor = fontVariant.TextAnchor ?? new Space(0.5f, Axes.Both);
+                Space textPivot = fontVariant.TextPivot ?? new Space(0.5f, Axes.Both);
+
                 // Calculate the position based on the anchor and pivot. Round this down to avoid blurry text.
-                Vector2 position = (Bounds.AbsoluteContentPosition.ToVector2() + (fontVariant.TextAnchor.GetScaledSpace(Bounds.ContentSize.ToVector2()) - fontVariant.TextPivot.GetScaledSpace(TextSize))) + fontVariant.Offset;
+                Vector2 position = (Bounds.AbsoluteContentPosition.ToVector2() + (textAnchor.GetScaledSpace(Bounds.ContentSize.ToVector2()) - textPivot.GetScaledSpace(TextSize)))
+                                   + (fontVariant.Offset ?? Vector2.Zero);
                 position.X = (float)Math.Floor(position.X);
                 position.Y = (float)Math.Floor(position.Y);
 
                 // If a drop shadow is to be drawn, draw it first.
-                if (DropShadowOffset.HasValue)
-                    guiCamera.DrawString(fontVariant.SpriteFont, Text, position + fontVariant.DropShadowOffset.Value, fontVariant.DropShadowColour);
+                if (fontVariant.DropShadowOffset.HasValue && fontVariant.DropShadowColour.HasValue)
+                    guiCamera.DrawString(fontVariant.SpriteFont, Text, position + fontVariant.DropShadowOffset.Value, fontVariant.DropShadowColour.Value);
 
                 // Draw the text itself.
                 guiCamera.DrawString(fontVariant.SpriteFont, Text, position, fontVariant.FinalColour);
