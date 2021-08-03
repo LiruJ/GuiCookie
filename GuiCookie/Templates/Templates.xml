@@ -35,7 +35,6 @@
 	<Button Components="Frame, MouseHandler" Controller="Button"/>
 	<TextButton Components="Frame, TextBlock, MouseHandler" Controller="TextButton"/>
 	<ImageButton Components="Frame, ImageBlock, MouseHandler" Controller="ImageButton"/>
-	<TextFileButton Components="Frame, TextBlock, MouseHandler" Controller="TextFileButton"/>
 
 	<!--Boxes and labels-->
 	<TextBox Components="Frame, TextBlock" Controller="TextBox"/>

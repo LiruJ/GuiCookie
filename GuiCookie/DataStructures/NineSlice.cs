@@ -13,7 +13,7 @@ namespace GuiCookie.DataStructures
         private const string thirdsKeyword = "Thirds";
 
         private const string hSliceKeyword = "HSlice";
-        
+
         private const string vSliceKeyword = "VSlice";
         #endregion
 
@@ -57,30 +57,19 @@ namespace GuiCookie.DataStructures
         #endregion
 
         #region Calculation Functions
-        public byte CalculatePieceMask(Piece piece)
+        public static byte CalculatePieceMask(Piece piece)
         {
-            switch (piece)
+            return piece switch
             {
                 // If it's an edge or centre piece, return the mask constant.
-                case Piece.Left:
-                    return 0b10000;
-                case Piece.Bottom:
-                    return 0b01000;
-                case Piece.Right:
-                    return 0b00100;
-                case Piece.Top:
-                    return 0b00010;
-                case Piece.Centre:
-                    return 0b00001;
-
+                Piece.Left => 0b10000,
+                Piece.Bottom => 0b01000,
+                Piece.Right => 0b00100,
+                Piece.Top => 0b00010,
+                Piece.Centre => 0b00001,
                 // Corners can never be stretched, so return an invalid mask.
-                case Piece.BottomLeft:
-                case Piece.BottomRight:
-                case Piece.TopRight:
-                case Piece.TopLeft:
-                default:
-                    return 0;
-            }
+                _ => 0,
+            };
         }
 
         public void SetPieceStretchMask(Piece piece, bool stretched)
@@ -110,38 +99,28 @@ namespace GuiCookie.DataStructures
 
         public Rectangle CalculateSource(Rectangle mainSource, Piece piece)
         {
-            switch (piece)
+            return piece switch
             {
-                case Piece.BottomLeft:
-                    return new Rectangle(new Point(mainSource.X, mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * (1.0f - MaxY))));
-                case Piece.Bottom:
-                    return new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MinX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Ceiling(mainSource.Height * (1.0f - MaxY))));
-                case Piece.BottomRight:
-                    return new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * (1.0f - MaxY))));
-                case Piece.Right:
-                    return new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MinY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY))));
-                case Piece.TopRight:
-                    return new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y),
-                        new Point((int)Math.Ceiling(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * MinY)));
-                case Piece.Top:
-                    return new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MinX), mainSource.Y),
-                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Ceiling(mainSource.Height * MinY)));
-                case Piece.TopLeft:
-                    return new Rectangle(new Point(mainSource.X, mainSource.Y),
-                        new Point((int)Math.Ceiling(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * MinY)));
-                case Piece.Left:
-                    return new Rectangle(new Point(mainSource.X, mainSource.Y + (int)Math.Ceiling(mainSource.Height * MinY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY))));
-                case Piece.Centre:
-                    return new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MinX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MinY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY))));
-                default:
-                    throw new Exception($"Invalid piece. {piece}");
-            }
+                Piece.BottomLeft => new Rectangle(new Point(mainSource.X, mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
+                        new Point((int)Math.Ceiling(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * (1.0f - MaxY)))),
+                Piece.Bottom => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MinX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
+                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Ceiling(mainSource.Height * (1.0f - MaxY)))),
+                Piece.BottomRight => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
+                        new Point((int)Math.Ceiling(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * (1.0f - MaxY)))),
+                Piece.Right => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MinY)),
+                        new Point((int)Math.Ceiling(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
+                Piece.TopRight => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y),
+                        new Point((int)Math.Ceiling(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * MinY))),
+                Piece.Top => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MinX), mainSource.Y),
+                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Ceiling(mainSource.Height * MinY))),
+                Piece.TopLeft => new Rectangle(new Point(mainSource.X, mainSource.Y),
+                        new Point((int)Math.Ceiling(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * MinY))),
+                Piece.Left => new Rectangle(new Point(mainSource.X, mainSource.Y + (int)Math.Ceiling(mainSource.Height * MinY)),
+                        new Point((int)Math.Ceiling(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
+                Piece.Centre => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MinX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MinY)),
+                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
+                _ => throw new Exception($"Invalid piece. {piece}"),
+            };
         }
         #endregion
 
@@ -161,7 +140,7 @@ namespace GuiCookie.DataStructures
         {
             // Start with an empty value.
             nineSlice = Empty;
-
+            
             // If the input is invalid, handle it.
             if (string.IsNullOrWhiteSpace(input)) return throwException ? throw new ArgumentNullException(nameof(input), "Given string cannot be null, empty, or whitespace.") : false;
 
@@ -173,19 +152,19 @@ namespace GuiCookie.DataStructures
                 // Handle keywords.
                 case thirdsKeyword:
                     nineSlice = Thirds;
-                    return values.Length > 1 ? tryParseStretchMask(values[1], out nineSlice.stretchMask, throwException) : true;
+                    return values.Length <= 1 || tryParseStretchMask(values[1], out nineSlice.stretchMask, throwException);
                 case vSliceKeyword:
                     nineSlice = VSlice;
-                    return values.Length > 1 ? tryParseStretchMask(values[1], out nineSlice.stretchMask, throwException) : true;
+                    return values.Length <= 1 || tryParseStretchMask(values[1], out nineSlice.stretchMask, throwException);
                 case hSliceKeyword:
                     nineSlice = HSlice;
-                    return values.Length > 1 ? tryParseStretchMask(values[1], out nineSlice.stretchMask, throwException) : true;
+                    return values.Length <= 1 || tryParseStretchMask(values[1], out nineSlice.stretchMask, throwException);
 
                 // Otherwise; parse the string.
                 default:
                     // If there are not exactly 4 or 5 values, throw an exception.
                     if (values.Length != 4 || values.Length != 5)
-                        return throwException ? throw new ArgumentException($"NineSlice must have 4 or 5 values; minX, maxX, minY, and maxY, with an optional stretchMask, separated with the {separator} character. Given string: {input} had {values.Length} values.") : false;
+                        return throwException ? throw new ArgumentException($"NineSlice must have 4 or 5 values; minX, maxX, minY, and maxY, with an optional StretchMask, separated with the {separator} character. Given string: {input} had {values.Length} values.") : false;
 
                     // Parse each value.
                     if (!float.TryParse(values[0], out float minX) || (minX < 0 || minX > 1)) return throwException ? throw new FormatException($"MinX of nineslice was invalid, float value between 0 and 1 expected.") : false;
@@ -200,7 +179,6 @@ namespace GuiCookie.DataStructures
                     nineSlice = new NineSlice(minX, maxX, minY, maxY, stretchMask);
                     return true;
             }
-
         }
 
         private static bool tryParseStretchMask(string input, out byte stretchMask, bool throwException = false)
@@ -222,7 +200,7 @@ namespace GuiCookie.DataStructures
         #region Equality Functions
         public override bool Equals(object obj) => obj is NineSlice slice && Equals(slice);
 
-        public bool Equals(NineSlice other) 
+        public bool Equals(NineSlice other)
             => stretchMask == other.stretchMask &&
                    MaxY == other.MaxY &&
                    MinY == other.MinY &&

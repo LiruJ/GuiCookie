@@ -8,14 +8,12 @@ namespace GuiCookie.Components
     public class Draggable : Component, IDraggable
     {
         #region Dependencies
-        private readonly ElementManager elementManager;
         private readonly DragAndDropManager dragAndDropManager;
         #endregion
 
         #region Constructors
-        public Draggable(ElementManager elementManager, DragAndDropManager dragAndDropManager)
+        public Draggable(DragAndDropManager dragAndDropManager)
         {
-            this.elementManager = elementManager ?? throw new System.ArgumentNullException(nameof(elementManager));
             this.dragAndDropManager = dragAndDropManager ?? throw new System.ArgumentNullException(nameof(dragAndDropManager));
         }
         #endregion

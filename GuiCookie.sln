@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GuiCookie", "GuiCookie\GuiC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Example\Example.csproj", "{5658E2F5-83EB-4EF1-B513-17620C0D995A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuiCookieTests", "GuiCookieTests\GuiCookieTests.csproj", "{01508854-0701-4D50-8720-2D9C47AF06D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GuiCookieTests", "GuiCookieTests\GuiCookieTests.csproj", "{01508854-0701-4D50-8720-2D9C47AF06D6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F5657A0-B92C-48CF-A9AC-44F30679100F}"
+	ProjectSection(SolutionItems) = preProject
+		License.txt = License.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

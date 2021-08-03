@@ -10,7 +10,7 @@
       <Default URI="Gui\\TestFont"/>
     </Fonts>
     <Images>
-      <Main URI="Gui/TestSprites" Tilemap="4, 4">
+      <Main URI="Gui\\TestSprites" Tilemap="4, 4">
         <Button/>
         <ButtonPressed/>
         <Inlay/>
@@ -19,7 +19,7 @@
         <VerticalSliderHandle Bounds="16, 48, 16, 12"/>
         <HorizontalSliderHandle Bounds="32, 64, 12, 16"/>
       </Main>
-      <Icons URI="Gui/Icons" Tilemap="3, 3">
+      <Icons URI="Gui\\Icons" Tilemap="3, 3">
         <RemoveButton Tile="0, 1"/>
         <AddButton Tile="0, 2"/>
       </Icons>
@@ -29,7 +29,7 @@
   <!--The main content for the style-->
   <Styles>
     <Default>
-      <SliceFrame NineSlice="Thirds, 00001" Colour="#5F628A" ShadowOffset="-5, 5"/>
+      <SliceFrame NineSlice="Thirds, 101" Colour="#5F628A" ShadowOffset="-5, 5"/>
       <Font Font="Default" Colour="#bbb" ShadowOffset="-1"/>
 
       <Hovered>
