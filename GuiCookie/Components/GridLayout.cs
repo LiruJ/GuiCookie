@@ -1,84 +1,220 @@
 ﻿using GuiCookie.DataStructures;
 using GuiCookie.Elements;
+using GuiCookie.Helpers;
+using GuiCookie.Rendering;
+using LiruGameHelperMonoGame.Parsers;
 using Microsoft.Xna.Framework;
 using System;
 
 namespace GuiCookie.Components
 {
-    /// <summary> Helps with aligning elements to a grid, but does not do so itself. Also does not have any dimensional data, meaning that the grid can extend infinitely. See <see cref="CellLayout"/> for such behaviour. </summary>
+    /// <summary> Holds elements in a 2D array and maintains a grid layout. </summary>
     public class GridLayout : Component
     {
+        #region Constants
+        private const string cellSizeAttributeName = "CellSize";
+
+        private const string gridSizeAttributeName = "GridSize";
+
+        private const string spacingAttributeName = "Spacing";
+        #endregion
+
+        #region Dependencies
+        private readonly ElementManager elementManager;
+        #endregion
+
+        #region Fields
+        /// <summary> Is <c>true</c> if the layout needs to recalculate next frame, otherwise; <c>false</c>. </summary>
+        private bool isDirty = false;
+        #endregion
+
+        #region Backing Fields
+        private Point? cellSize = null;
+
+        private Point? gridSizeAttribute = null;
+
+        private Point cachedGridSize = Point.Zero;
+
+        private Point spacing = Point.Zero;
+        #endregion
+
         #region Properties
         /// <summary> The size of a grid cell in pixels. </summary>
-        public Point CellSize { get; set; }
+        public Point CellSize
+        {
+            get => cellSize ?? Vector2.Floor(Bounds.ContentSize.ToVector2() / GridSize.ToVector2()).ToPoint();
+            set
+            {
+                // Set the cell size.
+                cellSize = value;
+
+                // Dirty the layout.
+                isDirty = true;
+            }
+        }
+
+        /// <summary> How many cells wide and tall this layout is. </summary>
+        public Point GridSize
+        {
+            get
+            {
+                // If the attribute has been set, use that.
+                if (gridSizeAttribute.HasValue) return gridSizeAttribute.Value;
+
+                // Otherwise; if the layout is dirty, recalculate and return the grid size.
+                if (isDirty) recalculateGridSize();
+                return cachedGridSize;
+            }
+            set
+            {
+                // Set the grid size.
+                gridSizeAttribute = value;
+
+                // Dirty the layout.
+                isDirty = true;
+            }
+        }
+
+        /// <summary> The number of columns (vertical) that this cell layout uses. </summary>
+        public int ColumnCount
+        {
+            get => GridSize.X;
+            set => GridSize = new Point(value, RowCount);
+        }
+
+        /// <summary> The number of rows (horizontal) that this cell layout uses. </summary>
+        public int RowCount
+        {
+            get => GridSize.Y;
+            set => GridSize = new Point(ColumnCount, value);
+        }
+
+        public Point Spacing
+        {
+            get => spacing;
+            set
+            {
+                // Set the spacing.
+                spacing = value;
+
+                // Dirty the layout.
+                isDirty = true;
+            }
+        }
+        #endregion
+
+        #region Constructors
+        public GridLayout(ElementManager elementManager)
+        {
+            this.elementManager = elementManager;
+        }
         #endregion
 
         #region Initialisation Functions
+        public override void OnCreated()
+        {
+            gridSizeAttribute = Element.Attributes.GetAttributeOrDefault(gridSizeAttributeName, (Point?)null, ToPoint.TryParse);
+            cellSize = Element.Attributes.GetAttributeOrDefault(cellSizeAttributeName, (Point?)null, ToPoint.TryParse);
+
+            // A grid layout cannot function without at least one defined dimensional property, so throw an exception if that is the case.
+            if (gridSizeAttribute == null && cellSize == null)
+                throw new Exception($"{nameof(GridLayout)} of {(string.IsNullOrWhiteSpace(Element.Name) ? Element.ToString() : Element.Name)} does not have a {gridSizeAttributeName} or {cellSizeAttributeName} defined. Must have at least one.");
+
+            // Load the spacing.
+            spacing = Element.Attributes.GetAttributeOrDefault(spacingAttributeName, Point.Zero, ToPoint.TryParse);
+        }
+
         public override void OnSetup()
         {
             // Bind the child added/removed signals to recalculate the layout.
-            Element.OnChildAdded.Connect((_) => { recalculateLayout(); });
-            Element.OnChildRemoved.Connect((_) => { recalculateLayout(); });
+            Element.OnChildAdded.Connect((_) => isDirty = true);
+            Element.OnChildRemoved.Connect((_) => isDirty = true);
 
-            // Recalculate the children to start with.
-            recalculateLayout();
+            // Dirty the layout to start with.
+            isDirty = true;
         }
         #endregion
 
-        #region Style Functions
-        public override void OnSizeChanged()
-        {
-            recalculateLayout();
-        }
+        #region Range Functions
+        public bool IsInRange(Point cellPosition) => IsInRange(cellPosition.X, cellPosition.Y);
+
+        public bool IsInRange(int x, int y) => x >= 0 && x < ColumnCount && y >= 0 && y < RowCount;
         #endregion
 
-        #region Layout Functions
-        /// <summary> Adjusts the given pixel position (relative to this component's element) so that it aligns with the grid. </summary>
-        /// <param name="position"></param>
-        /// <returns></returns>
-        public Point AdjustPosition(Point position)
-        {
-            Vector2 gridCellPosition = position.ToVector2() / CellSize.ToVector2();
-            return new Point((int)Math.Floor(gridCellPosition.X), (int)Math.Floor(gridCellPosition.Y)) * CellSize;
-        }
+        #region Calculation Functions
+        public override void OnSizeChanged() => isDirty = true;
 
-        /// <summary> Calculates the size in pixels from the given <paramref name="size"/> in grid cells. </summary>
-        /// <param name="size"> The size in grid cells to adjust. </param>
-        /// <returns> The adjusted size. </returns>
-        public Point AdjustSize(Point size) => size * CellSize;
+        private void recalculateGridSize()
+        {
+            // If the grid size attribute has been set, there's no need to calculate the grid size.
+            if (gridSizeAttribute.HasValue) return;
+
+            // Pre-calculate the cell size.
+            Point cellSize = CellSize;
+
+            // Reset the previous value.
+            cachedGridSize = Point.Zero;
+
+            // Count the number of grid cells on the X and Y axis.
+            int currentWidth = 0;
+            while (currentWidth < Bounds.ContentSize.X)
+            {
+                currentWidth += cellSize.X;
+
+                if (currentWidth < Bounds.ContentSize.X)
+                    cachedGridSize.X++;
+
+                currentWidth += Spacing.X;
+            }
+
+            int currentHeight = 0;
+            while (currentHeight < Bounds.ContentSize.Y)
+            {
+                currentHeight += cellSize.Y;
+
+                if (currentHeight < Bounds.ContentSize.Y)
+                    cachedGridSize.Y++;
+
+                currentHeight += Spacing.Y;
+            }
+
+            // Force update the layout. This means that the grid size will accurately represent the grid,
+            // and means that successive calls to GridSize.get while the layout is dirty will use the cached variable.
+            isDirty = false;
+            recalculateLayout();
+        }
 
         private void recalculateLayout()
         {
-            // The current width and height of the calculated row and column.
-            float currentWidth = 0;
-            float currentHeight = 0;
+            // Pre-calculate dimensions.
+            Point cellSize = CellSize;
+            Point gridSize = GridSize;
 
-            // The height of the current row.
-            float rowHeight = 0;
-
-            // Go over each child element in the parent element.
-            foreach (Element childElement in Element)
+            // Snap each child to the grid.
+            int x = 0, y = 0;
+            foreach (Element child in Element)
             {
-                // Reposition the current child element.
-                childElement.Bounds.ScaledPosition = new Space(currentWidth, currentHeight, Axes.None);
+                // Snap the child to the grid.
+                GridLayoutHelper.SnapToGrid(new Point(x, y), cellSize, Spacing, child.Bounds);
 
-                // Add the width of the just added child to the current width.
-                currentWidth += childElement.Bounds.TotalSize.X;
-
-                // If the height of the just added child is greater than the height of the current row, save it.
-                rowHeight = Math.Max(rowHeight, childElement.Bounds.TotalSize.Y);
-
-                // If the width of the current row is greater than the size of the containing element, start on the next row.
-                if (currentWidth >= Element.Bounds.ContentSize.X)
+                // Handle incrementing the cell position.
+                if (x + 1 >= gridSize.X)
                 {
-                    // Add the row height to the current height.
-                    currentHeight += rowHeight;
-
-                    // Reset the current width and row height.
-                    currentWidth = 0;
-                    rowHeight = 0;
+                    x = 0;
+                    y++;
                 }
+                else x++;
             }
+
+            // Undirty the layout.
+            isDirty = false;
+        }
+        #endregion
+
+        #region Update Functions
+        public override void Draw(IGuiCamera guiCamera)
+        {
+            if (isDirty) recalculateLayout();
         }
         #endregion
     }

@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Components;
+using GuiCookie.Helpers;
 using LiruGameHelper.Signals;
 using Microsoft.Xna.Framework;
 
@@ -7,7 +8,7 @@ namespace GuiCookie.Elements
     public class CellGrid : Element, IClickable
     {
         #region Components
-        protected CellLayout cellLayout;
+        protected GridLayout cellLayout;
         protected MouseHandler mouseHandler;
         #endregion
 
@@ -26,14 +27,14 @@ namespace GuiCookie.Elements
         #region Initialisation Functions
         public override void OnCreated()
         {
-            cellLayout = GetComponent<CellLayout>();
+            cellLayout = GetComponent<GridLayout>();
             mouseHandler = GetComponent<MouseHandler>();
 
             // If a both components were given, bind left click to select a cell.
             if (mouseHandler != null && cellLayout != null)
             {
-                mouseHandler.LeftClicked.Connect(() => { if (Enabled) cellLeftClicked.Invoke(cellLayout.RelativeToCellPosition(mouseHandler.RelativeMousePosition)); });
-                mouseHandler.RightClicked.Connect(() => { if (Enabled) cellRightClicked.Invoke(cellLayout.RelativeToCellPosition(mouseHandler.RelativeMousePosition)); });
+                mouseHandler.LeftClicked.Connect(() => { if (Enabled) cellLeftClicked.Invoke(GridLayoutHelper.PixelToCellPosition(mouseHandler.RelativeMousePosition, cellLayout.CellSize)); });
+                mouseHandler.RightClicked.Connect(() => { if (Enabled) cellRightClicked.Invoke(GridLayoutHelper.PixelToCellPosition(mouseHandler.RelativeMousePosition, cellLayout.CellSize)); });
             }
         }
         #endregion

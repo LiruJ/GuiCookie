@@ -1,25 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Main Styles="Content/Gui/TestStyle" DefaultStyle="Button" Templates="Elements/TestTemplates.xml" Padding="1%">
 
-  <Pane Position="0, 0" Size="20%, 10%" Padding="5">
-    <TextButton Position="0, 0" Size="100%, 50%" Text="Disable Button" Tag="DisableButton"/>
-    <TextButton Position="0, 50%" Size="100%, 50%" Text="Enabled" Tag="TargetButton"/>
-  </Pane>
+	<Pane Position="0, 0" Size="20%, 10%" Padding="5">
+		<TextButton Position="0, 0" Size="100%, 50%" Text="Disable Button" Tag="DisableButton"/>
+		<TextButton Position="0, 50%" Size="100%, 50%" Text="Enabled" Tag="TargetButton"/>
+	</Pane>
 
-  <TestList Position="100%, 0" Size="20%, 50%" Pivot="100%, 0" Padding="5" Tag="List">
-    
-  </TestList>
-  
-  <ScrollPane Position="0%, 10%" Size="20%, 20%">
-    <HorizontalSliderBar Name="HorizontalSlider" Size="90%, 16"/>
-    <VerticalSliderBar Name="VerticalSlider" Size="16, 90%"/>
-  </ScrollPane>
-  
-  <DropTest Position="40%, 75%" Size="20%"/>
-  <DropTest Position="65%, 75%" Size="20%"/>
+	<TestList Position="100%, 0" Size="20%, 50%" Pivot="100%, 0" Padding="5" Tag="List">
 
-  <TestDraggable Position="0%, 80%" Size="10%, 5%" Text="Drag Me"/>
-  <TestDraggable Position="0%, 85%" Size="10%, 5%" Text="Drag Me"/>
-  <TestDraggable Position="0%, 90%" Size="10%, 5%" Text="Drag Me"/>
-  <TestDraggable Position="0%, 95%" Size="10%, 5%" Text="Drag Me"/>
+	</TestList>
+
+	<ScrollPane Position="0%, 10%" Size="20%, 20%">
+		<HorizontalSliderBar Name="HorizontalSlider" Size="90%, 16"/>
+		<VerticalSliderBar Name="VerticalSlider" Size="16, 90%"/>
+	</ScrollPane>
+
+	<Pane Controller="PortraitGrid" Position="25%, 0%" Size="20%, 35%" Padding="5">
+		<Partition Components="Frame, GridLayout" Size="100%, 80%" CellSize="20" Spacing="1" Name="Grid"/>
+	</Pane>
+
+	<DropTest Position="40%, 75%" Size="20%" CellSize="64"/>
+	<DropTest Position="65%, 75%" Size="20%" CellSize="64"/>
+
+	<TestDraggable Position="0%, 80%" Size="10%, 5%" Text="Drag Me"/>
+	<TestDraggable Position="0%, 85%" Size="10%, 5%" Text="Drag Me"/>
+	<TestDraggable Position="0%, 90%" Size="10%, 5%" Text="Drag Me"/>
+	<TestDraggable Position="0%, 95%" Size="10%, 5%" Text="Drag Me"/>
 </Main>

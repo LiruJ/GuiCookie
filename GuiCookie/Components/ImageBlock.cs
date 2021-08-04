@@ -89,7 +89,7 @@ namespace GuiCookie.Components
             if (Element.Attributes.HasAttribute(Content.ShadowColourAttributeName)) DropShadowColour = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, Content.ShadowColourAttributeName).Value;
 
             // Set clipping mode.
-            ClippingMode = Element.Attributes.GetEnumAttributeOrDefault(clippingModeAttributeName, ClippingMode.None);
+            ClippingMode = Element.Attributes.GetEnumAttributeOrDefault(clippingModeAttributeName, ClippingMode.Squeeze);
 
             // Set centred.
             Centred = Element.Attributes.GetAttributeOrDefault(centredAttributeName, false);
@@ -172,7 +172,7 @@ namespace GuiCookie.Components
                     break;
                 case ClippingMode.Stretch:
                     target = new Rectangle(Element.Bounds.AbsoluteContentPosition, size.ToPoint());
-                    target.Offset(offset);
+                    Offset = Point.Zero;
                     break;
                 default:
                     throw new System.Exception("Invalid clipping mode.");

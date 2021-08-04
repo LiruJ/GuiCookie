@@ -25,6 +25,8 @@ namespace GuiCookie.Styles
             Source = source;
         }
 
+        public Image(Texture2D texture, Rectangle source) : this(null, texture, source) { }
+
         public Image(Texture2D texture) : this(null, texture, texture != null ? texture.Bounds : Rectangle.Empty) { }
         #endregion
 

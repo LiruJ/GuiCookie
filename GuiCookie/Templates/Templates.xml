@@ -46,6 +46,5 @@
 	<LabelIcon Components="ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze"/>
 
 	<!--Layout controllers-->
-	<Grid Components="GridLayout"/>
-	<CellGrid Components="CellLayout, MouseHandler" Controller="CellGrid"/>
+	<CellGrid Components="GridLayout, MouseHandler" Controller="CellGrid"/>
 </Templates>

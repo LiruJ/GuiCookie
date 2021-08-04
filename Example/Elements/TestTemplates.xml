@@ -9,5 +9,5 @@
   </TestListItem>
   
   <TestDraggable Components="Frame, Draggable, TextBlock"/>
-  <DropTest Components="Frame, DropTarget, DirectionalLayout"/>
+  <DropTest Components="Frame, DropTarget, GridLayout"/>
 </Templates>

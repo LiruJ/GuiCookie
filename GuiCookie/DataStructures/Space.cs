@@ -36,6 +36,8 @@ namespace GuiCookie.DataStructures
         #endregion
 
         #region Constructors
+        /// <summary> Creates a new space with the given absolute pixel <paramref name="point"/>. </summary>
+        /// <param name="point"></param>
         public Space(Point point)
         {
             X = point.X;
@@ -47,14 +49,14 @@ namespace GuiCookie.DataStructures
         {
             X = both;
             Y = both;
-            this.Axes = axes;
+            Axes = axes;
         }
 
         public Space(float x, float y, Axes axes)
         {
             X = x;
             Y = y;
-            this.Axes = axes;
+            Axes = axes;
         }
         #endregion
 
