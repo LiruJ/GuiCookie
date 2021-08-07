@@ -1,0 +1,842 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GuiCookie</name>
+    </assembly>
+    <members>
+        <member name="F:GuiCookie.Attributes.AttributeCollection.rawAttributesByName">
+            <summary> The raw string values keyed by attribute. </summary>
+        </member>
+        <member name="M:GuiCookie.Attributes.AttributeCollection.GetAttributeOrDefault``1(System.String,``0,GuiCookie.Attributes.AttributeCollection.TryParse{``0})">
+            <summary> Attempts to parse the attribute with the given <paramref name="attributeName"/> using the given <paramref name="tryParser"/> function, returns <paramref name="defaultTo"/> if the key was not found or the function returned false. </summary>
+            <typeparam name="T"> The type of object to parse. </typeparam>
+            <param name="attributeName"> The name of the attribute to parse. </param>
+            <param name="defaultTo"> The value to return if the parser fails or the attribute was not found. </param>
+            <param name="tryParser"> The function to run in order to try and parse the attribute. e.g. <see cref="M:System.Int32.TryParse(System.String,System.Int32@)"/>. This function should not throw exceptions. </param>
+            <returns> The parsed attribute, or <paramref name="defaultTo"/> if the attribute was not found or could not parse. </returns>
+            <exception cref="T:System.ArgumentNullException"> The <paramref name="tryParser"/> was null. </exception>
+            <exception cref="T:System.ArgumentException"> The <paramref name="attributeName"/> was null or whitespace. </exception>
+        </member>
+        <member name="M:GuiCookie.Attributes.AttributeCollection.GetAttribute``1(System.String,System.Func{System.String,``0})">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="attributeName"></param>
+            <param name="parser"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException"> The <paramref name="parser"/> was null. </exception>
+            <exception cref="T:System.ArgumentException"> The <paramref name="attributeName"/> was null or whitespace. </exception>
+        </member>
+        <member name="M:GuiCookie.Components.AspectRatioFitter.validateSize(Microsoft.Xna.Framework.Point,Microsoft.Xna.Framework.Point@)">
+            <summary> Checks the current size against the calculated size. If the sizes roughly match, returns true, otherwise false. If false is returned <paramref name="newSize"/> is filled with the desired size of the element. </summary>
+            <param name="currentSize"></param>
+            <param name="newSize"></param>
+            <returns></returns>
+        </member>
+        <member name="P:GuiCookie.Components.Component.Element">
+            <summary> The element that contains this component. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.Component.Bounds">
+            <summary> The current <see cref="P:GuiCookie.Components.Component.Bounds"/> of the <see cref="P:GuiCookie.Components.Component.Element"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.Component.Root">
+            <summary> The current <see cref="P:GuiCookie.Components.Component.Root"/> of the <see cref="P:GuiCookie.Components.Component.Element"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.Component.Style">
+            <summary> The current <see cref="P:GuiCookie.Components.Component.Style"/> of the <see cref="P:GuiCookie.Components.Component.Element"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.Component.StyleState">
+            <summary> The current <see cref="T:GuiCookie.Styles.StyleStateMachine"/> of the <see cref="P:GuiCookie.Components.Component.Element"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.Component.CurrentStyleVariant">
+            <summary> The current <see cref="T:GuiCookie.Styles.StyleVariant"/> of the <see cref="P:GuiCookie.Components.Component.Element"/>. </summary>
+        </member>
+        <member name="M:GuiCookie.Components.Component.OnCreated">
+            <summary> This is called after the component has been added to an element for the first time. The element itself will not be done setting up, use <see cref="M:GuiCookie.Components.Component.OnSetup"/> if this is needed. </summary>
+        </member>
+        <member name="M:GuiCookie.Components.Component.OnSetup">
+            <summary> Called after the element has been fully set up. Use this to set references to other components, although other elements may not exist yet. </summary>
+        </member>
+        <member name="M:GuiCookie.Components.Component.OnPostSetup">
+            <summary> Called after every element has been fully set up. Use this to set references to other elements. </summary>
+        </member>
+        <member name="M:GuiCookie.Components.Component.ValidateSizeChanged">
+            <summary> Is fired when the size changes, returning a value that represents if the new size is valid. It is expected that this function will also change the size to something valid. </summary>
+            <returns></returns>
+        </member>
+        <member name="F:GuiCookie.Components.DirectionalLayout.isDirty">
+            <summary> Is <c>true</c> if the layout needs to recalculate next frame, otherwise; <c>false</c>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.DirectionalLayout.LayoutDirection">
+            <summary> The direction of the layout. Has no effect if value is <see cref="F:GuiCookie.DataStructures.Direction.None"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.DirectionalLayout.DesiredSize">
+            <summary> How large this layout wants to be, taking into account all child sizes and spacing. </summary>
+            <remarks> Note that this may be larger than the element itself if the children are relative. </remarks>
+        </member>
+        <member name="P:GuiCookie.Components.DirectionalLayout.Spacing">
+            <summary> How many pixels are between each element. </summary>
+        </member>
+        <member name="M:GuiCookie.Components.DirectionalLayout.MakeDirty">
+            <summary> Makes this layout dirty, meaning it will be recalculated next time it is drawn, updated, or certain properties are accessed. </summary>
+        </member>
+        <member name="T:GuiCookie.Components.Draggable">
+            <summary> The basic draggable component. Always returns itself through <see cref="!:IDraggable.OnDragBegin(Point)"/>, adds itself to the <see cref="T:GuiCookie.Elements.ElementManager"/> or <see cref="T:GuiCookie.Input.DragAndDrop.IDropTarget"/> through <see cref="M:GuiCookie.Input.DragAndDrop.IDraggable.OnDragEnd(GuiCookie.Input.DragAndDrop.IDropTarget,Microsoft.Xna.Framework.Point)"/>. </summary>
+        </member>
+        <member name="T:GuiCookie.Components.DropTarget">
+            <summary> The basic drop target component. Always returns itself through the <see cref="M:GuiCookie.Input.DragAndDrop.IDropTarget.OnDraggableDropped(GuiCookie.Input.DragAndDrop.IDraggable,Microsoft.Xna.Framework.Point)"/> function. </summary>
+        </member>
+        <member name="T:GuiCookie.Components.GridLayout">
+            <summary> Holds elements in a 2D array and maintains a grid layout. </summary>
+        </member>
+        <member name="F:GuiCookie.Components.GridLayout.isDirty">
+            <summary> Is <c>true</c> if the layout needs to recalculate next frame, otherwise; <c>false</c>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.GridLayout.CellSize">
+            <summary> The size of a grid cell in pixels. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.GridLayout.HasExplicitCellSize">
+            <summary>
+            If set to <c>false</c>; sets the internal cell size variable to null so that <see cref="P:GuiCookie.Components.GridLayout.GridSize"/> is automatically calculated from <see cref="P:GuiCookie.Components.GridLayout.CellSize"/>.
+            Note that if <see cref="P:GuiCookie.Components.GridLayout.HasExplicitGridSize"/> is <c>false</c>, setting this value to false will have no effect.
+            </summary>
+        </member>
+        <member name="P:GuiCookie.Components.GridLayout.GridSize">
+            <summary> How many cells wide and tall this layout is. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.GridLayout.HasExplicitGridSize">
+            <summary>
+            If set to <c>false</c>; sets the internal grid size variable to null so that <see cref="P:GuiCookie.Components.GridLayout.GridSize"/> is automatically calculated from <see cref="P:GuiCookie.Components.GridLayout.CellSize"/>.
+            Note that if <see cref="P:GuiCookie.Components.GridLayout.HasExplicitCellSize"/> is <c>false</c>, setting this value to false will have no effect.
+            </summary>
+        </member>
+        <member name="P:GuiCookie.Components.GridLayout.ColumnCount">
+            <summary> The number of columns (vertical) that this cell layout uses. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.GridLayout.RowCount">
+            <summary> The number of rows (horizontal) that this cell layout uses. </summary>
+        </member>
+        <member name="M:GuiCookie.Components.GridLayout.MakeDirty">
+            <summary> Makes this layout dirty, meaning it will be recalculated next time it is drawn, updated, or certain properties are accessed. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.IComponent.Element">
+            <summary> The element of the component. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.IComponent.Bounds">
+            <summary> The bounds of the component's element. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.ImageBlock.Colour">
+            <summary> The current colour of the current content. </summary>
+        </member>
+        <member name="T:GuiCookie.Components.MouseHandler">
+            <summary> Use this <see cref="T:GuiCookie.Components.Component"/> on an <see cref="T:GuiCookie.Elements.Element"/> to handle click detection and mouse events. </summary>
+        </member>
+        <member name="F:GuiCookie.Components.MouseHandler.inputManager">
+            <summary> The <see cref="F:GuiCookie.Components.MouseHandler.inputManager"/> used to determine if the handler was clicked. </summary>
+        </member>
+        <member name="F:GuiCookie.Components.MouseHandler.clickType">
+            <summary> The mode of click detection to use. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.MouseEntered">
+            <summary> Is fired when the mouse enters this <see cref="T:GuiCookie.Elements.Element"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.MouseLeft">
+            <summary> Is fired when the mouse leaves this <see cref="T:GuiCookie.Elements.Element"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.LeftClicked">
+            <summary> Is fired when the mouse is over this <see cref="T:GuiCookie.Elements.Element"/> and the left mouse button is clicked. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.RightClicked">
+            <summary> Is fired when the mouse is over this <see cref="T:GuiCookie.Elements.Element"/> and the right mouse button is clicked. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.IsClickDragged">
+            <summary> Is <c>true</c> if the mouse was left clicked on the <see cref="T:GuiCookie.Elements.Element"/> and is currently being held down, regardless of mouse position. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.IsMousedOver">
+            <summary> Is <c>true</c> if the mouse is over the <see cref="T:GuiCookie.Elements.Element"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.IsLeftClicked">
+            <summary> <c>true</c> if the mouse is over the <see cref="T:GuiCookie.Elements.Element"/> and the left click button is pressed. </summary>
+            <remarks> Will be true for every frame that the mouse is over the element and clicked, hence it is better to add a listener for the LeftClicked signal. </remarks>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.IsRightClicked">
+            <summary> <c>true</c> if the mouse is over the <see cref="T:GuiCookie.Elements.Element"/> and the right click button is pressed. </summary>
+            <remarks> Will be true for every frame that the mouse is over the element and clicked, hence it is better to add a listener for the RightClicked signal. </remarks>
+        </member>
+        <member name="M:GuiCookie.Components.MouseHandler.#ctor(GuiCookie.Input.InputManager)">
+            <summary> Creates a new <see cref="T:GuiCookie.Components.MouseHandler"/> with the given <paramref name="inputManager"/>. </summary>
+            <param name="inputManager"> The <see cref="T:GuiCookie.Input.InputManager"/> used for click detection. </param>
+        </member>
+        <member name="M:GuiCookie.Components.MouseHandler.OnCreated">
+            <summary> Sets the relevant data for this <see cref="T:GuiCookie.Components.Component"/>. </summary>
+        </member>
+        <member name="M:GuiCookie.Components.MouseHandler.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary> Updates the mouse properties, and fires any relevant <see cref="T:LiruGameHelper.Signals.Signal"/>s. </summary>
+            <param name="gameTime"> The current time of the game. </param>
+        </member>
+        <member name="P:GuiCookie.Components.TextBlock.Text">
+            <summary> The text to display. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.TextBlock.TextSize">
+            <summary> The size in pixels that the text wants to use. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.TextBlock.Colour">
+            <summary> The current colour of the current font. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.TextBlock.ResizeDirection">
+            <summary> The direction in which this text's element resizes. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.Parent">
+            <summary> The parent bounds, or null if these bounds are for the root. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.ScaledSize">
+            <summary> The size in either absolute (pixels) or relative (percentage) measurements. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.MinimumSize">
+            <summary> The minimum size of the bounds. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.MaximumSize">
+            <summary> The maximum size of the bounds. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.Padding">
+            <summary> The space around the sides of the overall bounds. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.TotalSize">
+            <summary> The total size of the entire bounds. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.ContentSize">
+            <summary> The size of the content area. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.Anchor">
+            <summary> The offset of the position relative to the size. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.ScaledPosition">
+            <summary> The scaled position, using either pixel or percentage measurements. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.RelativeTotalPosition">
+            <summary> The position of the bounds relative to the position of the parent content area. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.Bounds.AbsoluteTotalPosition">
+            <summary> The position of the bounds within the root. </summary>
+        </member>
+        <member name="M:GuiCookie.DataStructures.Bounds.#ctor(GuiCookie.DataStructures.ElementContainer,GuiCookie.Attributes.IReadOnlyAttributes)">
+            <summary> Create a new <see cref="T:GuiCookie.DataStructures.Bounds"/> with the given <see cref="N:GuiCookie.Attributes"/>. </summary>
+            <param name="elementAttributes"> The attributes of the containing <see cref="N:GuiCookie.Elements"/>, which is used to determine spacing data. </param>
+        </member>
+        <member name="F:GuiCookie.DataStructures.ClippingMode.None">
+            <summary> No cipping mode, content will overflow. </summary>
+        </member>
+        <member name="F:GuiCookie.DataStructures.ClippingMode.Clip">
+            <summary> Cuts the content to fit. </summary>
+        </member>
+        <member name="F:GuiCookie.DataStructures.ClippingMode.Squeeze">
+            <summary> Squeezes the content to fit. </summary>
+        </member>
+        <member name="F:GuiCookie.DataStructures.ClippingMode.Stretch">
+            <summary> Stretches the content to fill the whole area. </summary>
+        </member>
+        <member name="F:GuiCookie.DataStructures.ElementContainer.removalQueue">
+            <summary> 
+            The collection of elements to be removed from the <see cref="F:GuiCookie.DataStructures.ElementContainer.children"/> and/or <see cref="F:GuiCookie.DataStructures.ElementContainer.additionQueue"/> collection nex time <see cref="M:GuiCookie.DataStructures.ElementContainer.flushQueues"/> is called. 
+            Each item within this collection exists in the children and/or addition collection and there are no duplicates.
+            </summary>
+        </member>
+        <member name="F:GuiCookie.DataStructures.ElementContainer.additionQueue">
+            <summary>
+            If an item in this collection also exists within the main children collection, then it also exists within the removal queue. This basically means that the next flush will remove and re-add the item.
+            </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.ElementContainer.Element">
+            <summary> The Element that this container represents. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.ElementContainer.Count">
+            <summary> The number of active children within this container. </summary>
+        </member>
+        <member name="M:GuiCookie.DataStructures.ElementContainer.#ctor(GuiCookie.Root)">
+            <summary> Creates an element container for the root. </summary>
+            <param name="root"> The layout's root. </param>
+        </member>
+        <member name="M:GuiCookie.DataStructures.ElementContainer.AddChild(GuiCookie.DataStructures.ElementContainer)">
+            <summary>  </summary>
+            <param name="child"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GuiCookie.DataStructures.SideMask">
+            <summary> Represents four different directions. </summary>
+        </member>
+        <member name="M:GuiCookie.DataStructures.Sides.ScaleRectangle(Microsoft.Xna.Framework.Rectangle)">
+            <summary> Scales the given rectangle based on the values of this padding. </summary>
+            <param name="baseRectangle"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GuiCookie.DataStructures.Space">
+            <summary> Represents a two-dimensional position or size where either axis can be relative or absolute. </summary>
+        </member>
+        <member name="M:GuiCookie.DataStructures.Space.#ctor(Microsoft.Xna.Framework.Point)">
+            <summary> Creates a new space with the given absolute pixel <paramref name="point"/>. </summary>
+            <param name="point"></param>
+        </member>
+        <member name="F:GuiCookie.Elements.Button.mouseHandler">
+            <summary> The component that handles mouse events. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Button.LeftClicked">
+            <summary> Fired when the button is left clicked. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Button.RightClicked">
+            <summary> Fired when the button is right clicked. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.StyleState">
+            <summary> The <see cref="T:GuiCookie.Styles.StyleStateMachine"/> used to determine the current style based on the state of this element. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.Style">
+            <summary> The current <see cref="P:GuiCookie.Elements.Element.Style"/> that the <see cref="P:GuiCookie.Elements.Element.StyleState"/> is using. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.CurrentStyleVariant">
+            <summary> The <see cref="P:GuiCookie.Elements.Element.StyleState"/>'s current <see cref="T:GuiCookie.Styles.StyleVariant"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.InitialisationState">
+            <summary> The initialisation state of this element, showing which initialisation functions have been called. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.Template">
+            <summary> The template used to create this element. A copy of this template can be used to create a copy of this element via the <see cref="!:ElementManager.CreateElementFromTemplateName(string, AttributeCollection, Element)(Template, Template, AttributeCollection, Element)"/> function. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.Name">
+            <summary> The name of this element, used along with the <see cref="M:GuiCookie.Elements.Element.GetChildByName``1(System.String,System.Boolean)"/> function. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.HasName">
+            <summary> Is true if this element's <see cref="P:GuiCookie.Elements.Element.Name"/> is not null or whitespace, otherwise; false. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.Tag">
+            <summary> The root-level unique tag of this element, used with <see cref="M:GuiCookie.Root.GetElementFromTag``1(System.String)"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.HasTag">
+            <summary> Is true if this element's <see cref="P:GuiCookie.Elements.Element.Tag"/> is not null or whitespace, otherwise; false. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.Root">
+            <summary> The root containing this element. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.Bounds">
+            <summary> The positional data of this element, with its size and position. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.Attributes">
+            <summary> The attributes used to create this element from the layout sheet. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.Parent">
+            <summary> The element whose child is this element, or null if this is a root-level element. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.BlocksMouse">
+            <summary> Is true if this element can be moused over; otherwise false. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.EnabledAndVisible">
+            <summary> Is true if this element is both visible and enabled; otherwise false. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.Enabled">
+            <summary> Is true if this element should handle logic; otherwise false. Note that this usually does not do anything special, and it is up to the controller to decide what to do when disabled. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.Visible">
+            <summary> Is true if this element should be drawn; otherwise false. Note that this element will still be updated even if invisible, and can still handle clicks. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.HasChildren">
+            <summary> Is true if this element's <see cref="P:GuiCookie.Elements.Element.ChildCount"/> is greater than 0, otherwise; false. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.ChildCount">
+            <summary> The number of child elements of this element. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.OnChildAdded">
+            <summary> Is invoked when a child element is added to this element. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.OnChildRemoved">
+            <summary> Is invoked when a child element is removed from this element. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.OnEnabled">
+            <summary> Is invoked when this element's <see cref="P:GuiCookie.Elements.Element.Enabled"/> value is changed to true. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.Element.OnDisabled">
+            <summary> Is invoked when this element's <see cref="P:GuiCookie.Elements.Element.Enabled"/> value is changed to false. </summary>
+        </member>
+        <member name="M:GuiCookie.Elements.Element.OnCreated">
+            <summary> Called after the element has been fully set up. Use this to set references to components, although other elements may not exist yet. </summary>
+        </member>
+        <member name="M:GuiCookie.Elements.Element.OnFullSetup">
+            <summary> Called after every element has been fully set up. Use this to set references to other elements. </summary>
+        </member>
+        <member name="M:GuiCookie.Elements.Element.OnPostFullSetup">
+            <summary> Called after every element's <see cref="M:GuiCookie.Elements.Element.OnFullSetup"/> function has been called. Use this to initialise elements who required element references from <see cref="M:GuiCookie.Elements.Element.OnFullSetup"/>. </summary>
+        </member>
+        <member name="M:GuiCookie.Elements.Element.validateSizeChanged">
+            <summary> Is fired when this element's size changes, returning a value that indicates whether or not the resize was valid. </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuiCookie.Elements.Element.OnStyleChanged">
+            <summary> Called when this element's <see cref="P:GuiCookie.Elements.Element.Style"/> or <see cref="P:GuiCookie.Elements.Element.StyleState"/> is changed. Fired after <see cref="M:GuiCookie.Components.Component.OnStyleChanged"/>. </summary>
+        </member>
+        <member name="M:GuiCookie.Elements.Element.GetChild``1">
+            <summary> </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:GuiCookie.Elements.Element.GetComponent``1">
+            <summary> Gets the component with the type <typeparamref name="T"/>, or null if the component does not exist. </summary>
+            <typeparam name="T"> The type of <see cref="T:GuiCookie.Components.Component"/> to get. </typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:GuiCookie.Elements.Element.GetInterfacedComponent``1">
+            <summary> Gets the first component that implements the given interface <typeparamref name="T"/>, or null if none exist or <typeparamref name="T"/> was not an interface. </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:GuiCookie.Elements.Element.Draw(GuiCookie.Rendering.IGuiCamera)">
+            <summary> 
+            Called once per frame. By default, draws every component in the order of definition within the templates.
+            Do not call this function from an overridden function if you wish to change this behaviour.
+            </summary>
+            <param name="guiCamera"></param>
+            <remarks>
+            If the element is not visible, <see cref="M:GuiCookie.Elements.Element.Draw(GuiCookie.Rendering.IGuiCamera)"/> will still be called, but the components will not be drawn by default.
+            </remarks>
+        </member>
+        <member name="T:GuiCookie.Elements.ElementManager">
+            <summary> Allows for elements to be created from templates. </summary>
+        </member>
+        <member name="M:GuiCookie.Elements.ElementManager.CreateElementFromTemplateName(System.String,GuiCookie.Attributes.AttributeCollection,GuiCookie.Elements.Element,System.Object[])">
+            <summary> Creates an <see cref="T:GuiCookie.Elements.Element"/> using the <see cref="T:GuiCookie.Templates.Template"/> with the given <paramref name="templateName"/> and <paramref name="attributes"/>. </summary>
+            <param name="templateName"> The name of the template to use. </param>
+            <param name="attributes"> The attributes to pass to the main <see cref="T:GuiCookie.Elements.Element"/> along with the base <see cref="T:GuiCookie.Templates.Template"/>, or null if just the base <see cref="T:GuiCookie.Templates.Template"/> is to be used. </param>
+            <param name="parent"> The <see cref="T:GuiCookie.Elements.Element"/> to parent the new <see cref="T:GuiCookie.Elements.Element"/> to. </param>
+            <param name="inputs"> Any items to be passed through to the constructor of the <see cref="T:GuiCookie.Elements.Element"/>. </param>
+            <returns> The created <see cref="T:GuiCookie.Elements.Element"/>. </returns>
+        </member>
+        <member name="P:GuiCookie.Elements.TextBox.Text">
+            <summary> The text of the box. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.TextButton.TextBlock">
+            <summary> The text block that holds the actual text. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.TextButton.Text">
+            <summary> The text of the button. </summary>
+        </member>
+        <member name="T:GuiCookie.Helpers.GridLayoutHelper">
+            <summary> Helps with aligning elements to a grid. </summary>
+        </member>
+        <member name="M:GuiCookie.Helpers.GridLayoutHelper.SnapPixelPosition(Microsoft.Xna.Framework.Point,Microsoft.Xna.Framework.Point)">
+            <summary> Converts the given <paramref name="pixelPosition"/> so that it aligns with the grid defined by the given <paramref name="cellSize"/>. </summary>
+            <param name="pixelPosition"> The grid position to adjust. </param>
+            <param name="cellSize"> The size of a cell. </param>
+            <returns> The snapped pixel position. </returns>
+        </member>
+        <member name="M:GuiCookie.Helpers.GridLayoutHelper.CellToPixelPosition(Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Point)">
+            <summary> Converts the given <paramref name="cellPosition"/> and returns a pixel position snapped to the grid defined by the given <paramref name="cellSize"/>. </summary>
+            <param name="cellPosition"> The position of the cell. </param>
+            <param name="cellSize"> The size of a cell. </param>
+            <returns> The snapped pixel position. </returns>
+        </member>
+        <member name="M:GuiCookie.Helpers.GridLayoutHelper.CellToPixelPosition(Microsoft.Xna.Framework.Point,Microsoft.Xna.Framework.Point)">
+            <summary> Converts the given <paramref name="cellPosition"/> into a pixel position that has been snapped to the grid defined by the given <paramref name="cellSize"/>. </summary>
+            <param name="cellPosition"> The position of the cell. </param>
+            <param name="cellSize"> The size of a cell. </param>
+            <returns> The snapped pixel position. </returns>
+        </member>
+        <member name="M:GuiCookie.Helpers.GridLayoutHelper.CellToPixelSpace(Microsoft.Xna.Framework.Point,Microsoft.Xna.Framework.Point,System.Nullable{Microsoft.Xna.Framework.Point})">
+            <summary> Creates an absolute <see cref="T:GuiCookie.DataStructures.Space"/> with a pixel position that has been snapped to the grid defined by the given <paramref name="cellSize"/>. </summary>
+            <param name="cellPosition"> The position of the cell. </param>
+            <param name="cellSize"> The size of a cell. </param>
+            <returns> The snapped absolute position space. </returns>
+        </member>
+        <member name="M:GuiCookie.Helpers.GridLayoutHelper.PixelToCellPosition(Microsoft.Xna.Framework.Point,Microsoft.Xna.Framework.Point)">
+            <summary> Converts the given <paramref name="pixelPosition"/> into a cell position on the grid defined by the given <paramref name="cellSize"/>. </summary>
+            <param name="pixelPosition"> The position of the pixel. </param>
+            <param name="cellSize"> The size of a cell. </param>
+            <returns> The converted cell position. </returns>
+        </member>
+        <member name="M:GuiCookie.Helpers.GridLayoutHelper.AdjustSize(Microsoft.Xna.Framework.Point,Microsoft.Xna.Framework.Point)">
+            <summary> Calculates the size in pixels from the given <paramref name="sizeInCells"/> in grid cells. </summary>
+            <param name="sizeInCells"> The size in grid cells to adjust. </param>
+            <param name="cellSize"> The size of a cell. </param>
+            <returns> The adjusted size. </returns>
+        </member>
+        <member name="M:GuiCookie.Helpers.GridLayoutHelper.AdjustSizeToSpace(Microsoft.Xna.Framework.Point,Microsoft.Xna.Framework.Point)">
+            <summary> Calculates the size in pixels from the given <paramref name="sizeInCells"/> in grid cells. </summary>
+            <param name="sizeInCells"> The size in grid cells to adjust. </param>
+            <param name="cellSize"> The size of a cell. </param>
+            <returns> The adjusted size. </returns>
+        </member>
+        <member name="P:GuiCookie.Input.DragAndDrop.DragAndDropManager.CurrentDraggable">
+            <summary> The current <see cref="T:GuiCookie.Input.DragAndDrop.IDraggable"/> that is being dragged. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.DragAndDrop.DragAndDropManager.DraggableOffset">
+            <summary> The position of the mouse relative to the <see cref="P:GuiCookie.Input.DragAndDrop.DragAndDropManager.CurrentDraggable"/> when it was first dragged. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.DragAndDrop.DragAndDropManager.DraggableOrigin">
+            <summary> The absolute total position of the <see cref="P:GuiCookie.Input.DragAndDrop.DragAndDropManager.CurrentDraggable"/> when it was first dragged. </summary>
+        </member>
+        <member name="M:GuiCookie.Input.DragAndDrop.DragAndDropManager.BeginDragging(GuiCookie.Input.DragAndDrop.IDraggable,Microsoft.Xna.Framework.Point)">
+            <summary> 
+            Begins dragging the given <paramref name="draggable"/> so long as the <see cref="P:GuiCookie.Input.DragAndDrop.DragAndDropManager.CurrentDraggable"/> is null. Uses the given <paramref name="offset"/> when keeping the draggable pinned to the mouse. 
+            Calls <see cref="!:IDraggable.OnDragBegin(Point)"/> with the given <paramref name="offset"/> and sets the <see cref="P:GuiCookie.Input.DragAndDrop.DragAndDropManager.CurrentDraggable"/> to its return value.
+            </summary>
+            <param name="draggable"></param>
+            <param name="offset"></param>
+        </member>
+        <member name="M:GuiCookie.Input.DragAndDrop.DragAndDropManager.StopDragging(GuiCookie.Input.DragAndDrop.IDropTarget,Microsoft.Xna.Framework.Point)">
+            <summary> Stops dragging the <see cref="P:GuiCookie.Input.DragAndDrop.DragAndDropManager.CurrentDraggable"/>, attempting to drop it into the given <paramref name="dropTarget"/>. </summary>
+            <param name="dropTarget">  </param>
+            <param name="offset">  </param>
+        </member>
+        <member name="M:GuiCookie.Input.DragAndDrop.IDraggable.OnDragBegin(Microsoft.Xna.Framework.Point,Microsoft.Xna.Framework.Point@)">
+            <summary> Is called by the drag and drop manager when nothing is being dragged and the user starts dragging the element containing this component. </summary>
+            <param name="relativeMousePosition"> The position of the mouse relative to this component's bounds. </param>
+            <returns> The draggable to be set as the current within the drag and drop manager. </returns>
+        </member>
+        <member name="M:GuiCookie.Input.DragAndDrop.IDraggable.OnDragEnd(GuiCookie.Input.DragAndDrop.IDropTarget,Microsoft.Xna.Framework.Point)">
+            <summary> Is called after <see cref="M:GuiCookie.Input.DragAndDrop.IDropTarget.OnDraggableDropped(GuiCookie.Input.DragAndDrop.IDraggable,Microsoft.Xna.Framework.Point)"/>, using its return value as the <paramref name="dropTarget"/> parameter. </summary>
+            <param name="dropTarget"> The <see cref="T:GuiCookie.Input.DragAndDrop.IDropTarget"/> that this <see cref="T:GuiCookie.Input.DragAndDrop.IDraggable"/> was dropped onto. </param>
+            <param name="relativeMousePosition"> The position of the mouse relative to the original <see cref="T:GuiCookie.Input.DragAndDrop.IDropTarget"/>. </param>
+            <returns> True if the drop is successful; otherwise, false. If the drop was successful, the <see cref="P:GuiCookie.Input.DragAndDrop.DragAndDropManager.CurrentDraggable"/> is set to null. </returns>
+        </member>
+        <member name="M:GuiCookie.Input.DragAndDrop.IDropTarget.OnDraggableHovered(GuiCookie.Input.DragAndDrop.IDraggable,Microsoft.Xna.Framework.Point)">
+            <summary> Is called every frame that the <paramref name="draggable"/> is being held over this <see cref="T:GuiCookie.Input.DragAndDrop.IDropTarget"/> but without being dropped. </summary>
+            <param name="draggable"> The draggable that is being hovered. </param>
+            <param name="relativeMousePosition"> The mouse position relative to this drop target's element. </param>
+        </member>
+        <member name="M:GuiCookie.Input.DragAndDrop.IDropTarget.OnDraggableDropped(GuiCookie.Input.DragAndDrop.IDraggable,Microsoft.Xna.Framework.Point)">
+            <summary>
+            Is called when an <see cref="T:GuiCookie.Input.DragAndDrop.IDraggable"/> component is dragged and dropped within the bounds of this component's element.
+            Note that this function should not change the parents/children of any of the elements, that can be done in <see cref="M:GuiCookie.Input.DragAndDrop.IDraggable.OnDragEnd(GuiCookie.Input.DragAndDrop.IDropTarget,Microsoft.Xna.Framework.Point)"/>, which is called directly after this function.
+            </summary>
+            <param name="draggable"> The draggable that has been dropped. </param>
+            <param name="relativeMousePosition"> The mouse position relative to this drop target's element. </param>
+            <returns> The target that should be given the <paramref name="draggable"/>. </returns>
+        </member>
+        <member name="T:GuiCookie.Input.InputManager">
+            <summary> Keeps internal buffers of both <see cref="T:Microsoft.Xna.Framework.Input.Keyboard"/> and <see cref="T:Microsoft.Xna.Framework.Input.Mouse"/> states and supplies easy methods of checking against those states. </summary>
+        </member>
+        <member name="F:GuiCookie.Input.InputManager.currentKeyboardState">
+            <summary> The <see cref="T:Microsoft.Xna.Framework.Input.KeyboardState"/> of the current frame. </summary>
+        </member>
+        <member name="F:GuiCookie.Input.InputManager.previousKeyboardState">
+            <summary> The <see cref="T:Microsoft.Xna.Framework.Input.KeyboardState"/> of the previous frame. </summary>
+        </member>
+        <member name="F:GuiCookie.Input.InputManager.currentMouseState">
+            <summary> The <see cref="T:Microsoft.Xna.Framework.Input.MouseState"/> of the current frame. </summary>
+        </member>
+        <member name="F:GuiCookie.Input.InputManager.previousMouseState">
+            <summary> The <see cref="T:Microsoft.Xna.Framework.Input.MouseState"/> of the previous frame. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.MousePosition">
+            <summary> The current position of the <see cref="T:Microsoft.Xna.Framework.Input.Mouse"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.MouseLeftClickPosition">
+            <summary> Gets the value representing the position of the <see cref="T:Microsoft.Xna.Framework.Input.Mouse"/> when the left click button was pressed, only changing when the button is released then pressed again. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.MouseRightClickPosition">
+            <summary> Gets the value representing the position of the <see cref="T:Microsoft.Xna.Framework.Input.Mouse"/> when the right click button was pressed, only changing when the button is released then pressed again. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.MousedOverElement">
+            <summary> The deepest <see cref="T:GuiCookie.Elements.Element"/> that the <see cref="T:Microsoft.Xna.Framework.Input.Mouse"/> is currently hovering over. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.MousedOverClickable">
+            <summary> The deepest <see cref="T:GuiCookie.Elements.IClickable"/> that the <see cref="T:Microsoft.Xna.Framework.Input.Mouse"/> is currently hovering over. </summary>
+        </member>
+        <member name="M:GuiCookie.Input.InputManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys)">
+            <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> is pressed on the current frame; otherwise, <c>false</c>. </summary>
+            <param name="key"> The <see cref="!:Key"/> to check. </param>
+        </member>
+        <member name="M:GuiCookie.Input.InputManager.IsKeyUp(Microsoft.Xna.Framework.Input.Keys)">
+            <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> is unpressed on the current frame; otherwise, <c>false</c>. </summary>
+            <param name="key"> The <see cref="!:Key"/> to check. </param>
+        </member>
+        <member name="M:GuiCookie.Input.InputManager.WasKeyDown(Microsoft.Xna.Framework.Input.Keys)">
+            <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> was pressed on the previous frame; otherwise, <c>false</c>. </summary>
+            <param name="key"> The <see cref="!:Key"/> to check. </param>
+        </member>
+        <member name="M:GuiCookie.Input.InputManager.WasKeyUp(Microsoft.Xna.Framework.Input.Keys)">
+            <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> was unpressed on the previous frame; otherwise, <c>false</c>. </summary>
+            <param name="key"> The <see cref="!:Key"/> to check. </param>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.IsLeftMouseDown">
+            <summary> Gets a value that is <c>true</c> when the left mouse button is clicked on the current frame; otherwise, <c>false</c>. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.IsLeftMouseUp">
+            <summary> Gets a value that is <c>true</c> when the left mouse button is unclicked on the current frame; otherwise, <c>false</c>. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.WasLeftMouseDown">
+            <summary> Gets a value that is <c>true</c> when the left mouse button was clicked on the previous frame; otherwise, <c>false</c>. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.WasLeftMouseUp">
+            <summary> Gets a value that is <c>true</c> when the left mouse button was unclicked on the previous frame; otherwise, <c>false</c>. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.IsRightMouseDown">
+            <summary> Gets a value that is <c>true</c> when the right mouse button is clicked on the current frame; otherwise, <c>false</c>. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.IsRightMouseUp">
+            <summary> Gets a value that is <c>true</c> when the right mouse button is unclicked on the current frame; otherwise, <c>false</c>. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.WasRightMouseDown">
+            <summary> Gets a value that is <c>true</c> when the right mouse button was clicked on the previous frame; otherwise, <c>false</c>. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.WasRightMouseUp">
+            <summary> Gets a value that is <c>true</c> when the right mouse button was unclicked on the previous frame; otherwise, <c>false</c>. </summary>
+        </member>
+        <member name="M:GuiCookie.Input.InputManager.#ctor">
+            <summary> Creates a new <see cref="T:GuiCookie.Input.InputManager"/> using the default Monogame input. </summary>
+        </member>
+        <member name="M:GuiCookie.Input.InputManager.UpdateMouseAndKeyboardStates">
+            <summary> Updates the internal <see cref="T:Microsoft.Xna.Framework.Input.KeyboardState"/>s and <see cref="T:Microsoft.Xna.Framework.Input.MouseState"/>s, giving a current snapshot of the inputs. </summary>
+        </member>
+        <member name="M:GuiCookie.Input.InputManager.UpdateElementStates(GuiCookie.Elements.ElementManager)">
+            <summary> Updates the <see cref="N:GuiCookie.Elements"/> properties, giving a current snapshot of the selected <see cref="N:GuiCookie.Elements"/>s. </summary>
+            <param name="elementManager"></param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:GuiCookie.Input.InputManager.findMousedOverElement(System.Collections.Generic.IEnumerable{GuiCookie.Elements.Element})" -->
+        <!-- Badly formed XML comment ignored for member "M:GuiCookie.Input.InputManager.FindMousedOverBase``1(System.Collections.Generic.IEnumerable{GuiCookie.Elements.Element},GuiCookie.Elements.Element)" -->
+        <member name="M:GuiCookie.Input.InputManager.FindMousedOverWithComponent``1(System.Collections.Generic.IEnumerable{GuiCookie.Elements.Element},GuiCookie.Elements.Element)">
+            <summary> Finds the <see cref="T:GuiCookie.Components.Component"/> belonging to an <see cref="T:GuiCookie.Elements.Element"/> furthest removed from the root-level that is moused over. </summary>
+            <typeparam name="T"> The type of <see cref="T:GuiCookie.Components.Component"/> to find. </typeparam>
+            <param name="container"> The element container to check first. </param>
+            <param name="ignoreElement"> The element to ignore, or null if no elements are to be ignored. </param>
+            <returns> The <typeparamref name="T"/> version of the moused over component. </returns>
+            <remarks> Recursively calls upon this function in order to perform the search. The recursion happens before the component check, so elements with no children are checked first, then their parents, and so on. </remarks>
+        </member>
+        <member name="M:GuiCookie.Input.InputManager.FindInBoundsWithInterfacedComponent``1(GuiCookie.DataStructures.ElementContainer,Microsoft.Xna.Framework.Rectangle,GuiCookie.Elements.Element)">
+            <summary> Finds the <see cref="T:GuiCookie.Components.Component"/> belonging to an <see cref="T:GuiCookie.Elements.Element"/> furthest removed from the root-level that is moused over and implements the given <typeparamref name="T"/> interface. </summary>
+            <typeparam name="T"> The type of interface to find. </typeparam>
+            <param name="container"> The element container to check first. </param>
+            <param name="bounds"> The bounds to check. </param>
+            <param name="ignoreElement"> The element to ignore, or null if no elements are to be ignored. </param>
+            <returns> The interfaced version of the moused over component. </returns>
+            <remarks> Recursively calls upon this function in order to perform the search. The recursion happens before the component check, so elements with no children are checked first, then their parents, and so on. </remarks>
+        </member>
+        <member name="T:GuiCookie.Rendering.IGuiCamera">
+            <summary> Interfaces away a class that draws textures and fonts, implement this on your camera class to allow the UI to draw with it. </summary>
+        </member>
+        <member name="T:GuiCookie.Root">
+            <summary> The base class for a UI controller, inherit from this and create a new inherited class via the <see cref="T:GuiCookie.UIManager"/> to create a custom UI controller. </summary>
+        </member>
+        <member name="P:GuiCookie.Root.Bounds">
+            <summary> The bounds of the game window. </summary>
+        </member>
+        <member name="P:GuiCookie.Root.IsMousedOver">
+            <summary> Gets a value that is <c>true</c> when the mouse is over an element; otherwise, <c>false</c>. </summary>
+        </member>
+        <member name="P:GuiCookie.Root.HasSetUp">
+            <summary> Is true if the layout file has been loaded and the starting elements set up; otherwise false. </summary>
+        </member>
+        <member name="M:GuiCookie.Root.InternalInitialise(System.String,GuiCookie.Styles.StyleManager,GuiCookie.Templates.TemplateManager,GuiCookie.Input.InputManager,GuiCookie.Input.DragAndDrop.DragAndDropManager,GuiCookie.Elements.ElementManager,Microsoft.Xna.Framework.GameWindow)">
+            <summary> Creates a new gui <see cref="T:GuiCookie.Root"/> using the given dependencies, loading its data from the given <paramref name="guiSheetPath"/>. </summary>
+            <param name="guiSheetPath"> The file path of the gui xml file. </param>
+            <param name="contentManager"> The object used to load content. </param>
+            <param name="gameWindow"> The window onto which the GUI should be drawn. </param>
+            <param name="graphicsDevice"> The graphics device used to create <see cref="T:Microsoft.Xna.Framework.Graphics.Texture2D"/>s. </param>
+        </member>
+        <member name="M:GuiCookie.Root.OnCreated">
+            <summary> Is called before anything is set up. </summary>
+        </member>
+        <member name="M:GuiCookie.Root.PreInitialise">
+            <summary> Is called just before any elements are loaded. </summary>
+        </member>
+        <member name="M:GuiCookie.Root.Initialise">
+            <summary> Is called just after all elements are loaded, but <see cref="M:GuiCookie.Elements.Element.OnFullSetup"/> and <see cref="M:GuiCookie.Elements.Element.OnPostFullSetup"/> have not been called. </summary>
+        </member>
+        <member name="M:GuiCookie.Root.PostInitialise">
+            <summary> Is called once everything has been set up. </summary>
+        </member>
+        <member name="M:GuiCookie.Root.loadStyleSheets(GuiCookie.Styles.StyleManager,GuiCookie.Attributes.AttributeCollection)">
+            <summary> Loads and saves the style sheets from the given <paramref name="mainNode"/> into the given <paramref name="styleManager"/>. </summary>
+            <param name="styleManager"> The <see cref="T:GuiCookie.Styles.StyleManager"/> into which the <paramref name="mainNode"/> is loaded. </param>
+            <param name="attributes"> The <see cref="N:GuiCookie.Attributes"/> of the main node. </param>
+        </member>
+        <member name="M:GuiCookie.Root.loadTemplateSheets(GuiCookie.Templates.TemplateManager,GuiCookie.Attributes.AttributeCollection)">
+            <summary> Loads and saves the template sheets from the given <paramref name="mainNode"/> into the given <paramref name="templateManager"/>. </summary>
+            <param name="templateManager"> The <see cref="T:GuiCookie.Templates.TemplateManager"/> into which the <paramref name="mainNode"/> is loaded. </param>
+            <param name="attributes"> The <see cref="N:GuiCookie.Attributes"/> of the main node. </param>
+        </member>
+        <member name="M:GuiCookie.Root.screenResized(System.Object,System.EventArgs)">
+            <summary> Is called when the screen resizes, handles moving and resizing elements. </summary>
+            <param name="state"></param>
+            <param name="args"></param>
+        </member>
+        <member name="M:GuiCookie.Root.GetElementFromTag(System.String)">
+            <summary> Gets the <see cref="N:GuiCookie.Elements"/> with the given <paramref name="tag"/>, or <c>null</c> if none was found. </summary>
+            <param name="tag"> The tag of the <see cref="N:GuiCookie.Elements"/>. </param>
+            <returns> The <see cref="N:GuiCookie.Elements"/> with the given <paramref name="tag"/>. </returns>
+        </member>
+        <member name="M:GuiCookie.Root.GetElementFromTag``1(System.String)">
+            <summary> Gets the <see cref="N:GuiCookie.Elements"/> with the given <paramref name="tag"/>, or <c>null</c> if none was found. </summary>
+            <typeparam name="T"> The type of <see cref="N:GuiCookie.Elements"/> to find. </typeparam>
+            <param name="tag"> The tag of the <see cref="N:GuiCookie.Elements"/>. </param>
+            <returns> The <see cref="N:GuiCookie.Elements"/> with the given <paramref name="tag"/>. </returns>
+        </member>
+        <member name="M:GuiCookie.Root.RemoveElement(GuiCookie.Elements.Element)">
+            <summary> Creates, adds, and returns an <see cref="T:GuiCookie.Elements.Element"/> loaded from the given <paramref name="templateName"/>, using the <paramref name="attributes"/>, and as a child of the given <paramref name="parent"/>. </summary>
+            <param name="template"> The <see cref="T:GuiCookie.Templates.Template"/> from which to create the <see cref="T:GuiCookie.Elements.Element"/>. </param>
+            <param name="attributes"> The <see cref="N:GuiCookie.Attributes"/> of the new <see cref="T:GuiCookie.Elements.Element"/>. </param>
+            <param name="parent"> The parent <see cref="T:GuiCookie.Elements.Element"/> of the new <see cref="T:GuiCookie.Elements.Element"/>, or <c>null</c> to add it to the <see cref="T:GuiCookie.Root"/> instead. </param>
+            <returns> The created <see cref="T:GuiCookie.Elements.Element"/>. </returns>
+        </member>
+        <member name="M:GuiCookie.Root.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary> Updates the UI. </summary>
+            <param name="gameTime"> The current time of the game. </param>
+        </member>
+        <member name="M:GuiCookie.Root.Draw(GuiCookie.Rendering.IGuiCamera)">
+            <summary> Draws the UI. </summary>
+            <param name="guiCamera"> The <see cref="T:GuiCookie.Rendering.IGuiCamera"/> with which to draw. </param>
+        </member>
+        <member name="P:GuiCookie.Styles.Content.Colour">
+            <summary> The main colour applied to content (image blocks, etc.). </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Font.SpriteFont">
+            <summary> The <see cref="P:GuiCookie.Styles.Font.SpriteFont"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Font.Colour">
+            <summary> The text colour. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Font.Offset">
+            <summary> The amount of pixels to offset the final position by. This is useful for things like buttons that appear to be pushed inwards. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.IStyleAttribute.Name">
+            <summary> The name of this style attribute. </summary>
+        </member>
+        <member name="M:GuiCookie.Styles.IStyleAttribute.CreateCopy">
+            <summary> Fully copies all attribute values to a new object. </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GuiCookie.Styles.IStyleAttribute.OverrideBaseAttribute(GuiCookie.Styles.IStyleAttribute)">
+            <summary> This is called when this style attribute must be combined with another in order to create a hybrid style. This usually happens for things like a style's hover attributes overriding the base. </summary>
+            <param name="baseAttribute"></param>
+        </member>
+        <member name="T:GuiCookie.Styles.ResourceManager">
+            <summary> Handles loading and holding style resources. </summary>
+        </member>
+        <member name="F:GuiCookie.Styles.ResourceManager.fontsByName">
+            <summary> The font resources keyed by name. </summary>
+        </member>
+        <member name="F:GuiCookie.Styles.ResourceManager.imagesByName">
+            <summary> The image resources keyed by name. </summary>
+        </member>
+        <member name="F:GuiCookie.Styles.ResourceManager.coloursByName">
+            <summary> The colour resources keyed by name. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.ResourceManager.RootFolder">
+            <summary> The root folder from which the resources are loaded. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.ResourceManager.FontsByName">
+            <summary> The readonly fonts keyed by name. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.ResourceManager.ImagesByName">
+            <summary> The readonly images keyed by name. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.ResourceManager.ColoursByName">
+            <summary> The readonly colours keyed by name. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.SliceFrame.Image">
+            <summary> Gets a value representing the name of the image atlas that this <see cref="T:GuiCookie.Styles.SliceFrame"/> sources from. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.SliceFrame.Colour">
+            <summary> Gets a value representing the <see cref="T:Microsoft.Xna.Framework.Color"/> of the main tint, or <see cref="T:GuiCookie.Styles.SliceFrame"/> <see cref="T:Microsoft.Xna.Framework.Color"/> if no texture is supplied. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.SliceFrame.CacheTexture">
+            <summary> True if any texture created from this SliceFrame should be cached to a separate texture, false if it should be drawn on-demand. </summary>
+        </member>
+        <member name="T:GuiCookie.Styles.Style">
+            <summary> Represents the parameters of an <see cref="N:GuiCookie.Elements"/>'s style. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Style.Name">
+            <summary> The name of this <see cref="T:GuiCookie.Styles.Style"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Style.BaseStyleName">
+            <summary> The name of the <see cref="T:GuiCookie.Styles.Style"/> that this style inherits from. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Style.BaseVariant">
+            <summary> The base <see cref="T:GuiCookie.Styles.StyleVariant"/> with no changes applied. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Style.StyleVariantsByName">
+            <summary> The read-only collection of style variants. </summary>
+        </member>
+        <member name="M:GuiCookie.Styles.Style.#ctor(GuiCookie.Styles.ResourceManager,LiruGameHelper.Reflection.ConstructorCache{GuiCookie.Styles.IStyleAttribute},System.Xml.XmlNode)">
+            <summary> Creates a style from the given <paramref name="styleNode"/>. </summary>
+            <param name="styleNode"> The <see cref="T:System.Xml.XmlNode"/> that contains the element style. </param>
+        </member>
+        <member name="T:GuiCookie.Styles.StyleManager">
+            <summary> Loads, stores, and handles styles. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.StyleManager.ResourceManager">
+            <summary> The object that holds all loaded resources for this style manager. </summary>
+        </member>
+        <member name="M:GuiCookie.Styles.StyleManager.Add(GuiCookie.Styles.Style)">
+            <summary> Adds the given <paramref name="style"/> to the manager, allowing it to be used by <see cref="T:GuiCookie.Elements.Element"/>s. </summary>
+            <param name="style"> The style to add. </param>
+        </member>
+        <member name="P:GuiCookie.Styles.StyleStateMachine.BaseVariant">
+            <summary> The base variant of the current <see cref="P:GuiCookie.Styles.StyleStateMachine.Style"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.StyleStateMachine.HoveredVariant">
+            <summary> The variant of the current <see cref="P:GuiCookie.Styles.StyleStateMachine.Style"/> that is used when the element is moused over, defaulting to <see cref="P:GuiCookie.Styles.StyleStateMachine.BaseVariant"/> if none was defined. </summary>
+            <remarks> The element needs a <see cref="T:GuiCookie.Components.MouseHandler"/> in order for this variant to be used. </remarks>
+        </member>
+        <member name="P:GuiCookie.Styles.StyleStateMachine.ClickedVariant">
+            <summary> The variant of the current <see cref="P:GuiCookie.Styles.StyleStateMachine.Style"/> that is used when the element is clicked, defaulting to <see cref="P:GuiCookie.Styles.StyleStateMachine.BaseVariant"/> if none was defined. </summary>
+            <remarks> The element needs a <see cref="T:GuiCookie.Components.MouseHandler"/> in order for this variant to be used. </remarks>
+        </member>
+        <member name="P:GuiCookie.Styles.StyleStateMachine.DisabledVariant">
+            <summary> The variant of the current <see cref="P:GuiCookie.Styles.StyleStateMachine.Style"/> that is used when the element is disabled, defaulting to <see cref="P:GuiCookie.Styles.StyleStateMachine.BaseVariant"/> if none was defined. </summary>
+        </member>
+        <member name="F:GuiCookie.Styles.StyleStateMachine.mouseHandler">
+            <summary> The mouse handler of the parent element. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.StyleStateMachine.CurrentStyleVariant">
+            <summary> The current style variant according to the state of the element. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.StyleStateMachine.Style">
+            <summary> The style to work with. </summary>
+        </member>
+        <member name="F:GuiCookie.Styles.StyleVariant.styleAttributesByTypeAndName">
+            <summary> The collection of style attributes keyed by a combination of the type and its name. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.StyleVariant.Name">
+            <summary> The name of this variant, e.g. "Hover". </summary>
+        </member>
+        <member name="M:GuiCookie.Styles.StyleVariant.GetFirstAttributeOfType``1">
+            <summary> Gets the first attribute of the type <typeparamref name="T"/>, prioritising unnamed attributes. </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="P:GuiCookie.Templates.Template.IdentifierName">
+            <summary> The name used to identify this template as a child. This is the name attribute in the xml. </summary>
+        </member>
+        <member name="M:GuiCookie.Templates.Template.CreateCopy">
+            <summary> Copies this template's values to new collections. Also performs a copy on every child, ensuring the resulting copy is safe to use. </summary>
+            <returns></returns>
+        </member>
+        <member name="T:GuiCookie.Templates.TemplateManager">
+            <summary> Manages templates from a template sheet. </summary>
+        </member>
+        <member name="M:GuiCookie.Templates.TemplateManager.LoadDefault">
+            <summary> Loads the default template definitions from an embedded xml file. </summary>
+        </member>
+        <member name="F:GuiCookie.UIManager.componentCache">
+            <summary> Caches component types and constructors, so that a single <see cref="T:GuiCookie.UIManager"/> can store every registered <see cref="T:GuiCookie.Components.Component"/>. </summary>
+        </member>
+        <member name="M:GuiCookie.UIManager.#ctor(Microsoft.Xna.Framework.Game)">
+            <summary> Creates a new <see cref="T:GuiCookie.UIManager"/> with the dependencies taken from the given <paramref name="game"/>. </summary>
+            <param name="game"> The Monogame <see cref="T:Microsoft.Xna.Framework.Game"/> instance. </param>
+        </member>
+        <member name="M:GuiCookie.UIManager.#ctor(Microsoft.Xna.Framework.Content.ContentManager,Microsoft.Xna.Framework.GameWindow,Microsoft.Xna.Framework.Graphics.GraphicsDevice)">
+            <summary> Creates a new <see cref="T:GuiCookie.UIManager"/> with the dependencies manually given. </summary>
+            <param name="contentManager"> The <see cref="T:Microsoft.Xna.Framework.Content.ContentManager"/>. </param>
+            <param name="gameWindow"> The <see cref="T:Microsoft.Xna.Framework.GameWindow"/>. </param>
+            <param name="graphicsDevice"> The <see cref="T:Microsoft.Xna.Framework.Graphics.GraphicsDevice"/>. </param>
+        </member>
+        <member name="M:GuiCookie.UIManager.CreateUIRoot``1(System.String,System.Object[])">
+            <summary> Creates a new <see cref="T:GuiCookie.Root"/> with the given type <typeparamref name="T"/>, loaded from the sheet found at <paramref name="sheetPath"/>, and passing along any <paramref name="parameters"/> to the root's constructor. </summary>
+            <typeparam name="T"> The type of <see cref="T:GuiCookie.Root"/> to create. </typeparam>
+            <param name="sheetPath"> The file path of the xml file to load. </param>
+            <param name="parameters"> Any parameters to pass to the constructor of the <see cref="T:GuiCookie.Root"/> object. </param>
+            <returns> A <see cref="T:GuiCookie.Root"/> object with the given type, constructed with the given parameters. </returns>
+        </member>
+        <member name="M:GuiCookie.UIManager.CreateGuiCamera">
+            <summary> Creates the default Monogame <see cref="T:GuiCookie.Rendering.GuiCamera"/> with a new <see cref="T:Microsoft.Xna.Framework.Graphics.SpriteBatch"/>. </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

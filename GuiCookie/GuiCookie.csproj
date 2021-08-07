@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <Version>1.7.3.10</Version>
+	  <Version>1.7.3.11</Version>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>Liru</Authors>
     <Company>Lovebirb</Company>
@@ -12,10 +12,12 @@
     <PackageIcon>Icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/LiruJ/GuiCookie</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>MonoGame; User Interface; UI</PackageTags>
+    <PackageTags>MonoGame; UI</PackageTags>
     <NeutralLanguage>English (United Kingdom)</NeutralLanguage>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <FileVersion>1.7.3.11</FileVersion>
+    <AssemblyVersion>1.7.3.11</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
