@@ -340,7 +340,30 @@ namespace GuiCookie.Elements
         #region Child Functions
         public bool ContainsChild(Element child) => ElementContainer.Contains(child?.ElementContainer);
 
+        /// <summary> </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public T GetChild<T>() where T : Element => ElementContainer.GetChild<T>();
+
+        public T GetInterfacedChild<T>() where T : class
+            => TryGetInterfacedChild(out T interfacedChild) ? interfacedChild : null;
+
+        public bool TryGetInterfacedChild<T>(out T interfacedChild) where T : class
+        {
+            interfacedChild = null;
+            if (!typeof(T).IsInterface) return false;
+
+            foreach (Element child in ElementContainer)
+            {
+                if (child is T interfacedElement)
+                {
+                    interfacedChild = interfacedElement;
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         public Element GetChildByName(string name, bool recursive = false) => ElementContainer.GetChildByName(name, recursive);
 
@@ -350,6 +373,24 @@ namespace GuiCookie.Elements
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Given name cannot be null.", nameof(name));
 
             return ElementContainer.GetChildByName<T>(name, recursive);
+        }
+
+        public T GetInterfacedChildByName<T>(string name, bool recursive = false) where T : class
+            => TryGetInterfacedChildByName(name, out T interfacedChild, recursive) ? interfacedChild : null;
+
+        public bool TryGetInterfacedChildByName<T>(string name, out T interfacedChild, bool recursive = false) where T : class
+        {
+            interfacedChild = null;
+            if (!typeof(T).IsInterface) return false;
+
+            Element child = GetChildByName(name, recursive);
+
+            if (child is T interfacedElement)
+            {
+                interfacedChild = interfacedElement;
+                return true;
+            }
+            return false;
         }
 
         public Element GetChildByIndex(int index) => ElementContainer.GetChildByIndex(index);
@@ -392,7 +433,7 @@ namespace GuiCookie.Elements
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public T GetInterfacedComponent<T>() where T : class
-            => TryGetInterfacedComponent<T>(out T interfacedComponent) ? interfacedComponent : null;
+            => TryGetInterfacedComponent(out T interfacedComponent) ? interfacedComponent : null;
 
         public bool TryGetInterfacedComponent<T>(out T interfacedComponent) where T : class
         {

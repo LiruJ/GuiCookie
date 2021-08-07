@@ -30,6 +30,10 @@ namespace GuiCookie.Elements
             cellLayout = GetComponent<GridLayout>();
             mouseHandler = GetComponent<MouseHandler>();
 
+            //
+            //  TODO: CORRECT THIS WITH SPACING.
+            //
+
             // If a both components were given, bind left click to select a cell.
             if (mouseHandler != null && cellLayout != null)
             {

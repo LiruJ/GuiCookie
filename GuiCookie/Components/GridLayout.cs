@@ -25,13 +25,13 @@ namespace GuiCookie.Components
 
         #region Fields
         /// <summary> Is <c>true</c> if the layout needs to recalculate next frame, otherwise; <c>false</c>. </summary>
-        private bool isDirty = false;
+        private bool isDirty = true;
         #endregion
 
         #region Backing Fields
         private Point? cellSize = null;
 
-        private Point? gridSizeAttribute = null;
+        private Point? gridSize = null;
 
         private Point cachedGridSize = Point.Zero;
 
@@ -45,11 +45,38 @@ namespace GuiCookie.Components
             get => cellSize ?? Vector2.Floor(Bounds.ContentSize.ToVector2() / GridSize.ToVector2()).ToPoint();
             set
             {
+                // If either axis of the value is invalid, do nothing.
+                if (value.X <= 0 || value.Y <= 0) return;
+
+                // If the value is the same as the current value, do nothing.
+                if (value == cellSize) return;
+
                 // Set the cell size.
                 cellSize = value;
 
                 // Dirty the layout.
-                isDirty = true;
+                MakeDirty();
+            }
+        }
+
+        /// <summary>
+        /// If set to <c>false</c>; sets the internal cell size variable to null so that <see cref="GridSize"/> is automatically calculated from <see cref="CellSize"/>.
+        /// Note that if <see cref="HasExplicitGridSize"/> is <c>false</c>, setting this value to false will have no effect.
+        /// </summary>
+        public bool HasExplicitCellSize
+        {
+            get => cellSize.HasValue;
+            set
+            {
+                // Only handle a false value, and only make the change if there is a grid size to fall back on.
+                if (!value && HasExplicitGridSize)
+                {
+                    // Clear the value.
+                    cellSize = null;
+
+                    // Dirty the layout.
+                    MakeDirty();
+                }
             }
         }
 
@@ -59,7 +86,7 @@ namespace GuiCookie.Components
             get
             {
                 // If the attribute has been set, use that.
-                if (gridSizeAttribute.HasValue) return gridSizeAttribute.Value;
+                if (gridSize.HasValue) return gridSize.Value;
 
                 // Otherwise; if the layout is dirty, recalculate and return the grid size.
                 if (isDirty) recalculateGridSize();
@@ -67,11 +94,34 @@ namespace GuiCookie.Components
             }
             set
             {
+                // If either axis of the value is invalid, do nothing.
+                if (value.X <= 0 || value.Y <= 0) return;
+
+                // If the value is the same as the current value, do nothing.
+                if (value == gridSize) return;
+
                 // Set the grid size.
-                gridSizeAttribute = value;
+                gridSize = value;
 
                 // Dirty the layout.
-                isDirty = true;
+                MakeDirty();
+            }
+        }
+
+        /// <summary>
+        /// If set to <c>false</c>; sets the internal grid size variable to null so that <see cref="GridSize"/> is automatically calculated from <see cref="CellSize"/>.
+        /// Note that if <see cref="HasExplicitCellSize"/> is <c>false</c>, setting this value to false will have no effect.
+        /// </summary>
+        public bool HasExplicitGridSize
+        {
+            get => gridSize.HasValue;
+            set
+            {
+                // Clear the value.
+                gridSize = null;
+
+                // Dirty the layout.
+                MakeDirty();
             }
         }
 
@@ -98,7 +148,7 @@ namespace GuiCookie.Components
                 spacing = value;
 
                 // Dirty the layout.
-                isDirty = true;
+                MakeDirty();
             }
         }
         #endregion
@@ -113,11 +163,12 @@ namespace GuiCookie.Components
         #region Initialisation Functions
         public override void OnCreated()
         {
-            gridSizeAttribute = Element.Attributes.GetAttributeOrDefault(gridSizeAttributeName, (Point?)null, ToPoint.TryParse);
+            // Load the grid and cell size.
+            gridSize = Element.Attributes.GetAttributeOrDefault(gridSizeAttributeName, (Point?)null, ToPoint.TryParse);
             cellSize = Element.Attributes.GetAttributeOrDefault(cellSizeAttributeName, (Point?)null, ToPoint.TryParse);
 
             // A grid layout cannot function without at least one defined dimensional property, so throw an exception if that is the case.
-            if (gridSizeAttribute == null && cellSize == null)
+            if (gridSize == null && cellSize == null)
                 throw new Exception($"{nameof(GridLayout)} of {(string.IsNullOrWhiteSpace(Element.Name) ? Element.ToString() : Element.Name)} does not have a {gridSizeAttributeName} or {cellSizeAttributeName} defined. Must have at least one.");
 
             // Load the spacing.
@@ -127,55 +178,56 @@ namespace GuiCookie.Components
         public override void OnSetup()
         {
             // Bind the child added/removed signals to recalculate the layout.
-            Element.OnChildAdded.Connect((_) => isDirty = true);
-            Element.OnChildRemoved.Connect((_) => isDirty = true);
-
-            // Dirty the layout to start with.
-            isDirty = true;
+            Element.OnChildAdded.Connect((_) => MakeDirty());
+            Element.OnChildRemoved.Connect((_) => MakeDirty());
         }
         #endregion
 
-        #region Range Functions
-        public bool IsInRange(Point cellPosition) => IsInRange(cellPosition.X, cellPosition.Y);
-
-        public bool IsInRange(int x, int y) => x >= 0 && x < ColumnCount && y >= 0 && y < RowCount;
-        #endregion
-
         #region Calculation Functions
-        public override void OnSizeChanged() => isDirty = true;
+        public override void OnSizeChanged() => MakeDirty();
+
+        /// <summary> Makes this layout dirty, meaning it will be recalculated next time it is drawn, updated, or certain properties are accessed. </summary>
+        public void MakeDirty() => isDirty = true;
 
         private void recalculateGridSize()
         {
             // If the grid size attribute has been set, there's no need to calculate the grid size.
-            if (gridSizeAttribute.HasValue) return;
+            if (gridSize.HasValue) return;
 
             // Pre-calculate the cell size.
             Point cellSize = CellSize;
 
-            // Reset the previous value.
-            cachedGridSize = Point.Zero;
-
-            // Count the number of grid cells on the X and Y axis.
-            int currentWidth = 0;
-            while (currentWidth < Bounds.ContentSize.X)
+            // If there is no spacing, don't bother doing the calculations the long way.
+            if (Spacing == Point.Zero) 
+                cachedGridSize = Vector2.Floor(Bounds.ContentSize.ToVector2() / cellSize.ToVector2()).ToPoint();
+            // Otherwise; do the calculations the long way.
+            else
             {
-                currentWidth += cellSize.X;
+                // Reset the previous value.
+                cachedGridSize = Point.Zero;
 
-                if (currentWidth < Bounds.ContentSize.X)
-                    cachedGridSize.X++;
+                // Count the number of grid cells on the X and Y axis.
+                int currentWidth = 0;
+                while (currentWidth < Bounds.ContentSize.X)
+                {
+                    currentWidth += cellSize.X;
 
-                currentWidth += Spacing.X;
-            }
+                    if (currentWidth < Bounds.ContentSize.X)
+                        cachedGridSize.X++;
 
-            int currentHeight = 0;
-            while (currentHeight < Bounds.ContentSize.Y)
-            {
-                currentHeight += cellSize.Y;
+                    currentWidth += Spacing.X;
+                }
 
-                if (currentHeight < Bounds.ContentSize.Y)
-                    cachedGridSize.Y++;
+                int currentHeight = 0;
+                while (currentHeight < Bounds.ContentSize.Y)
+                {
+                    currentHeight += cellSize.Y;
 
-                currentHeight += Spacing.Y;
+                    if (currentHeight < Bounds.ContentSize.Y)
+                        cachedGridSize.Y++;
+
+                    currentHeight += Spacing.Y;
+                }
             }
 
             // Force update the layout. This means that the grid size will accurately represent the grid,
@@ -212,10 +264,9 @@ namespace GuiCookie.Components
         #endregion
 
         #region Update Functions
-        public override void Draw(IGuiCamera guiCamera)
-        {
-            if (isDirty) recalculateLayout();
-        }
+        public override void Draw(IGuiCamera guiCamera) { if (isDirty) recalculateLayout(); }
+
+        public override void Update(GameTime gameTime) { if (isDirty) recalculateLayout(); }
         #endregion
     }
 }

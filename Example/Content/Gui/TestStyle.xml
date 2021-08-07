@@ -47,7 +47,7 @@
     </Default>
 
     <Button Base="Default">
-      <SliceFrame Image="Button"  ShadowOffset="-2, 2" ShadowColour="#4444"/>
+      <SliceFrame Image="Button"  ShadowOffset="-2, 2" ShadowColour="#444a"/>
 
       <Clicked>
         <SliceFrame Image="ButtonPressed"/>

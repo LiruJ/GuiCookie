@@ -20,6 +20,11 @@
 		<SliderHandle Name="Handle" Size="100%, 10%" Style="VerticalSliderHandle"/>
 	</VerticalSliderBar>
 
+	<LabelledSlider Components="DirectionalLayout" Controller="LabelledSlider" Layout="Horizontal" Prefix="Value: ">
+		<TextBox Size="45%, 100%" Name="Label"/>
+		<HorizontalSliderBar Size="55%, 100%" DecimalDigits="2" Name="Slider"/>
+	</LabelledSlider>
+	
 	<ProgressBar Components="Frame, ImageBlock" Controller="ProgressBar"/>
 
 	<!--Panes-->

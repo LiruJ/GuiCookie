@@ -23,6 +23,10 @@ namespace Example.Elements
 
         #region Elements
         private GridLayout grid = null;
+
+        private LabelledSlider xSpaceSlider = null;
+
+        private LabelledSlider ySpaceSlider = null;
         #endregion
 
         #region Fields
@@ -41,6 +45,9 @@ namespace Example.Elements
         public override void OnFullSetup()
         {
             grid = GetChildByName("Grid").GetComponent<GridLayout>();
+            xSpaceSlider = GetChildByName<LabelledSlider>("XSpaceSlider");
+            ySpaceSlider = GetChildByName<LabelledSlider>("YSpaceSlider");
+
 
             Template cellTemplate = Root.TemplateManager.GetTemplateFromName("ImageLabel");
 
@@ -49,7 +56,6 @@ namespace Example.Elements
             {
                 ImageBlock portraitImage = Root.ElementManager.CreateElementFromTemplate(cellTemplate, null, grid.Element).GetComponent<ImageBlock>();
                 portraitImage.ClippingMode = GuiCookie.DataStructures.ClippingMode.Stretch;
-
 
                 Rectangle source = new Rectangle(x * portraitDimension, y * portraitDimension, portraitDimension, portraitDimension);
 
@@ -62,6 +68,15 @@ namespace Example.Elements
                 }
                 else x++;
             }
+        }
+
+        public override void OnPostFullSetup()
+        {
+            grid.Spacing = new Point((int)xSpaceSlider.Slider.Value, (int)ySpaceSlider.Slider.Value);
+
+            xSpaceSlider?.Slider?.ConnectValueChanged(() => grid.Spacing = new Point((int)xSpaceSlider.Slider.Value, grid.Spacing.Y));
+            ySpaceSlider?.Slider?.ConnectValueChanged(() => grid.Spacing = new Point(grid.Spacing.X, (int)ySpaceSlider.Slider.Value));
+
         }
         #endregion
     }

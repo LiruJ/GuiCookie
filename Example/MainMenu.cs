@@ -13,7 +13,7 @@ namespace Example
         #endregion
 
         #region Elements
-        private TestList testList = null;
+        private ListPane testList = null;
 
         private TextButton disableButton = null;
 
@@ -27,7 +27,7 @@ namespace Example
 
         protected override void PostInitialise()
         {
-            testList = GetElementFromTag<TestList>("List");
+            testList = GetElementFromTag<ListPane>("List");
 
             disableButton = GetElementFromTag<TextButton>("DisableButton");
             targetButton = GetElementFromTag<TextButton>("TargetButton");
@@ -48,10 +48,7 @@ namespace Example
                 }
             });
 
-            for (int i = 0; i < 10; i++)
-            {
-                testList.Add(new ListItemData(random.Next(0, 9999), $"Item {testList.ChildCount + 1}"));
-            }
+
         }
     }
 }

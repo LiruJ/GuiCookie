@@ -1,29 +1,54 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Main Styles="Content/Gui/TestStyle" DefaultStyle="Button" Templates="Elements/TestTemplates.xml" Padding="1%">
 
-	<Pane Position="0, 0" Size="20%, 10%" Padding="5">
-		<TextButton Position="0, 0" Size="100%, 50%" Text="Disable Button" Tag="DisableButton"/>
-		<TextButton Position="0, 50%" Size="100%, 50%" Text="Enabled" Tag="TargetButton"/>
-	</Pane>
+	<!--The main column layout-->
+	<Partition Components="DirectionalLayout" Size="100%" Layout="Horizontal" Spacing="4">
+		<!--The button column-->
+		<Partition Size="15%, 100%">
+			<!--The pane that shows button states-->
+			<Pane Position="0, 0" Size="100%, 10%" Padding="5">
+				<TextButton Position="0, 0" Size="100%, 50%" Text="Disable Button" Tag="DisableButton"/>
+				<TextButton Position="0, 50%" Size="100%, 50%" Text="Enabled" Tag="TargetButton"/>
+			</Pane>
+		</Partition>
 
-	<TestList Position="100%, 0" Size="20%, 50%" Pivot="100%, 0" Padding="5" Tag="List">
+		<!--The grid of portraits-->
+		<Pane Controller="PortraitGrid" Components="DirectionalLayout" Position="15%, 0%" Size="20%, 35%" Padding="5" Spacing="4">
+			<!--The grid itself-->
+			<Partition Components="Frame, GridLayout" Size="100%, 80%" CellSize="20" Spacing="1" Name="Grid"/>
+			
+			<!--The spacing sliders-->
+			<LabelledSlider Size="100%, 16" Prefix="X Space: " Suffix="px" Name="XSpaceSlider">
+				<TextBox Name="Label"/>
+				<HorizontalSliderBar DecimalDigits="0" MaximumValue="5" Name="Slider"/>
+			</LabelledSlider>
+			<LabelledSlider Components="Frame" Size="100%, 16" Prefix="Y Space: " Suffix="px" Name="YSpaceSlider">
+				<TextBox Name="Label"/>
+				<HorizontalSliderBar DecimalDigits="0" MaximumValue="5" Name="Slider"/>
+			</LabelledSlider>
+		</Pane>
 
-	</TestList>
+		<!--The vertical list of items-->
+		<ListPane Components="DirectionalLayout" Size="20%, 50%" Spacing="4" Padding="5">
+			<!--The list itself-->
+			<Pane Components="DirectionalLayout" Size="100%, 80%" Padding="5" Name="List"/>
+			<!--The add child button-->
+			<TextButton Size="100%, 24" Text="Add Item" Name="AddItemButton"/>
+			
+			<!--The spacing slider-->
+			<LabelledSlider Size="100%, 16" Prefix="Space: " Suffix="px" Name="SpaceSlider">
+				<TextBox Name="Label"/>
+				<HorizontalSliderBar DecimalDigits="0" MaximumValue="5" Name="Slider"/>
+			</LabelledSlider>
+		</ListPane>
+	</Partition>
 
-	<ScrollPane Position="0%, 10%" Size="20%, 20%">
-		<HorizontalSliderBar Name="HorizontalSlider" Size="90%, 16"/>
-		<VerticalSliderBar Name="VerticalSlider" Size="16, 90%"/>
-	</ScrollPane>
-
-	<Pane Controller="PortraitGrid" Position="25%, 0%" Size="20%, 35%" Padding="5">
-		<Partition Components="Frame, GridLayout" Size="100%, 80%" CellSize="20" Spacing="1" Name="Grid"/>
-	</Pane>
-
-	<DropTest Position="40%, 75%" Size="20%" CellSize="64"/>
+	<!--These will be enabled again once the layout is a bit neater-->
+	<!--<DropTest Position="40%, 75%" Size="20%" CellSize="64"/>
 	<DropTest Position="65%, 75%" Size="20%" CellSize="64"/>
 
 	<TestDraggable Position="0%, 80%" Size="10%, 5%" Text="Drag Me"/>
 	<TestDraggable Position="0%, 85%" Size="10%, 5%" Text="Drag Me"/>
 	<TestDraggable Position="0%, 90%" Size="10%, 5%" Text="Drag Me"/>
-	<TestDraggable Position="0%, 95%" Size="10%, 5%" Text="Drag Me"/>
+	<TestDraggable Position="0%, 95%" Size="10%, 5%" Text="Drag Me"/>-->
 </Main>

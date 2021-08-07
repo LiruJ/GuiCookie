@@ -1,5 +1,4 @@
 ﻿using GuiCookie.DataStructures;
-using GuiCookie.Elements;
 using Microsoft.Xna.Framework;
 using System;
 
@@ -59,40 +58,6 @@ namespace GuiCookie.Helpers
             // Set the position and size of the bounds.
             bounds.ScaledPosition = CellToPixelSpace(cellPosition, cellSize, spacing);
             bounds.ScaledSize = AdjustSizeToSpace(new Point(1), cellSize);
-        }
-
-        public static void RecalculateLayout(Element element)
-        {
-            // The current width and height of the calculated row and column.
-            float currentWidth = 0;
-            float currentHeight = 0;
-
-            // The height of the current row.
-            float rowHeight = 0;
-
-            // Go over each child element in the parent element.
-            foreach (Element childElement in element)
-            {
-                // Reposition the current child element.
-                childElement.Bounds.ScaledPosition = new Space(currentWidth, currentHeight, Axes.None);
-
-                // Add the width of the just added child to the current width.
-                currentWidth += childElement.Bounds.TotalSize.X;
-
-                // If the height of the just added child is greater than the height of the current row, save it.
-                rowHeight = Math.Max(rowHeight, childElement.Bounds.TotalSize.Y);
-
-                // If the width of the current row is greater than the size of the containing element, start on the next row.
-                if (currentWidth >= element.Bounds.ContentSize.X)
-                {
-                    // Add the row height to the current height.
-                    currentHeight += rowHeight;
-
-                    // Reset the current width and row height.
-                    currentWidth = 0;
-                    rowHeight = 0;
-                }
-            }
         }
         #endregion
     }
