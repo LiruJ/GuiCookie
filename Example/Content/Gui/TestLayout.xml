@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Main Styles="Content/Gui/TestStyle" DefaultStyle="Button" Templates="Elements/TestTemplates.xml" Padding="1%">
+<Main Styles="Gui\\TestStyle" DefaultStyle="Default" Templates="Gui\\TestTemplates" Padding="1%">
 
 	<!--The main column layout-->
 	<Partition Components="DirectionalLayout" Size="100%" Layout="Horizontal" Spacing="4">
@@ -7,8 +7,8 @@
 		<Partition Size="15%, 100%">
 			<!--The pane that shows button states-->
 			<Pane Position="0, 0" Size="100%, 10%" Padding="5">
-				<TextButton Position="0, 0" Size="100%, 50%" Text="Disable Button" Tag="DisableButton"/>
-				<TextButton Position="0, 50%" Size="100%, 50%" Text="Enabled" Tag="TargetButton"/>
+				<TextButton Position="0, 0" Size="100%, 50%" Style="Button" Text="Disable Button" Tag="DisableButton"/>
+				<TextButton Position="0, 50%" Size="100%, 50%" Style="Button" Text="Enabled" Tag="TargetButton"/>
 			</Pane>
 		</Partition>
 
@@ -33,7 +33,7 @@
 			<!--The list itself-->
 			<Pane Components="DirectionalLayout" Size="100%, 80%" Padding="5" Name="List"/>
 			<!--The add child button-->
-			<TextButton Size="100%, 24" Text="Add Item" Name="AddItemButton"/>
+			<TextButton Size="100%, 24" Text="Add Item" Style="Button" Name="AddItemButton"/>
 			
 			<!--The spacing slider-->
 			<LabelledSlider Size="100%, 16" Prefix="Space: " Suffix="px" Name="SpaceSlider">

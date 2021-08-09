@@ -42,10 +42,10 @@ namespace GuiCookie.Components
             Element = element ?? throw new ArgumentNullException(nameof(element));
         }
 
-        /// <summary> This is called after the component has been added to an element for the first time. The element itself will not be done setting up, use <see cref="OnSetup"/> if this is needed. </summary>
+        /// <summary> Called after the component has been added to an element. The element itself will not be done setting up, use <see cref="OnSetup"/> if this is needed. </summary>
         public virtual void OnCreated() { }
 
-        /// <summary> Called after the element has been fully set up. Use this to set references to other components, although other elements may not exist yet. </summary>
+        /// <summary> Called after the component's element has been fully set up. Use this to set references to other components, although other elements may not exist yet. </summary>
         public virtual void OnSetup() { }
 
         /// <summary> Called after every element has been fully set up. Use this to set references to other elements. </summary>
@@ -63,6 +63,8 @@ namespace GuiCookie.Components
         #endregion
 
         #region Update Functions
+        /// <summary> Called every update cycle, even if the <see cref="Element"/> is disabled. </summary>
+        /// <param name="gameTime"> The current time snapshot. </param>
         public virtual void Update(GameTime gameTime) { }
         #endregion
 

@@ -641,15 +641,15 @@
         <member name="M:GuiCookie.Root.PostInitialise">
             <summary> Is called once everything has been set up. </summary>
         </member>
-        <member name="M:GuiCookie.Root.loadStyleSheets(GuiCookie.Styles.StyleManager,GuiCookie.Attributes.AttributeCollection)">
+        <member name="M:GuiCookie.Root.loadStyleSheets(GuiCookie.Styles.StyleManager,System.Xml.XmlNode)">
             <summary> Loads and saves the style sheets from the given <paramref name="mainNode"/> into the given <paramref name="styleManager"/>. </summary>
             <param name="styleManager"> The <see cref="T:GuiCookie.Styles.StyleManager"/> into which the <paramref name="mainNode"/> is loaded. </param>
-            <param name="attributes"> The <see cref="N:GuiCookie.Attributes"/> of the main node. </param>
+            <param name="mainNode"> The main <see cref="T:System.Xml.XmlNode"/> of the layout sheet. </param>
         </member>
-        <member name="M:GuiCookie.Root.loadTemplateSheets(GuiCookie.Templates.TemplateManager,GuiCookie.Attributes.AttributeCollection)">
+        <member name="M:GuiCookie.Root.loadTemplateSheets(GuiCookie.Templates.TemplateManager,System.Xml.XmlNode)">
             <summary> Loads and saves the template sheets from the given <paramref name="mainNode"/> into the given <paramref name="templateManager"/>. </summary>
             <param name="templateManager"> The <see cref="T:GuiCookie.Templates.TemplateManager"/> into which the <paramref name="mainNode"/> is loaded. </param>
-            <param name="attributes"> The <see cref="N:GuiCookie.Attributes"/> of the main node. </param>
+            <param name="mainNode"> The main <see cref="T:System.Xml.XmlNode"/> of the layout sheet. </param>
         </member>
         <member name="M:GuiCookie.Root.screenResized(System.Object,System.EventArgs)">
             <summary> Is called when the screen resizes, handles moving and resizing elements. </summary>
@@ -810,6 +810,11 @@
         </member>
         <member name="T:GuiCookie.Templates.TemplateManager">
             <summary> Manages templates from a template sheet. </summary>
+        </member>
+        <member name="M:GuiCookie.Templates.TemplateManager.GetTemplateFromName(System.String)">
+            <summary> Gets the <see cref="T:GuiCookie.Templates.Template"/> which has the given <paramref name="templateName"/>. </summary>
+            <param name="templateName"> The name of the template to get. </param>
+            <returns> The template with the given <paramref name="templateName"/>. </returns>
         </member>
         <member name="M:GuiCookie.Templates.TemplateManager.LoadDefault">
             <summary> Loads the default template definitions from an embedded xml file. </summary>

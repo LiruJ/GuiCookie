@@ -10,7 +10,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.IO;
 using System.Reflection;
+using System.Xml;
 
 namespace GuiCookie
 {
@@ -74,6 +76,10 @@ namespace GuiCookie
         /// <returns> A <see cref="Root"/> object with the given type, constructed with the given parameters. </returns>
         public T CreateUIRoot<T>(string sheetPath, params object[] parameters) where T : Root
         {
+            // Ensure the file path exists.
+            if (string.IsNullOrWhiteSpace(sheetPath))
+                throw new ArgumentException($"'{nameof(sheetPath)}' cannot be null or whitespace.", nameof(sheetPath));
+
             // Create the service provider with the given parameters.
             GameServiceContainer serviceProvider = new GameServiceContainer();
             foreach (object service in parameters)
@@ -111,8 +117,23 @@ namespace GuiCookie
             ElementManager elementManager = new ElementManager(root, componentManager, templateManager, styleManager, elementCache, serviceProvider);
             serviceProvider.AddService(elementManager);
 
+            // Add an extension to the path if it is missing.
+            if (!Path.HasExtension(sheetPath))
+                sheetPath = Path.ChangeExtension(sheetPath, ".xml");
+
+            // Convert the path to be relative to the content.
+            sheetPath = Path.Combine(contentManager.RootDirectory, sheetPath);
+
+            // If the file does not exist, throw an exception.
+            if (!File.Exists(sheetPath)) 
+                throw new FileNotFoundException("The given gui sheet file path does not exist.", sheetPath);
+
+            // Load the sheet.
+            XmlDocument guiSheet = new XmlDocument();
+            guiSheet.Load(sheetPath);
+
             // Initialise the root.
-            root.InternalInitialise(sheetPath, styleManager, templateManager, inputManager, dragAndDropManager, elementManager, gameWindow);
+            root.InternalInitialise(guiSheet, styleManager, templateManager, inputManager, dragAndDropManager, elementManager, gameWindow);
 
             // Return the root.
             return root;

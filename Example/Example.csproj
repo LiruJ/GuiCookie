@@ -42,7 +42,7 @@
     <None Update="Content\Gui\TestStyle.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Elements\TestTemplates.xml">
+    <None Update="Content\Gui\TestTemplates.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -13,9 +13,9 @@ namespace Example
     /// </summary>
     public class Game1 : Game
     {
-        readonly GraphicsDeviceManager graphics;
+        private readonly GraphicsDeviceManager graphics;
         private GuiCamera camera;
-        MainMenu mainMenu;
+        private MainMenu mainMenu;
 
         private readonly Random random = new Random();
         public Game1()
@@ -49,15 +49,18 @@ namespace Example
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-
+            // Create the UI Manager.
             UIManager uiManager = new UIManager(this);
+
+            // Register the controllers.
             uiManager.RegisterElementNamespace(Assembly.GetExecutingAssembly(), "Example.Elements");
             
-
+            // Create the UI camera.
             camera = uiManager.CreateGuiCamera();
+            camera.SamplerState = SamplerState.PointClamp;
             
-            mainMenu = uiManager.CreateUIRoot<MainMenu>("Content/Gui/TestLayout.xml", random);
+            // Load the root.
+            mainMenu = uiManager.CreateUIRoot<MainMenu>("Gui\\TestLayout", random);
         }
 
         /// <summary>

@@ -1,86 +1,89 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Main>
-  <!--The resources for this style-->
-  <Resources Folder="">
-    <Colours>
-      <HoveredBackground Colour="#BABCDF"/>
-      <InlayBackground Colour="#8A8DB0"/>
-    </Colours>
-    <Fonts>
-      <Default URI="Gui\\TestFont"/>
-    </Fonts>
-    <Images>
-      <Main URI="Gui\\TestSprites" Tilemap="4, 4">
-        <Button/>
-        <ButtonPressed/>
-        <Inlay/>
-        <VerticalSliderBar Bounds="0, 48, 16, 24"/>
-        <HorizontalSliderBar Bounds="32, 48, 24, 16"/>
-        <VerticalSliderHandle Bounds="16, 48, 16, 12"/>
-        <HorizontalSliderHandle Bounds="32, 64, 12, 16"/>
-      </Main>
-      <Icons URI="Gui\\Icons" Tilemap="3, 3">
-        <RemoveButton Tile="0, 1"/>
-        <AddButton Tile="0, 2"/>
-      </Icons>
-    </Images>
-  </Resources>
+	<!--The resources for this style-->
+	<Resources >
+		<Colours>
+			<MainColour Colour="#5F628A"/>
+			<InlayColour Colour="#8488BC"/>
+			<MainTint Colour="#DDD"/>
+			<ClickedTint Colour="#AAA"/>
+			<DisabledTint Colour="#222"/>
+		</Colours>
+		<Fonts>
+			<Default URI="Gui\\TestFont"/>
+		</Fonts>
+		<Images>
+			<Main URI="Gui\\TestSprites" Tilemap="4, 4">
+				<Button/>
+				<Pane/>
+				<Inlay/>
+				<VerticalSliderBar Bounds="0, 48, 16, 24"/>
+				<HorizontalSliderBar Bounds="32, 48, 24, 16"/>
+				<VerticalSliderHandle Bounds="16, 48, 16, 12"/>
+				<HorizontalSliderHandle Bounds="32, 64, 12, 16"/>
+			</Main>
+			<Icons URI="Gui\\Icons" Tilemap="3, 3">
+				<RemoveButton Tile="0, 1"/>
+				<AddButton Tile="0, 2"/>
+			</Icons>
+		</Images>
+	</Resources>
 
-  <!--The main content for the style-->
-  <Styles>
-    <Default>
-      <SliceFrame NineSlice="Thirds, 101" Colour="#5F628A" ShadowOffset="-5, 5"/>
-      <Font Font="Default" Colour="#bbb" ShadowOffset="-1"/>
+	<!--The main content for the style-->
+	<Styles>
+		<Default>
+			<SliceFrame Image="Pane" NineSlice="Thirds, 1" Colour="$MainColour" Tint="$MainTint" ShadowOffset="-5, 5"/>
+			<Font Font="Default" Colour="#BBB" ShadowOffset="-1"/>
 
-      <Hovered>
-        <SliceFrame Tint="#ccc"/>
-        <Font Colour="#ddd"/>
-      </Hovered>
-      <Clicked>
-        <SliceFrame Tint="#aaa"/>
-        <Font Colour="#999" Offset="0, 2"/>
-      </Clicked>
-      <Disabled>
-        <SliceFrame Tint="#222"/>
-        <Font Colour="#444"/>
-      </Disabled>
-    </Default>
+			<Hovered>
+				<SliceFrame Tint="#FFF"/>
+				<Font Colour="#DDD"/>
+			</Hovered>
+			<Clicked>
+				<SliceFrame Tint="$ClickedTint"/>
+				<Font Colour="#999" Offset="0, 2"/>
+			</Clicked>
+			<Disabled>
+				<SliceFrame Tint="$DisabledTint"/>
+				<Font Colour="#444"/>
+			</Disabled>
+		</Default>
 
-    <Button Base="Default">
-      <SliceFrame Image="Button"  ShadowOffset="-2, 2" ShadowColour="#444a"/>
+		<Button Base="Default">
+			<SliceFrame Image="Button" ShadowOffset="-2, 2" ShadowColour="#444a"/>
 
-      <Clicked>
-        <SliceFrame Image="ButtonPressed"/>
-      </Clicked>
-    </Button>
+			<Clicked>
+				<SliceFrame Image="Pane"/>
+			</Clicked>
+		</Button>
 
-    <HorizontalSliderHandle Base="Default">
-      <SliceFrame Image="HorizontalSliderHandle" NineSlice="HSlice" Colour="#575EA5"/>
-    </HorizontalSliderHandle>
+		<HorizontalSliderHandle Base="Default">
+			<SliceFrame Image="HorizontalSliderHandle" NineSlice="HSlice" Colour="#575EA5"/>
+		</HorizontalSliderHandle>
 
-    <HorizontalSliderBar Base="Default">
-      <SliceFrame Image="HorizontalSliderBar" NineSlice="HSlice" Colour="#484D89"/>
-    </HorizontalSliderBar>
+		<HorizontalSliderBar Base="Default">
+			<SliceFrame Image="HorizontalSliderBar" NineSlice="HSlice" Colour="#484D89"/>
+		</HorizontalSliderBar>
 
-    <VerticalSliderBar Base="Default">
-      <SliceFrame Image="VerticalSliderBar" NineSlice="VSlice" Colour="#484D89"/>
-    </VerticalSliderBar>
+		<VerticalSliderBar Base="Default">
+			<SliceFrame Image="VerticalSliderBar" NineSlice="VSlice" Colour="#484D89"/>
+		</VerticalSliderBar>
 
-    <VerticalSliderHandle Base="Default">
-      <SliceFrame Image="VerticalSliderHandle" NineSlice="VSlice" Colour="#575EA5"/>
-    </VerticalSliderHandle>
+		<VerticalSliderHandle Base="Default">
+			<SliceFrame Image="VerticalSliderHandle" NineSlice="VSlice" Colour="#575EA5"/>
+		</VerticalSliderHandle>
 
-    <Inlay Base="Default">
-      <SliceFrame Image="Inlay" Colour="$InlayBackground"/>
-      <Font Colour="#ddd"/>
-    </Inlay>
+		<Inlay Base="Default">
+			<SliceFrame Image="Inlay" Colour="$InlayColour"/>
+			<Font Colour="#ddd"/>
+		</Inlay>
 
-    <Add Base="Default">
-      <SliceFrame Image="AddButton" Colour="$InlayBackground"/>
-    </Add>
+		<Add Base="Default">
+			<SliceFrame Image="AddButton" Colour="$InlayColour"/>
+		</Add>
 
-    <Remove Base="Default">
-      <SliceFrame Image="RemoveButton" Colour="$InlayBackground"/>
-    </Remove>
-  </Styles>
+		<Remove Base="Default">
+			<SliceFrame Image="RemoveButton" Colour="$InlayColour"/>
+		</Remove>
+	</Styles>
 </Main>

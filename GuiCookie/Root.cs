@@ -6,11 +6,9 @@ using GuiCookie.Input.DragAndDrop;
 using GuiCookie.Rendering;
 using GuiCookie.Styles;
 using GuiCookie.Templates;
+using LiruGameHelper.XML;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Globalization;
-using System.IO;
 using System.Xml;
 
 namespace GuiCookie
@@ -55,13 +53,16 @@ namespace GuiCookie
         protected Root() { }
         #endregion
 
-        #region Initialisation Functions
-        /// <summary> Creates a new gui <see cref="Root"/> using the given dependencies, loading its data from the given <paramref name="guiSheetPath"/>. </summary>
-        /// <param name="guiSheetPath"> The file path of the gui xml file. </param>
-        /// <param name="contentManager"> The object used to load content. </param>
-        /// <param name="gameWindow"> The window onto which the GUI should be drawn. </param>
-        /// <param name="graphicsDevice"> The graphics device used to create <see cref="Texture2D"/>s. </param>
-        internal void InternalInitialise(string guiSheetPath, StyleManager styleManager, TemplateManager templateManager, InputManager inputManager, DragAndDropManager dragAndDropManager, ElementManager elementManager, GameWindow gameWindow)
+        #region Initialisation Functions       
+        /// <summary> Creates a new root from the given <paramref name="guiSheet"/> and dependencies. </summary>
+        /// <param name="guiSheet"> The XML layout document. </param>
+        /// <param name="styleManager"> The styles. </param>
+        /// <param name="templateManager"> The templates. </param>
+        /// <param name="inputManager"> The object for handling user input. </param>
+        /// <param name="dragAndDropManager"> The drag and drop manager. </param>
+        /// <param name="elementManager"> The elements. </param>
+        /// <param name="gameWindow"> The MonoGame <see cref="GameWindow"/>. </param>
+        internal void InternalInitialise(XmlDocument guiSheet, StyleManager styleManager, TemplateManager templateManager, InputManager inputManager, DragAndDropManager dragAndDropManager, ElementManager elementManager, GameWindow gameWindow)
         {
             // Bind the window changing size.
             gameWindow.ClientSizeChanged += screenResized;
@@ -73,30 +74,21 @@ namespace GuiCookie
             ElementManager = elementManager;
             TemplateManager = templateManager;
 
+            // Call the created function.
             OnCreated();
-
-            // If the file does not exist, throw an exception.
-            if (!File.Exists(guiSheetPath)) throw new FileNotFoundException("The given gui sheet file path does not exist.");
-
-            // Load the sheet.
-            XmlDocument guiSheet = new XmlDocument();
-            guiSheet.Load(guiSheetPath);
             
             // Select the main node, if it does not exist, throw an exception.
             XmlNode mainNode = guiSheet.SelectSingleNode(mainNodeName) ?? throw new Exception($"Gui sheet's main node must be named {mainNodeName}.");
 
-            // Create the attributes for the main node.
-            AttributeCollection attributes = new AttributeCollection(mainNode);
-
             // Initialise the bounds to the size of the window and the parsed padding.
-            Bounds = new Bounds(elementManager.ElementContainer, gameWindow.ClientBounds.Size, attributes);
+            Bounds = new Bounds(elementManager.ElementContainer, gameWindow.ClientBounds.Size, new AttributeCollection(mainNode));
             
             // Load the built-in templates.
             templateManager.LoadDefault();
 
             // Load the UI's linked sheets.
-            loadStyleSheets(styleManager, attributes);
-            loadTemplateSheets(templateManager, attributes);
+            loadStyleSheets(styleManager, mainNode);
+            loadTemplateSheets(templateManager, mainNode);
 
             // Set the default style.
             styleManager.LoadDefaultStyle(mainNode);
@@ -135,32 +127,27 @@ namespace GuiCookie
         #region Load Functions
         /// <summary> Loads and saves the style sheets from the given <paramref name="mainNode"/> into the given <paramref name="styleManager"/>. </summary>
         /// <param name="styleManager"> The <see cref="Styles.StyleManager"/> into which the <paramref name="mainNode"/> is loaded. </param>
-        /// <param name="attributes"> The <see cref="Attributes"/> of the main node. </param>
-        private void loadStyleSheets(StyleManager styleManager, AttributeCollection attributes)
+        /// <param name="mainNode"> The main <see cref="XmlNode"/> of the layout sheet. </param>
+        private void loadStyleSheets(StyleManager styleManager, XmlNode mainNode)
         {
-            // Get the attribute.
-            string stylesString = attributes.HasAttribute(stylesAttributeName) 
-                ? attributes.GetAttribute(stylesAttributeName) : throw new Exception($"The given gui sheet does not have the required Styles attribute on the main node.");
-
-            // Split the string by comma, and load each value into the stylemanager.
-            string[] styles = stylesString.Split(',');
-            foreach (string styleSheetName in styles) styleManager.LoadFromSheet(styleSheetName.Trim());
+            // Try to load the style paths. If it fails, then throw an exception.
+            if (!mainNode.GetAttributeList(stylesAttributeName, out string[] stylePaths))
+                throw new Exception($"The given gui sheet does not have the required Styles attribute on the main node.");
+            
+            // Load each style file.
+            foreach (string styleSheetName in stylePaths) styleManager.LoadFromSheet(styleSheetName);
         }
 
         /// <summary> Loads and saves the template sheets from the given <paramref name="mainNode"/> into the given <paramref name="templateManager"/>. </summary>
         /// <param name="templateManager"> The <see cref="Templates.TemplateManager"/> into which the <paramref name="mainNode"/> is loaded. </param>
-        /// <param name="attributes"> The <see cref="Attributes"/> of the main node. </param>
-        private void loadTemplateSheets(TemplateManager templateManager, AttributeCollection attributes)
+        /// <param name="mainNode"> The main <see cref="XmlNode"/> of the layout sheet. </param>
+        private void loadTemplateSheets(TemplateManager templateManager, XmlNode mainNode)
         {
-            // If the attribute does not exist, do nothing, as default templates will be used.
-            if (!attributes.HasAttribute(templatesAttributeName)) return;
+            // Try to load the template paths. If it fails, then return and just use the defaults.
+            if (!mainNode.GetAttributeList(templatesAttributeName, out string[] templatePaths)) return;
 
-            // Get the attribute.
-            string templatesString = attributes.GetAttribute(templatesAttributeName);
-
-            // Split the string by comma, and load each value into the templatemanager.
-            string[] templates = templatesString.Split(',');
-            foreach (string templateSheetName in templates) templateManager.LoadFromSheet(templateSheetName.Trim());
+            // Load each template file.
+            foreach (string templateSheetName in templatePaths) templateManager.LoadFromSheet(templateSheetName, StyleManager.ResourceManager.ContentManager.RootDirectory);
         }
         #endregion
 

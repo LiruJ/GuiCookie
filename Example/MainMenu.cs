@@ -1,34 +1,19 @@
-﻿using Example.DataStructures;
-using Example.Elements;
-using GuiCookie;
+﻿using GuiCookie;
 using GuiCookie.Elements;
-using System;
 
 namespace Example
 {
     public class MainMenu : Root
     {
-        #region Dependencies
-        private readonly Random random = null;
-        #endregion
-
         #region Elements
-        private ListPane testList = null;
-
         private TextButton disableButton = null;
 
         private TextButton targetButton = null;
         #endregion
 
-        public MainMenu(Random random)
-        {
-            this.random = random;
-        }
-
+        #region Initialisation Functions
         protected override void PostInitialise()
         {
-            testList = GetElementFromTag<ListPane>("List");
-
             disableButton = GetElementFromTag<TextButton>("DisableButton");
             targetButton = GetElementFromTag<TextButton>("TargetButton");
 
@@ -47,8 +32,7 @@ namespace Example
                     disableButton.Text = "Enable Button";
                 }
             });
-
-
         }
+        #endregion
     }
 }

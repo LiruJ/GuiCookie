@@ -17,32 +17,11 @@ namespace GuiCookie.Components
         private readonly InputManager inputManager;
         #endregion
 
-        #region Fields
-        /// <summary> The mode of click detection to use. </summary>
-        private ClickType clickType;
-        #endregion
-
-        #region Signals
-        /// <summary> Is fired when the mouse enters this <see cref="Element"/>. </summary>
-        public IConnectableSignal MouseEntered => mouseEntered;
-        private readonly Signal mouseEntered = new Signal();
-
-        /// <summary> Is fired when the mouse leaves this <see cref="Element"/>. </summary>
-        public IConnectableSignal MouseLeft => mouseLeft;
-        private readonly Signal mouseLeft = new Signal();
-
-        /// <summary> Is fired when the mouse is over this <see cref="Element"/> and the left mouse button is clicked. </summary>
-        public IConnectableSignal LeftClicked => leftClicked;
-        private readonly Signal leftClicked = new Signal();
-
-        /// <summary> Is fired when the mouse is over this <see cref="Element"/> and the right mouse button is clicked. </summary>
-        public IConnectableSignal RightClicked => rightClicked;
-        private readonly Signal rightClicked = new Signal();
-        #endregion
-
         #region Properties
+        /// <summary> Quick access for <see cref="InputManager.MousePosition"/>. </summary>
         public Point AbsoluteMousePosition => inputManager.MousePosition;
 
+        /// <summary> The position of the mouse relative to this component's <see cref="Element"/>. </summary>
         public Point RelativeMousePosition => inputManager.MousePosition - Element.Bounds.AbsoluteTotalPosition;
 
         /// <summary> Is <c>true</c> if the mouse was left clicked on the <see cref="Element"/> and is currently being held down, regardless of mouse position. </summary>
@@ -58,6 +37,27 @@ namespace GuiCookie.Components
         /// <summary> <c>true</c> if the mouse is over the <see cref="Element"/> and the right click button is pressed. </summary>
         /// <remarks> Will be true for every frame that the mouse is over the element and clicked, hence it is better to add a listener for the RightClicked signal. </remarks>
         public bool IsRightClicked { get; private set; }
+        
+        /// <summary> The mode of click detection to use. </summary>
+        public ClickType ClickType { get; set; }
+        #endregion
+
+        #region Signals
+        /// <summary> Is fired when the mouse enters this <see cref="Element"/>. </summary>
+        public IConnectableSignal MouseEntered => mouseEntered;
+        private readonly Signal mouseEntered = new Signal();
+
+        /// <summary> Is fired when the mouse leaves this <see cref="Element"/>. </summary>
+        public IConnectableSignal MouseLeft => mouseLeft;
+        private readonly Signal mouseLeft = new Signal();
+
+        /// <summary> Is fired when the mouse is over this <see cref="Element"/> and the left mouse button is released/pressed depending on the <see cref="ClickType"/>. </summary>
+        public IConnectableSignal LeftClicked => leftClicked;
+        private readonly Signal leftClicked = new Signal();
+
+        /// <summary> Is fired when the mouse is over this <see cref="Element"/> and the right mouse button is released/pressed depending on the <see cref="ClickType"/>. </summary>
+        public IConnectableSignal RightClicked => rightClicked;
+        private readonly Signal rightClicked = new Signal();
         #endregion
 
         #region Constructors
@@ -75,7 +75,7 @@ namespace GuiCookie.Components
         public override void OnCreated()
         {
             // Set the click type.
-            clickType = Element.Attributes.GetEnumAttributeOrDefault(clickTypeAttributeName, ClickType.OnMouseUp);
+            ClickType = Element.Attributes.GetEnumAttributeOrDefault(clickTypeAttributeName, ClickType.OnMouseUp);
         }
         #endregion
 
@@ -98,7 +98,7 @@ namespace GuiCookie.Components
             // If the element is moused over, and the mouse was clicked within the element, fire the clicked events.
             // The left clicked function only fires when there is a change in the mouse state in the previous frame, and the mouse started and ended within the element.
             if (IsMousedOver)
-                switch (clickType)
+                switch (ClickType)
                 {
                     case ClickType.OnMouseDown:
                         if (inputManager.IsLeftMouseDown && inputManager.WasLeftMouseUp && Element.Bounds.AbsoluteContains(inputManager.MouseLeftClickPosition)) leftClicked.Invoke();

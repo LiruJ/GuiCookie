@@ -38,10 +38,6 @@ namespace GuiCookie.Styles
         private const string tilePositionTagName = "Tile";
         #endregion
 
-        #region Dependencies
-        private readonly ContentManager contentManager;
-        #endregion
-
         #region Fields
         /// <summary> The font resources keyed by name. </summary>
         private readonly Dictionary<string, SpriteFont> fontsByName = new Dictionary<string, SpriteFont>();
@@ -54,8 +50,8 @@ namespace GuiCookie.Styles
         #endregion
 
         #region Properties
-        /// <summary> The root folder from which the resources are loaded. </summary>
-        public string RootFolder { get; private set; }
+        /// <summary> The <see cref="Microsoft.Xna.Framework.Content.ContentManager"/> used by this resource manager to load the resources. </summary>
+        public ContentManager ContentManager { get; }
 
         /// <summary> The readonly fonts keyed by name. </summary>
         public IReadOnlyDictionary<string, SpriteFont> FontsByName => fontsByName;
@@ -68,13 +64,20 @@ namespace GuiCookie.Styles
         #endregion
 
         #region Constructors
+        /// <summary> Creates a new resource manager using the given <paramref name="contentManager"/> to load content. </summary>
+        /// <param name="contentManager"> The content manager with which content is loaded. </param>
         public ResourceManager(ContentManager contentManager)
         {
-            this.contentManager = contentManager ?? throw new ArgumentNullException(nameof(contentManager));
+            ContentManager = contentManager ?? throw new ArgumentNullException(nameof(contentManager));
         }
         #endregion
 
         #region Add Functions
+        /// <summary> Adds the given <paramref name="colour"/> to the <see cref="ColoursByName"/> keyed by the given <paramref name="name"/> </summary>
+        /// <param name="name"> The key. </param>
+        /// <param name="colour"> The value. </param>
+        /// <exception cref="ArgumentException"> The given <paramref name="name"/> was empty or null. </exception>
+        /// <exception cref="ArgumentException"> The given <paramref name="name"/> has already been used as a key. </exception>
         public void AddColour(string name, Color colour)
         {
             // Ensure validity.
@@ -85,6 +88,11 @@ namespace GuiCookie.Styles
             coloursByName.Add(name, colour);
         }
 
+        /// <summary> Adds the given <paramref name="font"/> to the <see cref="FontsByName"/> keyed by the given <paramref name="name"/> </summary>
+        /// <param name="name"> The key. </param>
+        /// <param name="font"> The value. </param>
+        /// <exception cref="ArgumentException"> The given <paramref name="name"/> was empty or null. </exception>
+        /// <exception cref="ArgumentException"> The given <paramref name="name"/> has already been used as a key. </exception>
         public void AddFont(string name, SpriteFont font)
         {
             // Ensure validity.
@@ -96,6 +104,10 @@ namespace GuiCookie.Styles
             fontsByName.Add(name, font);
         }
 
+        /// <summary> Adds the given <paramref name="image"/> to the <see cref="ImagesByName"/> keyed by <see cref="Image.Name"/>. </summary>
+        /// <param name="image"> The value. </param>
+        /// <exception cref="ArgumentException"> The given <see cref="Image.Name"/> was empty or null. </exception>
+        /// <exception cref="ArgumentException"> The given <see cref="Image.Name"/> has already been used as a key. </exception>
         public void AddImage(Image image)
         {
             // Ensure validity.
@@ -108,18 +120,20 @@ namespace GuiCookie.Styles
         #endregion
 
         #region Load Functions
+        /// <summary> Loads the given <paramref name="resourceNode"/> into this resource manager. </summary>
+        /// <param name="resourceNode"> The XML node containing the resources. </param>
         public void Load(XmlNode resourceNode)
         {
             // Ensure the node exists.
             if (resourceNode == null) throw new ArgumentNullException(nameof(resourceNode));
 
             // Get the root path for the resources.
-            RootFolder = resourceNode.GetAttributeValue(rootFolderAttributeName, out string rootFolder) ? rootFolder : string.Empty;
+            resourceNode.GetAttributeValue(rootFolderAttributeName, out string rootFolder);
 
             // Load the colours, fonts, and images.
             loadColours(resourceNode.SelectSingleNode(coloursNodeName));
-            loadFonts(resourceNode.SelectSingleNode(fontsNodeName));
-            loadImages(resourceNode.SelectSingleNode(imagesNodeName));
+            loadFonts(resourceNode.SelectSingleNode(fontsNodeName), rootFolder);
+            loadImages(resourceNode.SelectSingleNode(imagesNodeName), rootFolder);
         }
 
         private void loadColours(XmlNode coloursNode)
@@ -133,7 +147,7 @@ namespace GuiCookie.Styles
                 AddColour(colourNode.Name, colourNode.ParseAttributeValue(colourAttributeName, Colour.Parse));
         }
 
-        private void loadFonts(XmlNode fontsNode)
+        private void loadFonts(XmlNode fontsNode, string rootFolder)
         {
             // Do nothing if the given node does not exist.
             if (fontsNode == null) return;
@@ -145,14 +159,14 @@ namespace GuiCookie.Styles
                 if (!fontNode.GetAttributeValue(uriAttributeName, out string fontURI)) throw new Exception($"{fontsNodeName} node was missing {uriAttributeName} attribute.");
 
                 // Load the font.
-                SpriteFont font = contentManager.Load<SpriteFont>(Path.Combine(RootFolder, fontURI));
+                SpriteFont font = ContentManager.Load<SpriteFont>(Path.Combine(rootFolder, fontURI));
 
                 // Add the font to the dictionary.
                 AddFont(fontNode.Name, font);
             }
         }
 
-        private void loadImages(XmlNode imagesNode)
+        private void loadImages(XmlNode imagesNode, string rootFolder)
         {
             // Do nothing if the given node does not exist.
             if (imagesNode == null) return;
@@ -164,7 +178,7 @@ namespace GuiCookie.Styles
                 if (!imageNode.GetAttributeValue(uriAttributeName, out string imageURI)) throw new Exception($"{imagesNodeName} node was missing {uriAttributeName} attribute.");
 
                 // Load the texture.
-                Texture2D texture = contentManager.Load<Texture2D>(Path.Combine(RootFolder, imageURI));
+                Texture2D texture = ContentManager.Load<Texture2D>(Path.Combine(rootFolder, imageURI));
 
                 // Add the root image to the dictionary.
                 AddImage(new Image(imageNode.Name, texture, texture.Bounds));
@@ -222,8 +236,18 @@ namespace GuiCookie.Styles
         #endregion
 
         #region Get Functions
+        /// <summary> Gets a <see cref="Color"/> from the given <paramref name="attributes"/> with the given <paramref name="attributeName"/>. If the colour cannot be parsed or does not exist, returns <paramref name="defaultTo"/>. This will use <see cref="ColoursByName"/> if the value starts with the '$' symbol. </summary>
+        /// <param name="attributes"> The attributes to check for the value with the given <paramref name="attributeName"/> key. </param>
+        /// <param name="attributeName"> The name of the attribute to try to parse. </param>
+        /// <param name="defaultTo"> The default <see cref="Color"/> to use if the parsing fails. </param>
+        /// <returns> The parsed <see cref="Color"/> if the attribute exists and was parsed successfully into a colour; otherwise <paramref name="defaultTo"/>. </returns>
         public Color? GetColourOrDefault(IReadOnlyAttributes attributes, string attributeName, Color? defaultTo = null) => GetColourOrDefault(attributes.GetAttributeOrDefault(attributeName, string.Empty), defaultTo);
 
+        /// <summary> Tries to parse the given <paramref name="colourString"/> as a <see cref="Color"/>, returning <paramref name="defaultTo"/> if it fails. This will use <see cref="ColoursByName"/> if the value starts with the '$' symbol. </summary>
+        /// <param name="colourString"> The raw colour as a string. </param>
+        /// <param name="defaultTo"> The default <see cref="Color"/> to use if the parsing fails. </param>
+        /// <returns> The parsed <see cref="Color"/> if the <paramref name="colourString"/> was parsed successfully into a colour; otherwise <paramref name="defaultTo"/>. </returns>
+        /// <seealso cref="Colour.TryParse(string, out Color)"/>
         public Color? GetColourOrDefault(string colourString, Color? defaultTo = null)
         {
             // If the given string is empty, return the default colour.
@@ -235,9 +259,9 @@ namespace GuiCookie.Styles
                 // If the colour string is literally just '$', return the default colour.
                 if (colourString.Length == 1) return defaultTo;
                 // Otherwise; try to get the colour from the dictionary.
-                else if (coloursByName.TryGetValue(colourString.Substring(1), out Color resourceColour)) return resourceColour;
+                else if (coloursByName.TryGetValue(colourString[1..], out Color resourceColour)) return resourceColour;
                 // In this case, it's clear that the user wanted a colour from the dictionary. Instead of returning the default colour, throw an exception. This makes it a little less confusing.
-                else throw new Exception($"Colour with name {colourString.Substring(1)} was not defined as a resource.");
+                else throw new Exception($"Colour with name {colourString[1..]} was not defined as a resource.");
             }
             // Otherwise; parse and return the colour.
             else if (Colour.TryParse(colourString, out Color parsedColour)) return parsedColour;

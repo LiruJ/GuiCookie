@@ -25,29 +25,50 @@ namespace GuiCookie.Templates
         }
         #endregion
 
+        #region Get Functions
+        /// <summary> Gets the <see cref="Template"/> which has the given <paramref name="templateName"/>. </summary>
+        /// <param name="templateName"> The name of the template to get. </param>
+        /// <returns> The template with the given <paramref name="templateName"/>. </returns>
+        public Template GetTemplateFromName(string templateName)
+            => string.IsNullOrWhiteSpace(templateName) ? throw new ArgumentException("Template name cannot be null") : (templatesByName.TryGetValue(templateName, out Template template)
+            ? template
+            : throw new Exception($"Template with name {templateName} was not defined or included."));
+        #endregion
+
         #region Load Functions
         /// <summary> Loads the default template definitions from an embedded xml file. </summary>
         public void LoadDefault()
         {
             // Load the embedded xml file for the pre-defined templates, then load their contents.
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(defaultTemplateSheetPath))
-            {
-                // Load the file from the stream.
-                XmlDocument templateSheet = new XmlDocument();
-                templateSheet.Load(stream);
+            using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(defaultTemplateSheetPath);
 
-                // Load the contents of the file.
-                loadFromSheet(templateSheet);
-            }
+            // Load the file from the stream.
+            XmlDocument templateSheet = new XmlDocument();
+            templateSheet.Load(stream);
+
+            // Load the contents of the file.
+            loadFromSheet(templateSheet);
         }
 
-        public void LoadFromSheet(string sheetPath)
+        /// <summary> Loads the template file at the given <paramref name="sheetPath"/> relative to the given <paramref name="rootDirectory"/> path. </summary>
+        /// <param name="sheetPath"> The path of the template file, relative to the <paramref name="rootDirectory"/> path. </param>
+        /// <param name="rootDirectory"> The root path, usually the content root path. </param>
+        public void LoadFromSheet(string sheetPath, string rootDirectory)
         {
-            // If the given sheet path has no extension, add one.
-            if (!Path.HasExtension(sheetPath)) sheetPath += ".xml";
+            // Ensure the path is not null.
+            if (string.IsNullOrWhiteSpace(sheetPath))
+                throw new ArgumentException($"'{nameof(sheetPath)}' cannot be null or whitespace.", nameof(sheetPath));
+
+            // Add an extension to the path if it is missing.
+            if (!Path.HasExtension(sheetPath))
+                sheetPath = Path.ChangeExtension(sheetPath, ".xml");
+
+            // Convert the path to be relative to the content.
+            sheetPath = Path.Combine(rootDirectory, sheetPath);
 
             // If the file does not exist, throw an exception.
-            if (!File.Exists(sheetPath)) throw new FileNotFoundException("The given template sheet file path does not exist.");
+            if (!File.Exists(sheetPath))
+                throw new FileNotFoundException("The given template sheet file path does not exist.", sheetPath);
 
             // Load the xml file.
             XmlDocument templateSheet = new XmlDocument();
@@ -90,13 +111,6 @@ namespace GuiCookie.Templates
             // Return the created template.
             return template;
         }
-        #endregion
-
-        #region Get Functions
-        public Template GetTemplateFromName(string templateName)
-            => string.IsNullOrWhiteSpace(templateName) ? throw new ArgumentException("Template name cannot be null") : (templatesByName.TryGetValue(templateName, out Template template)
-            ? template
-            : throw new Exception($"Template with name {templateName} was not defined or included."));
         #endregion
     }
 }

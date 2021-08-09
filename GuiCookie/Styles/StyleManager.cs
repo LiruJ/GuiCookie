@@ -52,11 +52,20 @@ namespace GuiCookie.Styles
         #region Load Functions
         public void LoadFromSheet(string sheetPath)
         {
-            // If the given sheet path has no extension, add one.
-            if (!Path.HasExtension(sheetPath)) sheetPath += ".xml";
+            // Ensure the path is not null.
+            if (string.IsNullOrWhiteSpace(sheetPath))
+                throw new ArgumentException($"'{nameof(sheetPath)}' cannot be null or whitespace.", nameof(sheetPath));
+
+            // Add an extension to the path if it is missing.
+            if (!Path.HasExtension(sheetPath))
+                sheetPath = Path.ChangeExtension(sheetPath, ".xml");
+
+            // Convert the path to be relative to the content.
+            sheetPath = Path.Combine(ResourceManager.ContentManager.RootDirectory, sheetPath);
 
             // If the file does not exist, throw an exception.
-            if (!File.Exists(sheetPath)) throw new FileNotFoundException("The given style sheet file path does not exist.");
+            if (!File.Exists(sheetPath))
+                throw new FileNotFoundException("The given style sheet file path does not exist.", sheetPath);
 
             // Load the xml file.
             XmlDocument styleSheet = new XmlDocument();

@@ -3,7 +3,7 @@
 	<!--Spatial templates-->
 	<Partition/>
 	<Pane Components="Frame"/>
-	<Square Components="Frame, AspectRatioFitter"/>
+	<Square Components="Frame, AspectRatioFitter" Ratio="1" RatioMode="WidthControlsHeight"/>
 
 	<!--Sliders-->
 	<SliderBar Components="Frame, MouseHandler" Controller="SliderBar">
