@@ -53,10 +53,10 @@
             <summary> The current <see cref="T:GuiCookie.Styles.StyleVariant"/> of the <see cref="P:GuiCookie.Components.Component.Element"/>. </summary>
         </member>
         <member name="M:GuiCookie.Components.Component.OnCreated">
-            <summary> This is called after the component has been added to an element for the first time. The element itself will not be done setting up, use <see cref="M:GuiCookie.Components.Component.OnSetup"/> if this is needed. </summary>
+            <summary> Called after the component has been added to an element. The element itself will not be done setting up, use <see cref="M:GuiCookie.Components.Component.OnSetup"/> if this is needed. </summary>
         </member>
         <member name="M:GuiCookie.Components.Component.OnSetup">
-            <summary> Called after the element has been fully set up. Use this to set references to other components, although other elements may not exist yet. </summary>
+            <summary> Called after the component's element has been fully set up. Use this to set references to other components, although other elements may not exist yet. </summary>
         </member>
         <member name="M:GuiCookie.Components.Component.OnPostSetup">
             <summary> Called after every element has been fully set up. Use this to set references to other elements. </summary>
@@ -64,6 +64,10 @@
         <member name="M:GuiCookie.Components.Component.ValidateSizeChanged">
             <summary> Is fired when the size changes, returning a value that represents if the new size is valid. It is expected that this function will also change the size to something valid. </summary>
             <returns></returns>
+        </member>
+        <member name="M:GuiCookie.Components.Component.Update(Microsoft.Xna.Framework.GameTime)">
+            <summary> Called every update cycle, even if the <see cref="P:GuiCookie.Components.Component.Element"/> is disabled. </summary>
+            <param name="gameTime"> The current time snapshot. </param>
         </member>
         <member name="F:GuiCookie.Components.DirectionalLayout.isDirty">
             <summary> Is <c>true</c> if the layout needs to recalculate next frame, otherwise; <c>false</c>. </summary>
@@ -135,20 +139,11 @@
         <member name="F:GuiCookie.Components.MouseHandler.inputManager">
             <summary> The <see cref="F:GuiCookie.Components.MouseHandler.inputManager"/> used to determine if the handler was clicked. </summary>
         </member>
-        <member name="F:GuiCookie.Components.MouseHandler.clickType">
-            <summary> The mode of click detection to use. </summary>
+        <member name="P:GuiCookie.Components.MouseHandler.AbsoluteMousePosition">
+            <summary> Quick access for <see cref="P:GuiCookie.Input.InputManager.MousePosition"/>. </summary>
         </member>
-        <member name="P:GuiCookie.Components.MouseHandler.MouseEntered">
-            <summary> Is fired when the mouse enters this <see cref="T:GuiCookie.Elements.Element"/>. </summary>
-        </member>
-        <member name="P:GuiCookie.Components.MouseHandler.MouseLeft">
-            <summary> Is fired when the mouse leaves this <see cref="T:GuiCookie.Elements.Element"/>. </summary>
-        </member>
-        <member name="P:GuiCookie.Components.MouseHandler.LeftClicked">
-            <summary> Is fired when the mouse is over this <see cref="T:GuiCookie.Elements.Element"/> and the left mouse button is clicked. </summary>
-        </member>
-        <member name="P:GuiCookie.Components.MouseHandler.RightClicked">
-            <summary> Is fired when the mouse is over this <see cref="T:GuiCookie.Elements.Element"/> and the right mouse button is clicked. </summary>
+        <member name="P:GuiCookie.Components.MouseHandler.RelativeMousePosition">
+            <summary> The position of the mouse relative to this component's <see cref="T:GuiCookie.Elements.Element"/>. </summary>
         </member>
         <member name="P:GuiCookie.Components.MouseHandler.IsClickDragged">
             <summary> Is <c>true</c> if the mouse was left clicked on the <see cref="T:GuiCookie.Elements.Element"/> and is currently being held down, regardless of mouse position. </summary>
@@ -163,6 +158,21 @@
         <member name="P:GuiCookie.Components.MouseHandler.IsRightClicked">
             <summary> <c>true</c> if the mouse is over the <see cref="T:GuiCookie.Elements.Element"/> and the right click button is pressed. </summary>
             <remarks> Will be true for every frame that the mouse is over the element and clicked, hence it is better to add a listener for the RightClicked signal. </remarks>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.ClickType">
+            <summary> The mode of click detection to use. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.MouseEntered">
+            <summary> Is fired when the mouse enters this <see cref="T:GuiCookie.Elements.Element"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.MouseLeft">
+            <summary> Is fired when the mouse leaves this <see cref="T:GuiCookie.Elements.Element"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.LeftClicked">
+            <summary> Is fired when the mouse is over this <see cref="T:GuiCookie.Elements.Element"/> and the left mouse button is released/pressed depending on the <see cref="P:GuiCookie.Components.MouseHandler.ClickType"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.MouseHandler.RightClicked">
+            <summary> Is fired when the mouse is over this <see cref="T:GuiCookie.Elements.Element"/> and the right mouse button is released/pressed depending on the <see cref="P:GuiCookie.Components.MouseHandler.ClickType"/>. </summary>
         </member>
         <member name="M:GuiCookie.Components.MouseHandler.#ctor(GuiCookie.Input.InputManager)">
             <summary> Creates a new <see cref="T:GuiCookie.Components.MouseHandler"/> with the given <paramref name="inputManager"/>. </summary>
@@ -622,12 +632,15 @@
         <member name="P:GuiCookie.Root.HasSetUp">
             <summary> Is true if the layout file has been loaded and the starting elements set up; otherwise false. </summary>
         </member>
-        <member name="M:GuiCookie.Root.InternalInitialise(System.String,GuiCookie.Styles.StyleManager,GuiCookie.Templates.TemplateManager,GuiCookie.Input.InputManager,GuiCookie.Input.DragAndDrop.DragAndDropManager,GuiCookie.Elements.ElementManager,Microsoft.Xna.Framework.GameWindow)">
-            <summary> Creates a new gui <see cref="T:GuiCookie.Root"/> using the given dependencies, loading its data from the given <paramref name="guiSheetPath"/>. </summary>
-            <param name="guiSheetPath"> The file path of the gui xml file. </param>
-            <param name="contentManager"> The object used to load content. </param>
-            <param name="gameWindow"> The window onto which the GUI should be drawn. </param>
-            <param name="graphicsDevice"> The graphics device used to create <see cref="T:Microsoft.Xna.Framework.Graphics.Texture2D"/>s. </param>
+        <member name="M:GuiCookie.Root.InternalInitialise(System.Xml.XmlDocument,GuiCookie.Styles.StyleManager,GuiCookie.Templates.TemplateManager,GuiCookie.Input.InputManager,GuiCookie.Input.DragAndDrop.DragAndDropManager,GuiCookie.Elements.ElementManager,Microsoft.Xna.Framework.GameWindow)">
+            <summary> Creates a new root from the given <paramref name="guiSheet"/> and dependencies. </summary>
+            <param name="guiSheet"> The XML layout document. </param>
+            <param name="styleManager"> The styles. </param>
+            <param name="templateManager"> The templates. </param>
+            <param name="inputManager"> The object for handling user input. </param>
+            <param name="dragAndDropManager"> The drag and drop manager. </param>
+            <param name="elementManager"> The elements. </param>
+            <param name="gameWindow"> The MonoGame <see cref="T:Microsoft.Xna.Framework.GameWindow"/>. </param>
         </member>
         <member name="M:GuiCookie.Root.OnCreated">
             <summary> Is called before anything is set up. </summary>
@@ -717,8 +730,8 @@
         <member name="F:GuiCookie.Styles.ResourceManager.coloursByName">
             <summary> The colour resources keyed by name. </summary>
         </member>
-        <member name="P:GuiCookie.Styles.ResourceManager.RootFolder">
-            <summary> The root folder from which the resources are loaded. </summary>
+        <member name="P:GuiCookie.Styles.ResourceManager.ContentManager">
+            <summary> The <see cref="T:Microsoft.Xna.Framework.Content.ContentManager"/> used by this resource manager to load the resources. </summary>
         </member>
         <member name="P:GuiCookie.Styles.ResourceManager.FontsByName">
             <summary> The readonly fonts keyed by name. </summary>
@@ -728,6 +741,48 @@
         </member>
         <member name="P:GuiCookie.Styles.ResourceManager.ColoursByName">
             <summary> The readonly colours keyed by name. </summary>
+        </member>
+        <member name="M:GuiCookie.Styles.ResourceManager.#ctor(Microsoft.Xna.Framework.Content.ContentManager)">
+            <summary> Creates a new resource manager using the given <paramref name="contentManager"/> to load content. </summary>
+            <param name="contentManager"> The content manager with which content is loaded. </param>
+        </member>
+        <member name="M:GuiCookie.Styles.ResourceManager.AddColour(System.String,Microsoft.Xna.Framework.Color)">
+            <summary> Adds the given <paramref name="colour"/> to the <see cref="P:GuiCookie.Styles.ResourceManager.ColoursByName"/> keyed by the given <paramref name="name"/> </summary>
+            <param name="name"> The key. </param>
+            <param name="colour"> The value. </param>
+            <exception cref="T:System.ArgumentException"> The given <paramref name="name"/> was empty or null. </exception>
+            <exception cref="T:System.ArgumentException"> The given <paramref name="name"/> has already been used as a key. </exception>
+        </member>
+        <member name="M:GuiCookie.Styles.ResourceManager.AddFont(System.String,Microsoft.Xna.Framework.Graphics.SpriteFont)">
+            <summary> Adds the given <paramref name="font"/> to the <see cref="P:GuiCookie.Styles.ResourceManager.FontsByName"/> keyed by the given <paramref name="name"/> </summary>
+            <param name="name"> The key. </param>
+            <param name="font"> The value. </param>
+            <exception cref="T:System.ArgumentException"> The given <paramref name="name"/> was empty or null. </exception>
+            <exception cref="T:System.ArgumentException"> The given <paramref name="name"/> has already been used as a key. </exception>
+        </member>
+        <member name="M:GuiCookie.Styles.ResourceManager.AddImage(GuiCookie.Styles.Image)">
+            <summary> Adds the given <paramref name="image"/> to the <see cref="P:GuiCookie.Styles.ResourceManager.ImagesByName"/> keyed by <see cref="P:GuiCookie.Styles.Image.Name"/>. </summary>
+            <param name="image"> The value. </param>
+            <exception cref="T:System.ArgumentException"> The given <see cref="P:GuiCookie.Styles.Image.Name"/> was empty or null. </exception>
+            <exception cref="T:System.ArgumentException"> The given <see cref="P:GuiCookie.Styles.Image.Name"/> has already been used as a key. </exception>
+        </member>
+        <member name="M:GuiCookie.Styles.ResourceManager.Load(System.Xml.XmlNode)">
+            <summary> Loads the given <paramref name="resourceNode"/> into this resource manager. </summary>
+            <param name="resourceNode"> The XML node containing the resources. </param>
+        </member>
+        <member name="M:GuiCookie.Styles.ResourceManager.GetColourOrDefault(GuiCookie.Attributes.IReadOnlyAttributes,System.String,System.Nullable{Microsoft.Xna.Framework.Color})">
+            <summary> Gets a <see cref="T:Microsoft.Xna.Framework.Color"/> from the given <paramref name="attributes"/> with the given <paramref name="attributeName"/>. If the colour cannot be parsed or does not exist, returns <paramref name="defaultTo"/>. This will use <see cref="P:GuiCookie.Styles.ResourceManager.ColoursByName"/> if the value starts with the '$' symbol. </summary>
+            <param name="attributes"> The attributes to check for the value with the given <paramref name="attributeName"/> key. </param>
+            <param name="attributeName"> The name of the attribute to try to parse. </param>
+            <param name="defaultTo"> The default <see cref="T:Microsoft.Xna.Framework.Color"/> to use if the parsing fails. </param>
+            <returns> The parsed <see cref="T:Microsoft.Xna.Framework.Color"/> if the attribute exists and was parsed successfully into a colour; otherwise <paramref name="defaultTo"/>. </returns>
+        </member>
+        <member name="M:GuiCookie.Styles.ResourceManager.GetColourOrDefault(System.String,System.Nullable{Microsoft.Xna.Framework.Color})">
+            <summary> Tries to parse the given <paramref name="colourString"/> as a <see cref="T:Microsoft.Xna.Framework.Color"/>, returning <paramref name="defaultTo"/> if it fails. This will use <see cref="P:GuiCookie.Styles.ResourceManager.ColoursByName"/> if the value starts with the '$' symbol. </summary>
+            <param name="colourString"> The raw colour as a string. </param>
+            <param name="defaultTo"> The default <see cref="T:Microsoft.Xna.Framework.Color"/> to use if the parsing fails. </param>
+            <returns> The parsed <see cref="T:Microsoft.Xna.Framework.Color"/> if the <paramref name="colourString"/> was parsed successfully into a colour; otherwise <paramref name="defaultTo"/>. </returns>
+            <seealso cref="M:LiruGameHelperMonoGame.Parsers.Colour.TryParse(System.String,Microsoft.Xna.Framework.Color@)"/>
         </member>
         <member name="P:GuiCookie.Styles.SliceFrame.Image">
             <summary> Gets a value representing the name of the image atlas that this <see cref="T:GuiCookie.Styles.SliceFrame"/> sources from. </summary>
@@ -818,6 +873,11 @@
         </member>
         <member name="M:GuiCookie.Templates.TemplateManager.LoadDefault">
             <summary> Loads the default template definitions from an embedded xml file. </summary>
+        </member>
+        <member name="M:GuiCookie.Templates.TemplateManager.LoadFromSheet(System.String,System.String)">
+            <summary> Loads the template file at the given <paramref name="sheetPath"/> relative to the given <paramref name="rootDirectory"/> path. </summary>
+            <param name="sheetPath"> The path of the template file, relative to the <paramref name="rootDirectory"/> path. </param>
+            <param name="rootDirectory"> The root path, usually the content root path. </param>
         </member>
         <member name="F:GuiCookie.UIManager.componentCache">
             <summary> Caches component types and constructors, so that a single <see cref="T:GuiCookie.UIManager"/> can store every registered <see cref="T:GuiCookie.Components.Component"/>. </summary>
