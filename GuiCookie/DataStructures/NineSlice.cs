@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
-using System.Globalization;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace GuiCookie.DataStructures
 {
@@ -163,7 +161,7 @@ namespace GuiCookie.DataStructures
                 // Otherwise; parse the string.
                 default:
                     // If there are not exactly 4 or 5 values, throw an exception.
-                    if (values.Length != 4 || values.Length != 5)
+                    if (values.Length != 4 && values.Length != 5)
                         return throwException ? throw new ArgumentException($"NineSlice must have 4 or 5 values; minX, maxX, minY, and maxY, with an optional StretchMask, separated with the {separator} character. Given string: {input} had {values.Length} values.") : false;
 
                     // Parse each value.
@@ -173,7 +171,9 @@ namespace GuiCookie.DataStructures
                     if (!float.TryParse(values[3], out float maxY) || (maxY < 0 || maxY > 1)) return throwException ? throw new FormatException($"MaxY of nineslice was invalid, float value between 0 and 1 expected.") : false;
 
                     // Parse the stretchmask.
-                    tryParseStretchMask(values[4], out byte stretchMask, throwException);
+                    byte stretchMask = 0;
+                    if (values.Length == 5)
+                        tryParseStretchMask(values[4], out stretchMask, throwException);
 
                     // Return the parsed nineslice.
                     nineSlice = new NineSlice(minX, maxX, minY, maxY, stretchMask);
