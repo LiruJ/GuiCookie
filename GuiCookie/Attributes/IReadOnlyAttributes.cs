@@ -24,5 +24,7 @@ namespace GuiCookie.Attributes
         Color GetAttributeOrDefault(string attributeName, Color defaultTo);
         Sides GetAttributeOrDefault(string attributeName, Sides defaultTo);
         T? GetAttributeOrDefault<T>(string attributeName, T? defaultTo, AttributeCollection.TryParse<T> tryParser) where T : struct;
+        int? GetAttributeOrDefault(string attributeName, int? defaultTo);
+        float? GetAttributeOrDefault(string attributeName, float? defaultTo);
     }
 }

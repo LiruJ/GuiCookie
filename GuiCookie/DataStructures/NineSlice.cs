@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using LiruGameHelperMonoGame.Parsers;
+using Microsoft.Xna.Framework;
 using System;
+using System.Globalization;
 
 namespace GuiCookie.DataStructures
 {
@@ -165,10 +167,10 @@ namespace GuiCookie.DataStructures
                         return throwException ? throw new ArgumentException($"NineSlice must have 4 or 5 values; minX, maxX, minY, and maxY, with an optional StretchMask, separated with the {separator} character. Given string: {input} had {values.Length} values.") : false;
 
                     // Parse each value.
-                    if (!float.TryParse(values[0], out float minX) || (minX < 0 || minX > 1)) return throwException ? throw new FormatException($"MinX of nineslice was invalid, float value between 0 and 1 expected.") : false;
-                    if (!float.TryParse(values[1], out float maxX) || (maxX < 0 || maxX > 1)) return throwException ? throw new FormatException($"MaxX of nineslice was invalid, float value between 0 and 1 expected.") : false;
-                    if (!float.TryParse(values[2], out float minY) || (minY < 0 || minY > 1)) return throwException ? throw new FormatException($"MinY of nineslice was invalid, float value between 0 and 1 expected.") : false;
-                    if (!float.TryParse(values[3], out float maxY) || (maxY < 0 || maxY > 1)) return throwException ? throw new FormatException($"MaxY of nineslice was invalid, float value between 0 and 1 expected.") : false;
+                    if (!float.TryParse(values[0], NumberStyles.Float, ParserSettings.FormatProvider, out float minX) || (minX < 0 || minX > 1)) return throwException ? throw new FormatException($"MinX of nineslice was invalid, float value between 0 and 1 expected.") : false;
+                    if (!float.TryParse(values[1], NumberStyles.Float, ParserSettings.FormatProvider, out float maxX) || (maxX < 0 || maxX > 1)) return throwException ? throw new FormatException($"MaxX of nineslice was invalid, float value between 0 and 1 expected.") : false;
+                    if (!float.TryParse(values[2], NumberStyles.Float, ParserSettings.FormatProvider, out float minY) || (minY < 0 || minY > 1)) return throwException ? throw new FormatException($"MinY of nineslice was invalid, float value between 0 and 1 expected.") : false;
+                    if (!float.TryParse(values[3], NumberStyles.Float, ParserSettings.FormatProvider, out float maxY) || (maxY < 0 || maxY > 1)) return throwException ? throw new FormatException($"MaxY of nineslice was invalid, float value between 0 and 1 expected.") : false;
 
                     // Parse the stretchmask.
                     byte stretchMask = 0;
@@ -195,6 +197,10 @@ namespace GuiCookie.DataStructures
                 return throwException ? throw new FormatException($"StretchMask of nineslice was invalid, byte mask value expected.") : false;
             }
         }
+        #endregion
+
+        #region String Functions
+        public override string ToString() => $"X: {MinX}-{MaxX} Y: {MinY}{MaxY} Stretch: {stretchMask}";
         #endregion
 
         #region Equality Functions

@@ -4,6 +4,13 @@
         <name>GuiCookie</name>
     </assembly>
     <members>
+        <member name="T:GuiCookie.Attributes.AttributeCollection.TryParse`1">
+            <summary> A delegate describing a function that attempts to parse the given <paramref name="input"/> into the <paramref name="output"/> with the given <typeparamref name="T"/> type. </summary>
+            <typeparam name="T"></typeparam>
+            <param name="input"></param>
+            <param name="output"></param>
+            <returns></returns>
+        </member>
         <member name="F:GuiCookie.Attributes.AttributeCollection.rawAttributesByName">
             <summary> The raw string values keyed by attribute. </summary>
         </member>

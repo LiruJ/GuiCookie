@@ -39,7 +39,7 @@ namespace GuiCookie.Components
         {
             // Get the aspect ratio properties.
             Mode = Element.Attributes.GetEnumAttributeOrDefault(modeAttributeName, AspectRatioMode.None);
-            Element.Attributes.GetAttributeOrDefault("Ratio", null, (string input, out float? output) => { output = float.TryParse(input, out float value) ? (float?)value : null; return true; });
+            ratio = Element.Attributes.GetAttributeOrDefault(valueAttributeName, (float?)null);
         }
 
         public override void OnSetup()

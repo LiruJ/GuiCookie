@@ -132,7 +132,7 @@ namespace GuiCookie.Elements
         private Element createElementFromTemplateNoChildren(Template template, Template parentTemplate, AttributeCollection attributes, Element parent, params object[] inputs)
         {
             // If the parent template exists and defines a template with the same name as the new element, use that template instead of the given one.
-            string identifierName = attributes?.GetAttributeOrDefault(nameAttributeName, null);
+            string identifierName = attributes?.GetAttributeOrDefault(nameAttributeName, (string)null);
             if (parentTemplate == null || identifierName == null || !parentTemplate.ChildrenByIdentifierName.TryGetValue(identifierName, out Template baseTemplate)) baseTemplate = template;
 
             // If attributes were given, combine them with the base template to make a unique template for this element.

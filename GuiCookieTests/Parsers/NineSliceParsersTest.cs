@@ -1,8 +1,7 @@
 ﻿using GuiCookie.DataStructures;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 
 namespace GuiCookieTests.Parsers
 {
@@ -56,6 +55,34 @@ namespace GuiCookieTests.Parsers
         public void FiveValueTest()
         {
             Assert.IsTrue(NineSlice.TryParse("0.2, 0.8, 0.1, 0.9, 01011", out NineSlice nineSlice), "Parse failed.");
+
+            Assert.AreEqual(0.2f, nineSlice.MinX, "MinX was invalid.");
+            Assert.AreEqual(0.8f, nineSlice.MaxX, "MaxX was invalid.");
+            Assert.AreEqual(0.1f, nineSlice.MinY, "MinY was invalid.");
+            Assert.AreEqual(0.9f, nineSlice.MaxY, "MaxY was invalid.");
+
+            Assert.IsFalse(nineSlice.IsPieceStretched(Piece.Left), "Left edge is stretched when it shouldn't be.");
+            Assert.IsTrue(nineSlice.IsPieceStretched(Piece.Bottom), "Bottom edge is not stretched when it should be.");
+            Assert.IsFalse(nineSlice.IsPieceStretched(Piece.Right), "Right edge is stretched when it shouldn't be.");
+            Assert.IsTrue(nineSlice.IsPieceStretched(Piece.Top), "Top edge is not stretched when it should be.");
+            Assert.IsTrue(nineSlice.IsPieceStretched(Piece.Centre), "Centre is not stretched when it should be.");
+        }
+
+        [TestMethod]
+        public void FiveValueDecimalTest()
+        {
+            // Save the current culture.
+            CultureInfo currentCulture = CultureInfo.CurrentCulture;
+
+            // Set the culture to German, as it uses the ',' character for decimal places which should break parsing if not accounted for.
+            CultureInfo.CurrentCulture = CultureInfo.CreateSpecificCulture("de-DE");
+
+            bool parsedCorrectly = NineSlice.TryParse("0.2, 0.8, 0.1, 0.9, 01011", out NineSlice nineSlice);
+
+            // Set the culture back so that the error message displays correctly.
+            CultureInfo.CurrentCulture = currentCulture;
+
+            Assert.IsTrue(parsedCorrectly, $"Parse failed {nineSlice}.");
 
             Assert.AreEqual(0.2f, nineSlice.MinX, "MinX was invalid.");
             Assert.AreEqual(0.8f, nineSlice.MaxX, "MaxX was invalid.");

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <Version>1.7.3.13</Version>
+	  <Version>1.7.3.14</Version>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>Liru</Authors>
     <Company>Lovebirb</Company>
@@ -16,8 +16,8 @@
     <NeutralLanguage>English (United Kingdom)</NeutralLanguage>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <FileVersion>1.7.3.13</FileVersion>
-    <AssemblyVersion>1.7.3.13</AssemblyVersion>
+    <FileVersion>1.7.3.14</FileVersion>
+    <AssemblyVersion>1.7.3.14</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -45,8 +45,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lovebirb.LiruGameHelper" Version="1.0.0" />
-    <PackageReference Include="Lovebirb.MonoGame.LiruGameHelper" Version="1.0.0" />
+    <PackageReference Include="Lovebirb.LiruGameHelper" Version="1.0.1" />
+    <PackageReference Include="Lovebirb.MonoGame.LiruGameHelper" Version="1.0.1" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
   </ItemGroup>
 

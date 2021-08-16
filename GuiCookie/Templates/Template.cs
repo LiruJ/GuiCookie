@@ -176,7 +176,7 @@ namespace GuiCookie.Templates
         private static void prepareFromAttributes(ref AttributeCollection attributes, out List<string> componentNames, out string controllerName, out string identifierName, out string baseName)
         {
             // Get the component names from the comma-separated component name list attribute.
-            string componentListString = attributes.GetAttributeOrDefault(componentListAttributeName, null);
+            string componentListString = attributes.GetAttributeOrDefault(componentListAttributeName, (string)null);
 
             // Remove the component names string from the collection as it's not needed for the element itself.
             attributes.Remove(componentListAttributeName);
@@ -185,9 +185,9 @@ namespace GuiCookie.Templates
             componentNames = componentListString == null ? new List<string>() : new List<string>(componentListString.Split(','));
 
             // If an explicit controller name was given, use that as the controller name; otherwise, default to null. Do the same with the identifier name and base name.
-            controllerName = attributes.GetAttributeOrDefault(controllerAttributeName, null);
-            identifierName = attributes.GetAttributeOrDefault(nameAttributeName, null);
-            baseName = attributes.GetAttributeOrDefault(baseAttributeName, null);
+            controllerName = attributes.GetAttributeOrDefault(controllerAttributeName, (string)null);
+            identifierName = attributes.GetAttributeOrDefault(nameAttributeName, (string)null);
+            baseName = attributes.GetAttributeOrDefault(baseAttributeName, (string)null);
 
             // Remove the controller name as it's not needed for the element itself.
             attributes.Remove(controllerAttributeName);

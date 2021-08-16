@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Xml;
 
 namespace GuiCookie.Attributes
@@ -11,6 +12,11 @@ namespace GuiCookie.Attributes
     public class AttributeCollection : IReadOnlyAttributes, IEnumerable<string>
     {
         #region Delegates
+        /// <summary> A delegate describing a function that attempts to parse the given <paramref name="input"/> into the <paramref name="output"/> with the given <typeparamref name="T"/> type. </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="input"></param>
+        /// <param name="output"></param>
+        /// <returns></returns>
         public delegate bool TryParse<T>(string input, out T output);
         #endregion
 
@@ -59,6 +65,7 @@ namespace GuiCookie.Attributes
 
         #region Get Functions
         public IEnumerator<string> GetEnumerator() => Keys.GetEnumerator();
+
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Keys).GetEnumerator();
 
         /// <summary> Attempts to parse the attribute with the given <paramref name="attributeName"/> using the given <paramref name="tryParser"/> function, returns <paramref name="defaultTo"/> if the key was not found or the function returned false. </summary>
@@ -140,9 +147,17 @@ namespace GuiCookie.Attributes
         #region Shortcut Functions
         public T GetEnumAttributeOrDefault<T>(string attributeName, T defaultTo) where T : struct => GetAttributeOrDefault(attributeName, defaultTo, Enum.TryParse);
 
-        public int GetAttributeOrDefault(string attributeName, int defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, int.TryParse);
+        public int GetAttributeOrDefault(string attributeName, int defaultTo) 
+            => GetAttributeOrDefault(attributeName, defaultTo, (string input, out int output) => int.TryParse(input, NumberStyles.Integer, ParserSettings.FormatProvider, out output));
 
-        public float GetAttributeOrDefault(string attributeName, float defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, float.TryParse);
+        public int? GetAttributeOrDefault(string attributeName, int? defaultTo) 
+            => GetAttributeOrDefault(attributeName, defaultTo, (string input, out int output) => int.TryParse(input, NumberStyles.Integer, ParserSettings.FormatProvider, out output));
+        
+        public float GetAttributeOrDefault(string attributeName, float defaultTo) 
+            => GetAttributeOrDefault(attributeName, defaultTo, (string input, out float output) => float.TryParse(input, NumberStyles.Float, ParserSettings.FormatProvider, out output));
+
+        public float? GetAttributeOrDefault(string attributeName, float? defaultTo)
+            => GetAttributeOrDefault(attributeName, defaultTo, (string input, out float output) => float.TryParse(input, NumberStyles.Float, ParserSettings.FormatProvider, out output));
 
         public bool GetAttributeOrDefault(string attributeName, bool defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, bool.TryParse);
 
