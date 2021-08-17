@@ -30,6 +30,9 @@ namespace GuiCookie.Components
         /// <summary> Is <c>true</c> if the mouse is over the <see cref="Element"/>. </summary>
         public bool IsMousedOver { get; private set; }
 
+        /// <summary> Is <c>true</c> if the mouse is over the <see cref="Element"/> and the <see cref="InputManager.MousedOverClickable"/> is the <see cref="Element"/>. </summary>
+        public bool IsMainMousedOver { get; private set; }
+
         /// <summary> <c>true</c> if the mouse is over the <see cref="Element"/> and the left click button is pressed. </summary>
         /// <remarks> Will be true for every frame that the mouse is over the element and clicked, hence it is better to add a listener for the LeftClicked signal. </remarks>
         public bool IsLeftClicked { get; private set; }
@@ -91,13 +94,14 @@ namespace GuiCookie.Components
 
             // If the element is moused over by the input manager, and the mouse is within the bounds of the element, mousedOver is true.
             // Also check against the previous frame's moused over value to check if the mouse has entered or left the element's bounds.
-            bool isMousedOver = inputManager.MousedOverClickable == Element && Element.Bounds.AbsoluteContains(inputManager.MousePosition);
+            bool isMousedOver = Element.Bounds.AbsoluteContains(inputManager.MousePosition);
+            bool isMainMousedOver = inputManager.MousedOverClickable == Element && isMousedOver;
             if (IsMousedOver && !isMousedOver && Element.Enabled) mouseLeft.Invoke();
             if (!IsMousedOver && isMousedOver && Element.Enabled) mouseEntered.Invoke();
 
             // If the element is moused over, and the mouse was clicked within the element, fire the clicked events.
             // The left clicked function only fires when there is a change in the mouse state in the previous frame, and the mouse started and ended within the element.
-            if (IsMousedOver)
+            if (IsMainMousedOver)
                 switch (ClickType)
                 {
                     case ClickType.OnMouseDown:
@@ -112,11 +116,12 @@ namespace GuiCookie.Components
 
             // If the mouse is over the element, set the moused over.
             IsMousedOver = isMousedOver;
+            IsMainMousedOver = isMainMousedOver;
 
             // Set the left and right clicked.
             IsClickDragged = Element.Bounds.AbsoluteContains(inputManager.MouseLeftClickPosition) && inputManager.IsLeftMouseDown;
-            IsLeftClicked = IsMousedOver && inputManager.IsLeftMouseDown;
-            IsRightClicked = IsMousedOver && inputManager.IsRightMouseDown;
+            IsLeftClicked = IsMainMousedOver && inputManager.IsLeftMouseDown;
+            IsRightClicked = IsMainMousedOver && inputManager.IsRightMouseDown;
         }
         #endregion
     }

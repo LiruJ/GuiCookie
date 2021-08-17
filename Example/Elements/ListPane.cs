@@ -1,6 +1,7 @@
 ﻿using Example.DataStructures;
 using GuiCookie.Components;
 using GuiCookie.Elements;
+using Microsoft.Xna.Framework;
 using System;
 
 namespace Example.Elements
@@ -21,6 +22,10 @@ namespace Example.Elements
 
         #region Fields
         private int totalItems = 0;
+        #endregion
+
+        #region Backing Fields
+        private Point desiredSize;
         #endregion
 
         #region Constructors

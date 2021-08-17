@@ -2,44 +2,105 @@
 <Main Styles="Gui\\TestStyle" DefaultStyle="Default" Templates="Gui\\TestTemplates" Padding="1%">
 	<!--The main column layout-->
 	<Partition Components="DirectionalLayout" Size="100%" Layout="Horizontal" Spacing="4">
-		<!--The button column-->
-		<Partition Size="15%, 100%">
-			<!--The pane that shows button states-->
-			<Pane Position="0, 0" Size="100%, 10%" Padding="5">
-				<TextButton Position="0, 0" Size="100%, 50%" Style="Button" Text="Disable Button" Tag="DisableButton"/>
-				<TextButton Position="0, 50%" Size="100%, 50%" Style="Button" Text="Enabled" Tag="TargetButton"/>
-			</Pane>
+
+		<!--The horizontal progress and slider bars, as well as buttons-->
+		<Partition Components="DirectionalLayout" Size="20%, 100%" Spacing="4">
+
+			<!--The slider bars-->
+			<Panel Size="100%, 0">
+				<TextBox Size="100%, 20" Text="Horizontal Sliders" Style="TitleBar" Name="TitleBar"/>
+
+				<Pane Components="DirectionalLayout" Spacing="4" Padding="5" Style="Inlay" Name="Content">
+					<!--The regular bars-->
+					<LabelledSlider Size="100%, 16" Prefix="Value: " IsPercentage="true"/>
+					<LabelledSlider Size="100%, 16" Prefix="Value: "/>
+
+					<!--The minimum/maximum bar-->
+					<LabelledSlider Controller="CounterSlider" Size="100%, 32" Prefix="">
+						<TextBox Size="20%, 100%" Name="Label"/>
+						<NumberCounter Size="10%, 100%" Name="MinimumCounter">
+							<TextButton Font="Small" Name="IncrementButton"/>
+							<TextBox Font="Small" Name="Label"/>
+							<TextButton Font="Small" Name="DecrementButton"/>
+						</NumberCounter>
+						<HorizontalSliderBar Size="60%, 100%" DecimalDigits="0" MaximumValue="5" Name="Slider"/>
+						<NumberCounter Size="10%, 100%" Name="MaximumCounter">
+							<TextButton Font="Small" Name="IncrementButton"/>
+							<TextBox Font="Small" Name="Label"/>
+							<TextButton Font="Small" Name="DecrementButton"/>
+						</NumberCounter>
+					</LabelledSlider>
+
+					<!--The bars with fills-->
+					<LabelledSlider Size="100%, 16" Prefix="Value: " IsPercentage="true">
+						<TextBox Name="Label"/>
+						<HorizontalSliderBar Style="HorizontalProgressBar" Name="Slider"/>
+					</LabelledSlider>
+				</Pane>
+			</Panel>
+
+			<!--The progress bar-->
+			<Panel Size="100%, 0">
+				<TextBox Size="100%, 20" Text="Progress Bar" Style="TitleBar" Name="TitleBar"/>
+
+				<Pane Controller="Clickometer" Components="DirectionalLayout" Layout="Horizontal" Spacing="4" Padding="5" Style="Inlay" Name="Content">
+					<TextButton Size="35%, 20" Text="Click" Name="Button"/>
+					<ProgressBar Size="65%, 20" Style="HorizontalProgressBar" Name="ProgressBar"/>
+				</Pane>
+			</Panel>
+
+			<!--The buttons-->
+			<Panel Size="100%, 0">
+				<TextBox Size="100%, 20" Text="Buttons" Style="TitleBar" Name="TitleBar"/>
+
+				<!--The pane that shows button states-->
+				<Pane Components="DirectionalLayout" Spacing="4" Padding="5" Style="Inlay" Name="Content">
+					<TextButton Size="100%, 32" Style="Button" Text="Disable Button" Tag="DisableButton"/>
+					<TextButton Size="100%, 32" Style="Button" Text="Enabled" Tag="TargetButton"/>
+				</Pane>
+			</Panel>
 		</Partition>
 
 		<!--The grid of portraits-->
-		<Pane Controller="PortraitGrid" Components="DirectionalLayout" Position="15%, 0%" Size="20%, 35%" Padding="5" Spacing="4">
-			<!--The grid itself-->
-			<Partition Components="Frame, GridLayout" Size="100%, 80%" CellSize="20" Spacing="1" Name="Grid"/>
-			
-			<!--The spacing sliders-->
-			<LabelledSlider Size="100%, 16" Prefix="X Space: " Suffix="px" Name="XSpaceSlider">
-				<TextBox Name="Label"/>
-				<HorizontalSliderBar DecimalDigits="0" MaximumValue="5" Name="Slider"/>
-			</LabelledSlider>
-			<LabelledSlider Components="Frame" Size="100%, 16" Prefix="Y Space: " Suffix="px" Name="YSpaceSlider">
-				<TextBox Name="Label"/>
-				<HorizontalSliderBar DecimalDigits="0" MaximumValue="5" Name="Slider"/>
-			</LabelledSlider>
-		</Pane>
+		<Panel Size="20%, 50%">
+			<TextBox Size="100%, 20" Text="Portrait Grid" Style="TitleBar" Name="TitleBar"/>
+
+			<Pane Controller="PortraitGrid" Components="DirectionalLayout" Size="100%, 0" Spacing="4" Padding="5" Style="Inlay" Name="Content">
+				<!--The spacing sliders-->
+				<LabelledSlider Size="100%, 16" Prefix="X Space: " Suffix="px" Name="XSpaceSlider">
+					<TextBox Name="Label"/>
+					<HorizontalSliderBar DecimalDigits="0" MaximumValue="5" Name="Slider"/>
+				</LabelledSlider>
+				<LabelledSlider Components="Frame" Size="100%, 16" Prefix="Y Space: " Suffix="px" Name="YSpaceSlider">
+					<TextBox Name="Label"/>
+					<HorizontalSliderBar DecimalDigits="0" MaximumValue="5" Name="Slider"/>
+				</LabelledSlider>
+				
+				<!--The grid itself-->
+				<Partition Components="Frame, GridLayout" Size="100%, 260" CellSize="20" Spacing="1" Padding="5" Name="Grid"/>
+			</Pane>
+		</Panel>
 
 		<!--The vertical list of items-->
-		<ListPane Components="DirectionalLayout" Size="20%, 50%" Spacing="4" Padding="5">
-			<!--The list itself-->
-			<Pane Components="DirectionalLayout" Size="100%, 80%" Padding="5" Name="List"/>
-			<!--The add child button-->
-			<TextButton Size="100%, 24" Text="Add Item" Style="Button" Name="AddItemButton"/>
-			
-			<!--The spacing slider-->
-			<LabelledSlider Size="100%, 16" Prefix="Space: " Suffix="px" Name="SpaceSlider">
-				<TextBox Name="Label"/>
-				<HorizontalSliderBar DecimalDigits="0" MaximumValue="5" Name="Slider"/>
-			</LabelledSlider>
-		</ListPane>
+		<Panel Size="20%, 50%">
+			<TextBox Size="100%, 20" Text="Vertical List" Style="TitleBar" Name="TitleBar"/>
+
+			<ListPane Components="DirectionalLayout" Size="100%, 0" Spacing="4" Padding="5" Style="Inlay" Name="Content">
+
+				<!--The add child button-->
+				<TextButton Size="100%, 24" Text="Add Item" Style="Button" Name="AddItemButton"/>
+
+				<!--The spacing slider-->
+				<LabelledSlider Size="100%, 16" Prefix="Space: " Suffix="px" Name="SpaceSlider">
+					<TextBox Name="Label"/>
+					<HorizontalSliderBar DecimalDigits="0" MaximumValue="5" Name="Slider"/>
+				</LabelledSlider>
+
+				<!--The list itself-->
+				<Pane Components="DirectionalLayout" Size="100%, 245" Padding="5" Name="List"/>
+
+			</ListPane>
+		</Panel>
 	</Partition>
 
 	<!--These will be enabled again once the layout is a bit neater-->

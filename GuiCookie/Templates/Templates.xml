@@ -25,7 +25,7 @@
 		<HorizontalSliderBar Size="55%, 100%" DecimalDigits="2" Name="Slider"/>
 	</LabelledSlider>
 	
-	<ProgressBar Components="Frame, ImageBlock" Controller="ProgressBar"/>
+	<ProgressBar Components="Frame" Controller="ProgressBar"/>
 
 	<!--Panes-->
 	<ScrollPane Components="Frame" Size="160">
@@ -35,6 +35,15 @@
 			<Partition Name="Content" Size="100%"/>
 		</Pane>
 	</ScrollPane>
+
+	<Panel Components="Frame, TitledPanel"/>
+	
+	<!--Numbers-->
+	<NumberCounter Controller="NumberCounter" Components="DirectionalLayout">
+		<TextButton Size="100%, 33%" Text="+" Name="IncrementButton"/>
+		<TextBox Size="100%, 33%" Name="Label"/>
+		<TextButton Size="100%, 33%" Text="-" Name="DecrementButton"/>
+	</NumberCounter>
 
 	<!--Buttons-->
 	<Button Components="Frame, MouseHandler" Controller="Button"/>

@@ -11,6 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Content\Gui\Icons.png" />
+    <None Remove="Content\Gui\SmallFont.spritefont" />
     <None Remove="Content\Gui\TestFont.spritefont" />
     <None Remove="Content\Gui\TestSprites.png" />
     <None Remove="Icon.ico" />

@@ -25,6 +25,13 @@
 /processorParam:TextureFormat=Color
 /build:Gui/Icons.png
 
+#begin Gui/SmallFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Gui/SmallFont.spritefont
+
 #begin Gui/TestFont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor

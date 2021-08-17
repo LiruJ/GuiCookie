@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <Version>1.7.3.14</Version>
+	  <Version>1.7.4.0</Version>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>Liru</Authors>
     <Company>Lovebirb</Company>
@@ -16,8 +16,13 @@
     <NeutralLanguage>English (United Kingdom)</NeutralLanguage>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <FileVersion>1.7.3.14</FileVersion>
-    <AssemblyVersion>1.7.3.14</AssemblyVersion>
+    <FileVersion>1.7.4.0</FileVersion>
+    <AssemblyVersion>1.7.4.0</AssemblyVersion>
+    <PackageReleaseNotes>Reworked sliders and progress bars to properly validate their data.
+Added optional fill to sliders that fills up to the current value.
+Fixed the DesiredSize property of the DirectionalLayout component so that it takes spacing into account.
+Added Panel and NumberCounter templates.
+Various small fixes.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -158,6 +158,9 @@
         <member name="P:GuiCookie.Components.MouseHandler.IsMousedOver">
             <summary> Is <c>true</c> if the mouse is over the <see cref="T:GuiCookie.Elements.Element"/>. </summary>
         </member>
+        <member name="P:GuiCookie.Components.MouseHandler.IsMainMousedOver">
+            <summary> Is <c>true</c> if the mouse is over the <see cref="T:GuiCookie.Elements.Element"/> and the <see cref="P:GuiCookie.Input.InputManager.MousedOverClickable"/> is the <see cref="T:GuiCookie.Elements.Element"/>. </summary>
+        </member>
         <member name="P:GuiCookie.Components.MouseHandler.IsLeftClicked">
             <summary> <c>true</c> if the mouse is over the <see cref="T:GuiCookie.Elements.Element"/> and the left click button is pressed. </summary>
             <remarks> Will be true for every frame that the mouse is over the element and clicked, hence it is better to add a listener for the LeftClicked signal. </remarks>
@@ -423,6 +426,84 @@
             <param name="parent"> The <see cref="T:GuiCookie.Elements.Element"/> to parent the new <see cref="T:GuiCookie.Elements.Element"/> to. </param>
             <param name="inputs"> Any items to be passed through to the constructor of the <see cref="T:GuiCookie.Elements.Element"/>. </param>
             <returns> The created <see cref="T:GuiCookie.Elements.Element"/>. </returns>
+        </member>
+        <member name="P:GuiCookie.Elements.IElement.Bounds">
+            <summary> The bounds of the element. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.LabelledSlider.Slider">
+            <summary> The <see cref="T:GuiCookie.Elements.SliderBar"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.LabelledSlider.Label">
+            <summary> The text label. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.LabelledSlider.Prefix">
+            <summary> The string attached to the start of the label. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.LabelledSlider.Suffix">
+            <summary> The string attached to the end of the label. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.LabelledSlider.IsPercentage">
+            <summary> If this is <c>true</c>, then the label will use the <see cref="!:SliderBar.NormalisedValue"/> property and format the text as a percentage. </summary>
+            <remarks> Note that the <c>%</c> character is automatically added and is not needed as a suffix. </remarks>
+        </member>
+        <member name="P:GuiCookie.Elements.NumberCounter.Label">
+            <summary> The value label. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.NumberCounter.IncrementButton">
+            <summary> The button that increments the counter. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.NumberCounter.DecrementButton">
+            <summary> The button that decrements the counter. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.NumberCounter.Value">
+            <summary> The current value of this counter. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.NumberCounter.OnValueChanged">
+            <summary> Invoked when the <see cref="P:GuiCookie.Elements.NumberCounter.Value"/> is changed. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ProgressBar.DecimalDigits">
+            <summary> The number of decimal digits used when rounding the value. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ProgressBar.LayoutDirection">
+            <summary> The direction of the progress bar. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ProgressBar.MinimumValue">
+            <summary> The lowest value this progress bar can be. </summary>
+            <remarks> If setting both the <see cref="P:GuiCookie.Elements.ProgressBar.MinimumValue"/> and <see cref="P:GuiCookie.Elements.ProgressBar.MaximumValue"/> at the same time, use <see cref="M:GuiCookie.Elements.ProgressBar.SetMinimumAndMaximum(System.Single,System.Single)"/> instead to avoid clamping errors. </remarks>
+        </member>
+        <member name="P:GuiCookie.Elements.ProgressBar.MaximumValue">
+            <summary> The highest value this progress bar can be. </summary>
+            <remarks> If setting both the <see cref="P:GuiCookie.Elements.ProgressBar.MinimumValue"/> and <see cref="P:GuiCookie.Elements.ProgressBar.MaximumValue"/> at the same time, use <see cref="M:GuiCookie.Elements.ProgressBar.SetMinimumAndMaximum(System.Single,System.Single)"/> instead to avoid clamping errors. </remarks>
+        </member>
+        <member name="P:GuiCookie.Elements.ProgressBar.Value">
+            <summary> Gets or sets the value of the progress bar. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ProgressBar.NormalisedValue">
+            <summary> Gets or sets the <see cref="P:GuiCookie.Elements.ProgressBar.Value"/> of this progress bar with a normalised value from <c>0</c> to <c>1</c>. </summary>
+        </member>
+        <member name="M:GuiCookie.Elements.ProgressBar.onValueRecalculated(System.Single)">
+            <summary> Called when the <see cref="P:GuiCookie.Elements.ProgressBar.Value"/> is recalculated. </summary>
+            <param name="oldValue"> The value before it was recalculated. This may be the same as the value. </param>
+        </member>
+        <member name="M:GuiCookie.Elements.ProgressBar.SetMinimumAndMaximum(System.Single,System.Single)">
+            <summary> Sets both the <see cref="P:GuiCookie.Elements.ProgressBar.MinimumValue"/> and <see cref="P:GuiCookie.Elements.ProgressBar.MaximumValue"/> to the values provided, allowing them to both be set at the same time with no clamping. </summary>
+            <param name="newMinimum"> The new minimum value. </param>
+            <param name="newMaximum"> The new maximum value. </param>
+        </member>
+        <member name="P:GuiCookie.Elements.SliderBar.Handle">
+            <summary> The handle for this slider bar. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.SliderBar.ValueNoSignal">
+            <summary> Gets or sets the value of the slider bar, not invoking <see cref="P:GuiCookie.Elements.SliderBar.OnValueChanged"/>, but still updating the position of the slider handle. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.SliderBar.OnValueChanged">
+            <summary> Invoked whenever the <see cref="!:Value"/> is changed. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.SliderBar.LeftClicked">
+            <summary> Access to <see cref="P:GuiCookie.Components.MouseHandler.LeftClicked"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.SliderBar.RightClicked">
+            <summary> Access to <see cref="P:GuiCookie.Components.MouseHandler.RightClicked"/>. </summary>
         </member>
         <member name="P:GuiCookie.Elements.TextBox.Text">
             <summary> The text of the box. </summary>
@@ -819,6 +900,9 @@
             <summary> Creates a style from the given <paramref name="styleNode"/>. </summary>
             <param name="styleNode"> The <see cref="T:System.Xml.XmlNode"/> that contains the element style. </param>
         </member>
+        <member name="P:GuiCookie.Styles.StyleAttributeCache`1.Name">
+            <summary> The name of the style attribute to use. If this is <c>null</c> then unnamed attributes are used instead. </summary>
+        </member>
         <member name="T:GuiCookie.Styles.StyleManager">
             <summary> Loads, stores, and handles styles. </summary>
         </member>
@@ -856,7 +940,7 @@
             <summary> The collection of style attributes keyed by a combination of the type and its name. </summary>
         </member>
         <member name="P:GuiCookie.Styles.StyleVariant.Name">
-            <summary> The name of this variant, e.g. "Hover". </summary>
+            <summary> The name of this variant, e.g. "Hovered". </summary>
         </member>
         <member name="M:GuiCookie.Styles.StyleVariant.GetFirstAttributeOfType``1">
             <summary> Gets the first attribute of the type <typeparamref name="T"/>, prioritising unnamed attributes. </summary>

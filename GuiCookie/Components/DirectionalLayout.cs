@@ -6,11 +6,11 @@ using System;
 
 namespace GuiCookie.Components
 {
-    public class DirectionalLayout : Component
+    public class DirectionalLayout : Component, ISizeCalculator
     {
         #region Constants
         private const string layoutAttributeName = "Layout";
-
+         
         private const string spacingAttributeName = "Spacing";
         #endregion
 
@@ -47,14 +47,14 @@ namespace GuiCookie.Components
 
         /// <summary> How large this layout wants to be, taking into account all child sizes and spacing. </summary>
         /// <remarks> Note that this may be larger than the element itself if the children are relative. </remarks>
-        public Point DesiredSize 
+        public Point DesiredSize
         {
-            get { if (isDirty) recalculateLayout(); return desiredSize; } 
-            private set => desiredSize = value; 
+            get { if (isDirty) recalculateLayout(); return desiredSize; }
+            private set => desiredSize = value;
         }
 
         /// <summary> How many pixels are between each element. </summary>
-        public int Spacing 
+        public int Spacing
         {
             get => spacing;
             set
@@ -109,15 +109,17 @@ namespace GuiCookie.Components
                 child.Bounds.RelativeTotalPosition = LayoutDirection == Direction.Horizontal ? new Point(currentPosition, 0) : new Point(0, currentPosition);
 
                 // Increment the position.
-                currentPosition += (int)Math.Floor(LayoutDirection == Direction.Horizontal ? child.Bounds.ScaledSize.GetScaledX(Bounds.ContentSize.X) : child.Bounds.ScaledSize.GetScaledY(Bounds.ContentSize.Y));
+                currentPosition += (int)Math.Floor(LayoutDirection == Direction.Horizontal
+                    ? child.Bounds.ScaledSize.GetScaledX(Bounds.ContentSize.X)
+                    : child.Bounds.ScaledSize.GetScaledY(Bounds.ContentSize.Y));
 
                 // Add spacing.
                 currentPosition += Spacing;
 
                 // Add to the desired size.
                 desiredSize = new Point(
-                    LayoutDirection == Direction.Vertical ? Math.Max(desiredSize.X, child.Bounds.TotalSize.X) : desiredSize.X + child.Bounds.TotalSize.X,
-                    LayoutDirection == Direction.Horizontal ? Math.Max(desiredSize.Y, child.Bounds.TotalSize.Y) : desiredSize.Y + child.Bounds.TotalSize.Y
+                    LayoutDirection == Direction.Vertical ? Math.Max(desiredSize.X, child.Bounds.TotalSize.X) : desiredSize.X + child.Bounds.TotalSize.X + Spacing,
+                    LayoutDirection == Direction.Horizontal ? Math.Max(desiredSize.Y, child.Bounds.TotalSize.Y) : desiredSize.Y + child.Bounds.TotalSize.Y + Spacing
                     );
             }
 

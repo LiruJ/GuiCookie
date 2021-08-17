@@ -16,7 +16,7 @@ namespace GuiCookie.Styles
         #endregion
 
         #region Properties
-        /// <summary> The name of this variant, e.g. "Hover". </summary>
+        /// <summary> The name of this variant, e.g. "Hovered". </summary>
         public string Name { get; }
         #endregion
 
@@ -64,6 +64,9 @@ namespace GuiCookie.Styles
         #region Get Functions
         public T GetUnnamedAttributeOfType<T>() where T : class, IStyleAttribute => unnamedStyleAttributesByType.TryGetValue(typeof(T), out IStyleAttribute styleAttribute) ? (T)styleAttribute : null;
 
+        public T GetNamedAttributeOfType<T>(string name) where T : class, IStyleAttribute
+            => styleAttributesByTypeAndName.TryGetValue(calculateKey(typeof(T), name), out IStyleAttribute styleAttribute) ? styleAttribute as T : null;
+
         /// <summary> Gets the first attribute of the type <typeparamref name="T"/>, prioritising unnamed attributes. </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -97,7 +100,9 @@ namespace GuiCookie.Styles
                 unnamedStyleAttributesByType.Add(type, styleAttribute);
         }
 
-        private string calculateKey(Type type, IStyleAttribute styleAttribute) => $"{type.Name}:{styleAttribute.Name}";
+        private string calculateKey(Type type, IStyleAttribute styleAttribute) => calculateKey(type, styleAttribute?.Name);
+
+        private string calculateKey(Type type, string name) => $"{type.Name}:{name}";
         #endregion
 
         #region Copy Functions

@@ -11,6 +11,7 @@
 		</Colours>
 		<Fonts>
 			<Default URI="Gui\\TestFont"/>
+			<Small URI="Gui\\SmallFont"/>
 		</Fonts>
 		<Images>
 			<Main URI="Gui\\TestSprites" Tilemap="4, 4">
@@ -19,8 +20,8 @@
 				<Inlay/>
 				<VerticalSliderBar Bounds="0, 48, 16, 24"/>
 				<HorizontalSliderBar Bounds="32, 48, 24, 16"/>
-				<VerticalSliderHandle Bounds="16, 48, 16, 12"/>
-				<HorizontalSliderHandle Bounds="32, 64, 12, 16"/>
+				<VerticalSliderHandle Bounds="17, 49, 14, 10"/>
+				<HorizontalSliderHandle Bounds="33, 65, 10, 14"/>
 			</Main>
 			<Icons URI="Gui\\Icons" Tilemap="3, 3">
 				<RemoveButton Tile="0, 1"/>
@@ -32,7 +33,7 @@
 	<!--The main content for the style-->
 	<Styles>
 		<Default>
-			<SliceFrame Image="Pane" NineSlice="Thirds, 1" Colour="$MainColour" Tint="$MainTint" ShadowOffset="-5, 5"/>
+			<SliceFrame Image="Pane" NineSlice="Thirds, 1" Colour="$MainColour" Tint="$MainTint" ShadowOffset="-2, 2"/>
 			<Font Font="Default" Colour="#BBB" ShadowOffset="-1"/>
 
 			<Hovered>
@@ -57,12 +58,26 @@
 			</Clicked>
 		</Button>
 
+		<TitleBar Base="Default">
+			<SliceFrame Tint="$ClickedTint"/>
+		</TitleBar>
+		
 		<HorizontalSliderHandle Base="Default">
-			<SliceFrame Image="HorizontalSliderHandle" NineSlice="HSlice" Colour="#575EA5"/>
+			<SliceFrame Image="HorizontalSliderHandle" NineSlice="Thirds" Colour="#575EA5"/>
 		</HorizontalSliderHandle>
 
 		<HorizontalSliderBar Base="Default">
-			<SliceFrame Image="HorizontalSliderBar" NineSlice="HSlice" Colour="#484D89"/>
+			<SliceFrame Image="HorizontalSliderBar" NineSlice="Thirds" Colour="#484D89"/>
+
+			<Hovered>
+				<SliceFrame Tint="#FFF"/>
+			</Hovered>
+			<Clicked>
+				<SliceFrame Tint="$ClickedTint"/>
+			</Clicked>
+			<Disabled>
+				<SliceFrame Tint="$DisabledTint"/>
+			</Disabled>
 		</HorizontalSliderBar>
 
 		<VerticalSliderBar Base="Default">
@@ -73,6 +88,18 @@
 			<SliceFrame Image="VerticalSliderHandle" NineSlice="VSlice" Colour="#575EA5"/>
 		</VerticalSliderHandle>
 
+		<HorizontalProgressBar Base="Default">
+			<SliceFrame Image="HorizontalSliderBar" NineSlice="Thirds" Colour="#484D89"/>
+			<SliceFrame Colour="Green" Tint="$MainTint" Name="Fill"/>
+
+			<Hovered>
+				<SliceFrame Tint="#FFF" Name="Fill"/>
+			</Hovered>
+			<Clicked>
+				<SliceFrame Tint="$ClickedTint" Name="Fill"/>
+			</Clicked>
+		</HorizontalProgressBar>
+		
 		<Inlay Base="Default">
 			<SliceFrame Image="Inlay" Colour="$InlayColour"/>
 			<Font Colour="#ddd"/>

@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace GuiCookie.Elements
 {
-    public class Element : IEnumerable<Element>
+    public class Element : IEnumerable<Element>, IElement
     {
         #region Constants
         private const string tagAttributeName = "Tag";

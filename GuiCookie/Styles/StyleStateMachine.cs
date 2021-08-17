@@ -109,7 +109,7 @@ namespace GuiCookie.Styles
                 if (mouseHandler != null)
                 {
                     if (mouseHandler.IsLeftClicked || mouseHandler.IsRightClicked) CurrentStyleVariant = ClickedVariant;
-                    else if (mouseHandler.IsMousedOver) CurrentStyleVariant = HoveredVariant;
+                    else if (mouseHandler.IsMainMousedOver) CurrentStyleVariant = HoveredVariant;
                     else CurrentStyleVariant = BaseVariant;
                 }
                 // Otherwise, use the default style.
