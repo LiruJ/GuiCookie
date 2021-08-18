@@ -22,7 +22,7 @@ namespace GuiCookie.Components
         #region Backing Fields
         private string text = string.Empty;
 
-        private DirectionMask resizeElement = DirectionMask.None;
+        private DirectionMask resizeDirection = DirectionMask.None;
         #endregion
 
         #region Properties
@@ -43,62 +43,62 @@ namespace GuiCookie.Components
         /// <summary> The size in pixels that the text wants to use. </summary>
         public Vector2 TextSize { get; private set; }
 
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Space? TextAnchor
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.TextAnchor : null;
-            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.TextAnchor = value; }
+            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font) ? font.TextAnchor : null;
+            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font)) font.TextAnchor = value; }
         }
 
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Space? TextPivot
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.TextPivot : null;
-            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.TextPivot = value; }
+            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font) ? font.TextPivot : null;
+            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font)) font.TextPivot = value; }
         }
 
-        public Vector2? DropShadowOffset
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
+        public DropShadow DropShadow
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.DropShadowOffset : null;
-            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.DropShadowOffset = value; }
+            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font) ? font.DropShadow : new DropShadow((Vector2?)null, null);
+            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font)) font.DropShadow = value; }
         }
 
-        public Color? DropShadowColour
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
+        public Color? Colour
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.DropShadowColour : null;
-            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.DropShadowColour = value; }
+            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font) ? font.Colour : null;
+            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font)) font.Colour = value; }
         }
 
-        /// <summary> The current colour of the current font. </summary>
-        public Color? Colour 
-        {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.Colour : null;
-            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.Colour = value; }
-        }
-
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Color? Tint
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.Tint : null;
-            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.Tint = value; }
+            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font) ? font.Tint : null;
+            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font)) font.Tint = value; }
         }
 
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Vector2? Offset
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.Offset : null;
-            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.Offset = value; }
+            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font) ? font.Offset : null;
+            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font)) font.Offset = value; }
         }
 
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public SpriteFont SpriteFont
         {
-            get => fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font) ? font.SpriteFont : null;
-            set { if (fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font font)) font.SpriteFont = value; }
+            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font) ? font.SpriteFont : null;
+            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font)) font.SpriteFont = value; }
         }
 
         /// <summary> The direction in which this text's element resizes. </summary>
         public DirectionMask ResizeDirection
         {
-            get => resizeElement;
+            get => resizeDirection;
             set
             {
-                resizeElement = value;
+                resizeDirection = value;
 
                 recalculateTextSizeProperties();
             }
@@ -119,15 +119,14 @@ namespace GuiCookie.Components
             if (Element.Attributes.HasAttribute(Font.PivotAttributeName)) TextPivot = Element.Attributes.GetAttribute(Font.PivotAttributeName, Space.Parse);
 
             // Set the drop shadow.
-            if (Element.Attributes.HasAttribute(Font.ShadowOffsetAttributeName)) DropShadowOffset = Element.Attributes.GetAttribute(Font.ShadowOffsetAttributeName, ToVector2.Parse);
-            if (Element.Attributes.HasAttribute(Font.ShadowColourAttributeName)) DropShadowColour = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, Font.ShadowColourAttributeName).Value;
+            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(Root.StyleManager.ResourceManager, Element.Attributes));
 
             // Set the offet.
             if (Element.Attributes.HasAttribute(Font.OffsetAttributeName)) Offset = Element.Attributes.GetAttribute(Font.OffsetAttributeName, ToVector2.Parse);
 
             // Set the colour and tint.
-            if (Element.Attributes.HasAttribute(ResourceManager.ColourAttributeName)) Colour = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, ResourceManager.ColourAttributeName);
-            if (Element.Attributes.HasAttribute(Font.TintAttributeName)) Tint = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, Font.TintAttributeName);
+            if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out Font font))
+                font.TintedColour = TintedColour.CreateCombination(font.TintedColour, new TintedColour(Root.StyleManager.ResourceManager, Element.Attributes));
 
             if (Element.Attributes.HasAttribute(Font.FontAttributeName))
             {
@@ -185,17 +184,17 @@ namespace GuiCookie.Components
                 Space textPivot = fontVariant.TextPivot ?? new Space(0.5f, Axes.Both);
 
                 // Calculate the position based on the anchor and pivot. Round this down to avoid blurry text.
-                Vector2 position = (Bounds.AbsoluteContentPosition.ToVector2() + (textAnchor.GetScaledSpace(Bounds.ContentSize.ToVector2()) - textPivot.GetScaledSpace(TextSize)))
+                Vector2 position = Bounds.AbsoluteContentPosition.ToVector2() + (textAnchor.GetScaledSpace(Bounds.ContentSize.ToVector2()) - textPivot.GetScaledSpace(TextSize))
                                    + (fontVariant.Offset ?? Vector2.Zero);
                 position.X = (float)Math.Floor(position.X);
                 position.Y = (float)Math.Floor(position.Y);
 
                 // If a drop shadow is to be drawn, draw it first.
-                if (fontVariant.DropShadowOffset.HasValue && fontVariant.DropShadowColour.HasValue)
-                    guiCamera.DrawString(fontVariant.SpriteFont, Text, position + fontVariant.DropShadowOffset.Value, fontVariant.DropShadowColour.Value);
+                if (fontVariant.DropShadow.HasData)
+                    guiCamera.DrawString(fontVariant.SpriteFont, Text, position + fontVariant.DropShadow.Offset.Value, fontVariant.DropShadow.Colour.Value);
 
                 // Draw the text itself.
-                guiCamera.DrawString(fontVariant.SpriteFont, Text, position, fontVariant.FinalColour);
+                guiCamera.DrawString(fontVariant.SpriteFont, Text, position, fontVariant.MixedColour);
             }
         }
         #endregion

@@ -1,7 +1,6 @@
 ﻿using GuiCookie.DataStructures;
 using GuiCookie.Rendering;
 using GuiCookie.Styles;
-using LiruGameHelperMonoGame.Parsers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -39,28 +38,25 @@ namespace GuiCookie.Components
         /// <summary> The current colour of the current content. </summary>
         public Color? Colour
         {
-            get => contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content) ? content.Colour : null;
-            set { if (contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content)) content.Colour = value; }
+            get => contentCache.TryGetVariantAttribute(Style.BaseVariant, out Content content) ? content.Colour : null;
+            set { if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out Content content)) content.Colour = value; }
         }
 
-        public Vector2? DropShadowOffset
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
+        public DropShadow DropShadow
         {
-            get => contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content) ? content.DropShadowOffset : null;
-            set { if (contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content)) content.DropShadowOffset = value; }
+            get => contentCache.TryGetVariantAttribute(Style.BaseVariant, out Content content) ? content.DropShadow : new DropShadow((Vector2?)null, null);
+            set { if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out Content content)) content.DropShadow = value; }
         }
 
-        public Color? DropShadowColour
-        {
-            get => contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content) ? content.DropShadowColour : null;
-            set { if (contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content)) content.DropShadowColour = value; }
-        }
-
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Color? Tint
         {
-            get => contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content) ? content.Tint : null;
-            set { if (contentCache.TryGetVariantAttribute(CurrentStyleVariant, out Content content)) content.Tint = value; }
+            get => contentCache.TryGetVariantAttribute(Style.BaseVariant, out Content content) ? content.Tint : null;
+            set { if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out Content content)) content.Tint = value; }
         }
 
+        /// <summary> The current image that is being displayed. </summary>
         public Image Image { get; set; }
         #endregion
 
@@ -81,12 +77,11 @@ namespace GuiCookie.Components
                 SetImageFromName(imageName);
 
             // Set the colour and tint.
-            if (Element.Attributes.HasAttribute(ResourceManager.ColourAttributeName)) Colour = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, ResourceManager.ColourAttributeName);
-            if (Element.Attributes.HasAttribute(Content.TintAttributeName)) Tint = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, Content.TintAttributeName);
+            if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out Content content))
+                content.TintedColour = TintedColour.CreateCombination(content.TintedColour, new TintedColour(Root.StyleManager.ResourceManager, Element.Attributes));
 
             // Set the drop shadow.
-            if (Element.Attributes.HasAttribute(Content.ShadowOffsetAttributeName)) DropShadowOffset = Element.Attributes.GetAttribute(Content.ShadowOffsetAttributeName, ToVector2.Parse);
-            if (Element.Attributes.HasAttribute(Content.ShadowColourAttributeName)) DropShadowColour = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, Content.ShadowColourAttributeName).Value;
+            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(Root.StyleManager.ResourceManager, Element.Attributes));
 
             // Set clipping mode.
             ClippingMode = Element.Attributes.GetEnumAttributeOrDefault(clippingModeAttributeName, ClippingMode.Squeeze);
@@ -111,7 +106,6 @@ namespace GuiCookie.Components
         public override void Draw(IGuiCamera guiCamera)
         {
             // If the current image is empty, don't draw.
-            // This allows the user to set their own image, instead of having a dependency on one being given.
             if (Texture == null) return;
 
             // Get the current content.
@@ -179,11 +173,11 @@ namespace GuiCookie.Components
             }
 
             // Draw the shadow first, if one exists.
-            if (content != null && content.DropShadowOffset.HasValue && content.DropShadowColour.HasValue)
-                guiCamera.DrawTextureAt(Image.Texture, new Rectangle(target.Location + content.DropShadowOffset.Value.ToPoint(), target.Size), source, content.DropShadowColour.Value);
+            if (content != null && content.DropShadow.HasData)
+                guiCamera.DrawTextureAt(Image.Texture, new Rectangle(target.Location + content.DropShadow.Offset.Value.ToPoint(), target.Size), source, content.DropShadow.Colour.Value);
 
             // Draw the image at the calculated target with the calculated source.
-            guiCamera.DrawTextureAt(Image.Texture, target, source, content?.FinalColour ?? Color.White);
+            guiCamera.DrawTextureAt(Image.Texture, target, source, content?.MixedColour ?? Color.White);
         }
         #endregion
     }

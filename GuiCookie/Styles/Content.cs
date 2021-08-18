@@ -1,5 +1,5 @@
 ﻿using GuiCookie.Attributes;
-using LiruGameHelperMonoGame.Parsers;
+using GuiCookie.DataStructures;
 using Microsoft.Xna.Framework;
 using System;
 
@@ -9,43 +9,46 @@ namespace GuiCookie.Styles
     {
         #region Constants
         private const string nameAttributeName = "Name";
-
-        public const string ShadowColourAttributeName = "ShadowColour";
-        public const string ShadowOffsetAttributeName = "ShadowOffset";
-
-        public const string TintAttributeName = "Tint";
         #endregion        
 
         #region Properties
         public string Name { get; }
 
-        /// <summary> The main colour applied to content (image blocks, etc.). </summary>
-        public Color? Colour { get; set; }
+        /// <summary> The colour and tint applied to the frame. </summary>
+        public TintedColour TintedColour { get; set; }
 
-        public Color? Tint { get; set; }
+        /// <summary> Accessor for <see cref="TintedColour.Colour"/>. </summary>
+        public Color? Colour
+        {
+            get => TintedColour.Colour;
+            set => TintedColour = new TintedColour(value, TintedColour.Tint);
+        }
 
-        public Color FinalColour => Colour.HasValue && Tint.HasValue
-            ? new Color(Colour.Value.ToVector4() * Tint.Value.ToVector4())
-            : Colour ?? Tint ?? Color.White;
+        /// <summary> Accessor for <see cref="TintedColour.Tint"/>. </summary>
+        public Color? Tint
+        {
+            get => TintedColour.Tint;
+            set => TintedColour = new TintedColour(TintedColour.Colour, value);
+        }
 
-        public Vector2? DropShadowOffset { get; set; }
+        /// <summary> Accessor for <see cref="TintedColour.Mixed"/>. </summary>
+        public Color MixedColour => TintedColour.Mixed;
 
-        public Color? DropShadowColour { get; set; }
+        /// <summary> The drop shadow data used to drop a shadow behind the content. </summary>
+        public DropShadow DropShadow { get; set; }
         #endregion
 
         #region Constructors
         public Content(ResourceManager resourceManager, IReadOnlyAttributes attributes)
         {
-            // Set the colour.
-            Colour = resourceManager.GetColourOrDefault(attributes, ResourceManager.ColourAttributeName);
-            Tint = resourceManager.GetColourOrDefault(attributes, TintAttributeName);
+            // Parse the colour.
+            TintedColour = new TintedColour(resourceManager, attributes);
 
             // Set the name.
             Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
 
             // Set the drop shadow.
-            DropShadowOffset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
-            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName);
+            DropShadow = new DropShadow(resourceManager, attributes);
         }
 
         private Content(Content original)
@@ -54,11 +57,9 @@ namespace GuiCookie.Styles
 
             Name = original.Name;
 
-            Colour = original.Colour;
-            Tint = original.Tint;
+            TintedColour = original.TintedColour;
 
-            DropShadowOffset = original.DropShadowOffset;
-            DropShadowColour = original.DropShadowColour;
+            DropShadow = original.DropShadow;
         }
         #endregion
 
@@ -79,10 +80,8 @@ namespace GuiCookie.Styles
             if (!(baseAttribute is Content baseContent)) throw new ArgumentException($"Cannot combine with attribute as it is not a content. {baseAttribute}");
 
             // Override the properties.
-            if (Colour == null) Colour = baseContent.Colour;
-            if (Tint == null) Tint = baseContent.Tint;
-            if (DropShadowOffset == null) DropShadowOffset = baseContent.DropShadowOffset;
-            if (DropShadowColour == null) DropShadowColour = baseContent.DropShadowColour;
+            TintedColour = TintedColour.CreateCombination(baseContent.TintedColour, TintedColour);
+            DropShadow = DropShadow.CreateCombination(baseContent.DropShadow, DropShadow);
         }
         #endregion
     }

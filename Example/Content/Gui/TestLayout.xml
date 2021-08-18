@@ -34,8 +34,10 @@
 					<!--The bars with fills-->
 					<LabelledSlider Size="100%, 16" Prefix="Value: " IsPercentage="true">
 						<TextBox Name="Label"/>
-						<HorizontalSliderBar Style="HorizontalProgressBar" Name="Slider"/>
+						<HorizontalSliderBar FillPadding="2, 2, 3" DrawBehind="True" Style="HorizontalSliderBar" Name="Slider"/>
 					</LabelledSlider>
+
+					<Partition Components="Frame, MouseHandler" Controller="SliderBar" Size="100%, 16" FillPadding="2, 2, 3" FillColour="Yellow" DrawBehind="True" Style="HorizontalProgressBar"/>
 				</Pane>
 			</Panel>
 
@@ -45,7 +47,7 @@
 
 				<Pane Controller="Clickometer" Components="DirectionalLayout" Layout="Horizontal" Spacing="4" Padding="5" Style="Inlay" Name="Content">
 					<TextButton Size="35%, 20" Text="Click" Name="Button"/>
-					<ProgressBar Size="65%, 20" Style="HorizontalProgressBar" Name="ProgressBar"/>
+					<ProgressBar Size="65%, 20" FillPadding="2, 2, 3" FillColour="Red" DrawBehind="True" Style="HorizontalProgressBar" Name="ProgressBar"/>
 				</Pane>
 			</Panel>
 

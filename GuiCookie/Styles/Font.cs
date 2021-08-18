@@ -16,36 +16,42 @@ namespace GuiCookie.Styles
 
         public const string AnchorAttributeName = "TextAnchor";
         public const string PivotAttributeName = "TextPivot";
-        public const string ShadowColourAttributeName = "ShadowColour";
-        public const string ShadowOffsetAttributeName = "ShadowOffset";
 
         public const string OffsetAttributeName = "Offset";
-
-        public const string TintAttributeName = "Tint";
         #endregion
 
         #region Properties
         public string Name { get; }
 
-        /// <summary> The <see cref="SpriteFont"/>. </summary>
+        /// <summary> The <see cref="Microsoft.Xna.Framework.Graphics.SpriteFont"/>. </summary>
         public SpriteFont SpriteFont { get; set; }
 
-        /// <summary> The text colour. </summary>
-        public Color? Colour { get; set; }
+        /// <summary> The colour and tint applied to the frame. </summary>
+        public TintedColour TintedColour { get; set; }
 
-        public Color? Tint { get; set; }
+        /// <summary> Accessor for <see cref="TintedColour.Colour"/>. </summary>
+        public Color? Colour
+        {
+            get => TintedColour.Colour;
+            set => TintedColour = new TintedColour(value, TintedColour.Tint);
+        }
 
-        public Color FinalColour => Colour.HasValue && Tint.HasValue
-            ? new Color(Colour.Value.ToVector4() * Tint.Value.ToVector4())
-            : Colour ?? Tint ?? Color.Black;
+        /// <summary> Accessor for <see cref="TintedColour.Tint"/>. </summary>
+        public Color? Tint
+        {
+            get => TintedColour.Tint;
+            set => TintedColour = new TintedColour(TintedColour.Colour, value);
+        }
+
+        /// <summary> Accessor for <see cref="TintedColour.Mixed"/>. </summary>
+        public Color MixedColour => TintedColour.Mixed;
 
         public Space? TextAnchor { get; set; }
 
         public Space? TextPivot { get; set; }
 
-        public Vector2? DropShadowOffset { get; set; }
-
-        public Color? DropShadowColour { get; set; }
+        /// <summary> The drop shadow data used to drop a shadow behind the text. </summary>
+        public DropShadow DropShadow { get; set; }
 
         /// <summary> The amount of pixels to offset the final position by. This is useful for things like buttons that appear to be pushed inwards. </summary>
         public Vector2? Offset { get; set; }
@@ -59,10 +65,9 @@ namespace GuiCookie.Styles
             SpriteFont = !string.IsNullOrWhiteSpace(fontName) ?
                 resourceManager.FontsByName.TryGetValue(fontName, out SpriteFont spriteFont) ? spriteFont : throw new Exception($"Font resource named \"{fontName}\" does not exist.")
                 : null;
-            
+
             // Parse the colour.
-            Colour = resourceManager.GetColourOrDefault(attributes, ResourceManager.ColourAttributeName, null);
-            Tint = resourceManager.GetColourOrDefault(attributes, TintAttributeName, null);
+            TintedColour = new TintedColour(resourceManager, attributes);
 
             // Set the name.
             Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
@@ -70,10 +75,9 @@ namespace GuiCookie.Styles
             // Set the text anchor and pivot.
             TextAnchor = attributes.GetAttributeOrDefault(AnchorAttributeName, (Space?)null, Space.TryParse);
             TextPivot = attributes.GetAttributeOrDefault(PivotAttributeName, (Space?)null, Space.TryParse);
-            
+
             // Set the drop shadow.
-            DropShadowOffset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
-            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName);
+            DropShadow = new DropShadow(resourceManager, attributes);
 
             // Set the offset.
             Offset = attributes.GetAttributeOrDefault(OffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
@@ -85,14 +89,12 @@ namespace GuiCookie.Styles
 
             Name = original.Name;
             SpriteFont = original.SpriteFont;
-            Colour = original.Colour;
-            Tint = original.Tint;
+            TintedColour = original.TintedColour;
 
             TextAnchor = original.TextAnchor;
             TextPivot = original.TextPivot;
 
-            DropShadowOffset = original.DropShadowOffset;
-            DropShadowColour = original.DropShadowColour;
+            DropShadow = original.DropShadow;
 
             Offset = original.Offset;
         }
@@ -116,11 +118,9 @@ namespace GuiCookie.Styles
 
             // Override the base's properties.
             if (SpriteFont == null) SpriteFont = baseFont.SpriteFont;
-            if (Colour == null) Colour = baseFont.Colour;
-            if (Tint == null) Tint = baseFont.Tint;
+            TintedColour = TintedColour.CreateCombination(baseFont.TintedColour, TintedColour);
+            DropShadow = DropShadow.CreateCombination(baseFont.DropShadow, DropShadow);
             if (Offset == null) Offset = baseFont.Offset;
-            if (DropShadowOffset == null) DropShadowOffset = baseFont.DropShadowOffset;
-            if (DropShadowColour == null) DropShadowColour = baseFont.DropShadowColour;
         }
         #endregion
     }

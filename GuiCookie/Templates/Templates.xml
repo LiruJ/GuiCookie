@@ -10,7 +10,7 @@
 		<SliderHandle Name="Handle"/>
 	</SliderBar>
 
-	<SliderHandle Components="Frame" Controller="SliderHandle" Pivot="50%"/>
+	<SliderHandle Components="Frame" Size="12, 100%" Pivot="50%"/>
 
 	<HorizontalSliderBar Base="SliderBar" Direction="Horizontal" Style="HorizontalSliderBar">
 		<SliderHandle Name="Handle" Size="10%, 100%" Style="HorizontalSliderHandle"/>

@@ -16,7 +16,7 @@ namespace GuiCookie.Elements
 
         #region Elements
         /// <summary> The handle for this slider bar. </summary>
-        public SliderHandle Handle { get; private set; }
+        public Element Handle { get; private set; }
         #endregion
 
         #region Properties
@@ -33,6 +33,9 @@ namespace GuiCookie.Elements
                 updateValue(false);
             }
         }
+
+        /// <summary> The total usable space along this slider's axis that represents the value area. The <see cref="Handle"/>'s size is taken into account. </summary>
+        public float UsableSize => LayoutDirection == Direction.Horizontal ? Bounds.TotalSize.X - (Handle?.Bounds.TotalSize.X ?? 0) : Bounds.TotalSize.Y - (Handle?.Bounds.TotalSize.Y ?? 0);
         #endregion
 
         #region Signals
@@ -53,8 +56,8 @@ namespace GuiCookie.Elements
             // Get the mouse handler.
             mouseHandler = GetComponent<MouseHandler>();
 
-            // Get the handle element, throw an exception if it does not exist.
-            Handle = GetChild<SliderHandle>() ?? throw new Exception("Slider bar is missing slider handle child.");
+            // Get the handle element.
+            Handle = GetChildByName("Handle");
 
             // Set up the base progress bar.
             base.OnFullSetup();
@@ -66,14 +69,40 @@ namespace GuiCookie.Elements
         #endregion
 
         #region Calculation Functions
-        protected override void OnSizeChanged() => Handle?.CalculateSliderPosition();
+        protected override void OnSizeChanged() => CalculateHandlePosition();
+
+        public void CalculateHandlePosition()
+        {
+            if (Handle == null) return;
+
+            Handle.Bounds.RelativeTotalPosition = LayoutDirection == Direction.Horizontal 
+                ? new Point((Handle.Bounds.TotalSize.X / 2) + (int)MathF.Floor((UsableSize * NormalisedValue) - (Bounds.RelativeContentPosition.X - Bounds.RelativeTotalPosition.X)), Bounds.TotalSize.Y / 2)
+                : new Point(Bounds.TotalSize.X / 2, (Handle.Bounds.TotalSize.Y / 2) + (int)MathF.Floor((UsableSize * NormalisedValue) - (Bounds.RelativeContentPosition.Y - Bounds.RelativeTotalPosition.Y)));
+        }
+
+        /// <summary> Resizes the <see cref="Handle"/> so that it covers the set range. For example; if the slider's minimum value is 0 and the maximum value is 2, and <paramref name="range"/> is 1, the handle will fill 50% of the slider bar. </summary>
+        /// <param name="range"> The range for the handle to cover. </param>
+        public void ResizeHandleRange(float range)
+        {
+            // If there is no handle, do nothing.
+            if (Handle == null) return;
+
+            // If the minimum is equal to the maximum, do nothing.
+            if (MinimumValue == MaximumValue) return;
+
+            // Resize and reposition the handle.
+            Handle.Bounds.ScaledSize = LayoutDirection == Direction.Horizontal
+                ? new Space(range / (MaximumValue - MinimumValue + 1), 1f, Axes.Both)
+                : new Space(1f, range / (MaximumValue - MinimumValue + 1), Axes.Both);
+            CalculateHandlePosition();
+        }
 
         protected override void onValueRecalculated(float oldValue) => updateValue(oldValue != Value);
 
         private void updateValue(bool invokeSignal)
         {
-            // Recalculate the position of the slider regardless of if the value changed..
-            Handle?.CalculateSliderPosition();
+            // Recalculate the position of the slider regardless of if the value changed.
+            CalculateHandlePosition();
 
             // If the signal should invoke, do so.
             if (invokeSignal) onValueChanged.Invoke();
@@ -81,7 +110,7 @@ namespace GuiCookie.Elements
         #endregion
 
         #region Style Functions
-        public override void OnStyleChanged() => fillFrameCache.Refresh(Style);
+        public override void OnStyleChanged() => fillCache.Refresh(Style);
         #endregion
 
         #region Update Functions
@@ -90,16 +119,16 @@ namespace GuiCookie.Elements
             // If the bar is clicked, handle sliding the handle.
             if (mouseHandler.IsClickDragged)
             {
-                // Calculate the useable size of the bar.
-                float size = LayoutDirection == Direction.Horizontal ? Bounds.TotalSize.X - Handle.Bounds.TotalSize.X : Bounds.TotalSize.Y - Handle.Bounds.TotalSize.Y;
+                // Calculate half of the handle's size. This is half of the size of the handle on the axis of the bar, or 0 if there is no handle.
+                float halfHandleSize = Handle != null ? (LayoutDirection == Direction.Horizontal ? Handle.Bounds.TotalSize.X : Handle.Bounds.TotalSize.Y) / 2.0f : 0;
 
                 // Calculate the position of the mouse within the usable area of the bar.
-                float mousePos = LayoutDirection == Direction.Horizontal ?
-                    MathHelper.Clamp(mouseHandler.RelativeMousePosition.X, Handle.Bounds.TotalSize.X / 2.0f, Bounds.TotalSize.X - (Handle.Bounds.TotalSize.X / 2.0f)) - (Handle.Bounds.TotalSize.X / 2.0f) :
-                    MathHelper.Clamp(mouseHandler.RelativeMousePosition.Y, Handle.Bounds.TotalSize.Y / 2.0f, Bounds.TotalSize.Y - (Handle.Bounds.TotalSize.Y / 2.0f)) - (Handle.Bounds.TotalSize.Y / 2.0f);
+                float mousePos = LayoutDirection == Direction.Horizontal
+                    ? MathHelper.Clamp(mouseHandler.RelativeMousePosition.X, halfHandleSize, Bounds.TotalSize.X - halfHandleSize) - halfHandleSize
+                    : MathHelper.Clamp(mouseHandler.RelativeMousePosition.Y, halfHandleSize, Bounds.TotalSize.Y - halfHandleSize) - halfHandleSize;
 
                 // Calculate the value based on what part of the bar is being clicked.
-                NormalisedValue = (mousePos / size);
+                NormalisedValue = (mousePos / UsableSize);
             }
         }
         #endregion
@@ -108,18 +137,23 @@ namespace GuiCookie.Elements
         protected override void drawFill(IGuiCamera guiCamera)
         {
             // Do nothing if there is no fill.
-            if (!fillFrameCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame fill)) return;
+            if (!fillCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame fill)) return;
 
-            // Calculate the size of the fill.
-            Point fillSize = LayoutDirection == Direction.Horizontal
-                ? new Point((int)MathF.Floor(Handle.Bounds.ScaledPosition.GetScaledX(Bounds.ContentSize.X)), Bounds.ContentSize.Y)
-                : new Point(Bounds.ContentSize.X, (int)MathF.Floor(Handle.Bounds.ScaledPosition.GetScaledY(Bounds.ContentSize.Y)));
+            // If there is no handle, fall back on the progress bar's way of drawing the fill.
+            if (Handle == null) base.drawFill(guiCamera);
+            // Otherwise; draw the fill so that it is hidden behind the handle.
+            else
+            {
+                // Calculate the absolute area for the fill to be drawn.
+                Rectangle fillArea = FillPadding.ScaleRectangle(Bounds.AbsoluteTotalArea);
 
-            // Calculate the destination of the fill.
-            Rectangle fillDestination = new Rectangle(Bounds.AbsoluteContentPosition, fillSize);
+                // Adjust the fill area's width or height so that it is hidden behind the handle.
+                if (LayoutDirection == Direction.Horizontal) fillArea.Width = Handle.Bounds.AbsoluteTotalArea.Center.X - fillArea.X;
+                else fillArea.Height = Handle.Bounds.AbsoluteTotalArea.Center.Y - fillArea.Y;
 
-            // Draw the fill.
-            NineSliceDrawer.DrawFrameOnDemand(fill, fillDestination, guiCamera, fill.FinalColour);
+                // Draw the fill.
+                NineSliceDrawer.DrawFrameOnDemand(fill, fillArea, guiCamera, fill.MixedColour);
+            }
         }
         #endregion
     }

@@ -31,7 +31,7 @@ namespace GuiCookie.Styles
 
             // Add each style attribute.
             foreach (IStyleAttribute styleAttribute in styleAttributes)
-                add(styleAttribute);
+                AddAttribute(styleAttribute);
         }
 
         public StyleVariant(XmlNode variantNode, ResourceManager resourceManager, ConstructorCache<IStyleAttribute> attributeCache)
@@ -45,7 +45,7 @@ namespace GuiCookie.Styles
                 IStyleAttribute styleAttribute = attributeCache.CreateInstance(childNode.Name, resourceManager, new AttributeCollection(childNode));
 
                 // Try to add the attributes to the collection.
-                add(styleAttribute);
+                AddAttribute(styleAttribute);
             }
         }
         
@@ -57,11 +57,11 @@ namespace GuiCookie.Styles
 
             // Copy each attribute.
             foreach (IStyleAttribute attribute in original.styleAttributesByTypeAndName.Values)
-                add(attribute.CreateCopy());
+                AddAttribute(attribute.CreateCopy());
         }
         #endregion
 
-        #region Get Functions
+        #region Collection Functions
         public T GetUnnamedAttributeOfType<T>() where T : class, IStyleAttribute => unnamedStyleAttributesByType.TryGetValue(typeof(T), out IStyleAttribute styleAttribute) ? (T)styleAttribute : null;
 
         public T GetNamedAttributeOfType<T>(string name) where T : class, IStyleAttribute
@@ -85,7 +85,7 @@ namespace GuiCookie.Styles
         #endregion
 
         #region Add Functions
-        private void add(IStyleAttribute styleAttribute)
+        public void AddAttribute(IStyleAttribute styleAttribute)
         {
             // Calculate the key.
             Type type = styleAttribute.GetType();
@@ -117,7 +117,7 @@ namespace GuiCookie.Styles
             {
                 // If this variant does not have the attribute, take a copy of it as it is.
                 string key = calculateKey(baseAttribute.GetType(), baseAttribute);
-                if (!styleAttributesByTypeAndName.TryGetValue(key, out IStyleAttribute derivedAttribute)) add(baseAttribute.CreateCopy());
+                if (!styleAttributesByTypeAndName.TryGetValue(key, out IStyleAttribute derivedAttribute)) AddAttribute(baseAttribute.CreateCopy());
                 // Otherwise; combine the derived attribute over the base attribute.
                 else derivedAttribute.OverrideBaseAttribute(baseAttribute);
             }

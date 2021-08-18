@@ -5,16 +5,6 @@ namespace GuiCookie.Styles
 {
     public class StyleStateMachine
     {
-        #region Constants
-        protected const string baseVariantName = "Base";
-
-        protected const string hoveredVariantName = "Hovered";
-
-        protected const string clickedVariantName = "Clicked";
-
-        protected const string disabledVariantName = "Disabled";
-        #endregion
-
         #region Fields
         protected readonly Element element;
 
@@ -56,7 +46,7 @@ namespace GuiCookie.Styles
                 style = value;
 
                 // Refresh the current variant.
-                refreshStyleVariants();
+                RefreshStyleVariants();
             }
         }
         #endregion
@@ -73,13 +63,14 @@ namespace GuiCookie.Styles
         #endregion
 
         #region Change Functions
-        private void refreshStyleVariants()
+        /// <summary> Searches through the current <see cref="Style"/> and caches any variants. </summary>
+        public void RefreshStyleVariants()
         {
             // If a new style exists, cache the variants.
             BaseVariant = Style?.BaseVariant;
-            HoveredVariant = Style?.GetStyleVariantFromName(hoveredVariantName) ?? BaseVariant;
-            ClickedVariant = Style?.GetStyleVariantFromName(clickedVariantName) ?? BaseVariant;
-            DisabledVariant = Style?.GetStyleVariantFromName(disabledVariantName) ?? BaseVariant;
+            HoveredVariant = Style?.GetStyleVariantFromName(Style.HoveredVariantName) ?? BaseVariant;
+            ClickedVariant = Style?.GetStyleVariantFromName(Style.ClickedVariantName) ?? BaseVariant;
+            DisabledVariant = Style?.GetStyleVariantFromName(Style.DisabledVariantName) ?? BaseVariant;
 
             // Refresh the current variant.
             UpdateCurrentStyle();

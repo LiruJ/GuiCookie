@@ -1,6 +1,6 @@
-﻿using GuiCookie.Rendering;
+﻿using GuiCookie.DataStructures;
+using GuiCookie.Rendering;
 using GuiCookie.Styles;
-using LiruGameHelperMonoGame.Parsers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
@@ -28,34 +28,32 @@ namespace GuiCookie.Components
         #endregion
 
         #region Properties
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Image? FrameImage
         {
-            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.Image : null;
-            set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.Image = value; }
+            get => sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrame sliceFrame) ? sliceFrame.Image : null;
+            set { if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrame sliceFrame)) sliceFrame.Image = value; }
         }
 
-        public Vector2? DropShadowOffset
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
+        public DropShadow DropShadow
         {
-            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.DropShadowOffset : null;
-            set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.DropShadowOffset = value; }
+            get => sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrame sliceFrame) ? sliceFrame.DropShadow : new DropShadow((Vector2?)null, null);
+            set { if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrame sliceFrame)) sliceFrame.DropShadow = value; }
         }
 
-        public Color? DropShadowColour
-        {
-            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.DropShadowColour : null;
-            set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.DropShadowColour = value; }
-        }
-
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Color? Colour
         {
-            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.Colour : null;
-            set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.Colour = value; }
+            get => sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrame sliceFrame) ? sliceFrame.Colour : null;
+            set { if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrame sliceFrame)) sliceFrame.Colour = value; }
         }
 
+        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Color? Tint
         {
-            get => sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame) ? sliceFrame.Tint : null;
-            set { if (sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) sliceFrame.Tint = value; }
+            get => sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrame sliceFrame) ? sliceFrame.Tint : null;
+            set { if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrame sliceFrame)) sliceFrame.Tint = value; }
         }
         #endregion
 
@@ -78,11 +76,11 @@ namespace GuiCookie.Components
                     image : throw new System.Exception($"Image with name {Element.Attributes.GetAttribute(frameImageAttributeName)} has not been loaded.");
 
             // Set the drop shadow.
-            if (Element.Attributes.HasAttribute(SliceFrame.ShadowOffsetAttributeName)) DropShadowOffset = Element.Attributes.GetAttribute(SliceFrame.ShadowOffsetAttributeName, ToVector2.Parse);
-            if (Element.Attributes.HasAttribute(SliceFrame.ShadowColourAttributeName)) DropShadowColour = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, SliceFrame.ShadowColourAttributeName).Value;
-        
-            // Set the tint.
-            if (Element.Attributes.HasAttribute(SliceFrame.TintAttributeName)) Tint = Root.StyleManager.ResourceManager.GetColourOrDefault(Element.Attributes, SliceFrame.TintAttributeName);
+            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(Root.StyleManager.ResourceManager, Element.Attributes));
+
+            // Set the colour and tint.
+            if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrame sliceFrame))
+                sliceFrame.TintedColour = TintedColour.CreateCombination(sliceFrame.TintedColour, new TintedColour(Root.StyleManager.ResourceManager, Element.Attributes));
         }
         #endregion
 
@@ -125,7 +123,7 @@ namespace GuiCookie.Components
             if (!texturesByStyleVariant.TryGetValue(CurrentStyleVariant, out Texture2D texture))
             {
                 // Try to get the current SliceFrame. If none was found then return null.
-                if (!sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrame sliceFrame)) return null;
+                if (!sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrame sliceFrame)) return null;
 
                 // Before going through the effort of creating an entirely new texture, first check to see if there's any identical textures that could be reused.
                 // For example, most of the time a hover variant is the same image but with a different tint, hence the same texture could be reused and it will be recoloured later.
@@ -175,21 +173,21 @@ namespace GuiCookie.Components
                 if (currentTexture == null) return;
 
                 // If a shadow is to be drawn, do that first.
-                if (sliceFrame.DropShadowOffset.HasValue && sliceFrame.DropShadowColour.HasValue)
-                    guiCamera.DrawTextureAt(currentTexture, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadowOffset.Value.ToPoint(), Bounds.TotalSize), sliceFrame.DropShadowColour.Value);
+                if (sliceFrame.DropShadow.HasData)
+                    guiCamera.DrawTextureAt(currentTexture, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadow.Offset.Value.ToPoint(), Bounds.TotalSize), sliceFrame.DropShadow.Colour.Value);
 
                 // Draw the texture.
-                guiCamera.DrawTextureAt(currentTexture, Bounds.AbsoluteTotalArea, sliceFrame.FinalColour);
+                guiCamera.DrawTextureAt(currentTexture, Bounds.AbsoluteTotalArea, sliceFrame.MixedColour);
             }
             // Otherwise; draw on-demand.
             else
             {
                 // If a shadow is to be drawn, do that first.
-                if (sliceFrame.DropShadowOffset.HasValue && sliceFrame.DropShadowColour.HasValue)
-                    NineSliceDrawer.DrawFrameOnDemand(sliceFrame, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadowOffset.Value.ToPoint(), Bounds.TotalSize), guiCamera, sliceFrame.DropShadowColour.Value);
+                if (sliceFrame.DropShadow.HasData)
+                    NineSliceDrawer.DrawFrameOnDemand(sliceFrame, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadow.Offset.Value.ToPoint(), Bounds.TotalSize), guiCamera, sliceFrame.DropShadow.Colour.Value);
 
                 // Draw the frame.
-                NineSliceDrawer.DrawFrameOnDemand(sliceFrame, Bounds.AbsoluteTotalArea, guiCamera, sliceFrame.FinalColour);
+                NineSliceDrawer.DrawFrameOnDemand(sliceFrame, Bounds.AbsoluteTotalArea, guiCamera, sliceFrame.MixedColour);
             }
         }
         #endregion

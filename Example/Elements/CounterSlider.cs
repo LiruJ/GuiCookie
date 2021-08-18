@@ -1,5 +1,4 @@
-﻿using GuiCookie.DataStructures;
-using GuiCookie.Elements;
+﻿using GuiCookie.Elements;
 using System;
 
 namespace Example.Elements
@@ -29,23 +28,11 @@ namespace Example.Elements
             MaximumCounter.Value = (int)MathF.Floor(Slider.MaximumValue);
 
             // Bind the counters to change the min/max of the slider.
-            MinimumCounter.OnValueChanged.Connect(() => { Slider.MinimumValue = MinimumCounter.Value; MinimumCounter.Value = (int)MathF.Floor(Slider.MinimumValue); resizeHandle(); });
-            MaximumCounter.OnValueChanged.Connect(() => { Slider.MaximumValue = MaximumCounter.Value; MaximumCounter.Value = (int)MathF.Floor(Slider.MaximumValue); resizeHandle(); });
+            MinimumCounter.OnValueChanged.Connect(() => { Slider.MinimumValue = MinimumCounter.Value; MinimumCounter.Value = (int)MathF.Floor(Slider.MinimumValue); Slider.ResizeHandleRange(1); });
+            MaximumCounter.OnValueChanged.Connect(() => { Slider.MaximumValue = MaximumCounter.Value; MaximumCounter.Value = (int)MathF.Floor(Slider.MaximumValue); Slider.ResizeHandleRange(1); });
         }
 
-        public override void OnPostFullSetup() => resizeHandle();
-        #endregion
-
-        #region Calculation Functions
-        private void resizeHandle()
-        {
-            // If the minimum is equal to the maximum, do nothing.
-            if (Slider.MinimumValue == Slider.MaximumValue) return;
-
-            // Resize and reposition the handle.
-            Slider.Handle.Bounds.ScaledSize = new Space(1f / ((Slider.MaximumValue - Slider.MinimumValue) + 1), 1f, Axes.Both);
-            Slider.Handle.CalculateSliderPosition();
-        }
+        public override void OnPostFullSetup() => Slider.ResizeHandleRange(1);
         #endregion
     }
 }

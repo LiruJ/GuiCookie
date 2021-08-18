@@ -98,6 +98,18 @@
         <member name="T:GuiCookie.Components.DropTarget">
             <summary> The basic drop target component. Always returns itself through the <see cref="M:GuiCookie.Input.DragAndDrop.IDropTarget.OnDraggableDropped(GuiCookie.Input.DragAndDrop.IDraggable,Microsoft.Xna.Framework.Point)"/> function. </summary>
         </member>
+        <member name="P:GuiCookie.Components.Frame.FrameImage">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.Frame.DropShadow">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.Frame.Colour">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.Frame.Tint">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
         <member name="T:GuiCookie.Components.GridLayout">
             <summary> Holds elements in a 2D array and maintains a grid layout. </summary>
         </member>
@@ -139,6 +151,15 @@
         </member>
         <member name="P:GuiCookie.Components.ImageBlock.Colour">
             <summary> The current colour of the current content. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.ImageBlock.DropShadow">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.ImageBlock.Tint">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.ImageBlock.Image">
+            <summary> The current image that is being displayed. </summary>
         </member>
         <member name="T:GuiCookie.Components.MouseHandler">
             <summary> Use this <see cref="T:GuiCookie.Components.Component"/> on an <see cref="T:GuiCookie.Elements.Element"/> to handle click detection and mouse events. </summary>
@@ -201,8 +222,26 @@
         <member name="P:GuiCookie.Components.TextBlock.TextSize">
             <summary> The size in pixels that the text wants to use. </summary>
         </member>
+        <member name="P:GuiCookie.Components.TextBlock.TextAnchor">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.TextBlock.TextPivot">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.TextBlock.DropShadow">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
         <member name="P:GuiCookie.Components.TextBlock.Colour">
-            <summary> The current colour of the current font. </summary>
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.TextBlock.Tint">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.TextBlock.Offset">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
+        </member>
+        <member name="P:GuiCookie.Components.TextBlock.SpriteFont">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name. </summary>
         </member>
         <member name="P:GuiCookie.Components.TextBlock.ResizeDirection">
             <summary> The direction in which this text's element resizes. </summary>
@@ -256,6 +295,37 @@
         <member name="F:GuiCookie.DataStructures.ClippingMode.Stretch">
             <summary> Stretches the content to fill the whole area. </summary>
         </member>
+        <member name="T:GuiCookie.DataStructures.DropShadow">
+            <summary> Represents an offset and a colour used to draw drop shadows behind elements. </summary>
+        </member>
+        <member name="F:GuiCookie.DataStructures.DropShadow.ShadowOffsetAttributeName">
+            <summary> The name of the offset attribute. </summary>
+        </member>
+        <member name="F:GuiCookie.DataStructures.DropShadow.ShadowColourAttributeName">
+            <summary> The name of the colour attribute. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.DropShadow.Offset">
+            <summary> The offset of the shadow from whatever object it is cast from. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.DropShadow.Colour">
+            <summary> The <see cref="T:Microsoft.Xna.Framework.Color"/> of the shadow. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.DropShadow.Alpha">
+            <summary> The alpha of the shadow's colour, where <c>1</c> is completely opaque and <c>0</c> is completely transparent. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.DropShadow.HasData">
+            <summary> Is <c>true</c> if both the <see cref="P:GuiCookie.DataStructures.DropShadow.Offset"/> and <see cref="P:GuiCookie.DataStructures.DropShadow.Colour"/> have values. </summary>
+        </member>
+        <member name="M:GuiCookie.DataStructures.DropShadow.#ctor(GuiCookie.Styles.ResourceManager,GuiCookie.Attributes.IReadOnlyAttributes)">
+            <summary> Creates a new drop shadow loaded from the given <paramref name="attributes"/> and <paramref name="resourceManager"/>. </summary>
+            <param name="resourceManager"> The resources used to link colour references. </param>
+            <param name="attributes"> The attributes from which to take the shadow data. </param>
+        </member>
+        <member name="M:GuiCookie.DataStructures.DropShadow.#ctor(System.Nullable{Microsoft.Xna.Framework.Vector2},System.Nullable{Microsoft.Xna.Framework.Color})">
+            <summary> Creates a drop shadow with the given <paramref name="offset"/> and <paramref name="colour"/>. </summary>
+            <param name="offset"> The offset of the drop shadow. </param>
+            <param name="colour"> The colour of the drop shadow. </param>
+        </member>
         <member name="F:GuiCookie.DataStructures.ElementContainer.removalQueue">
             <summary> 
             The collection of elements to be removed from the <see cref="F:GuiCookie.DataStructures.ElementContainer.children"/> and/or <see cref="F:GuiCookie.DataStructures.ElementContainer.additionQueue"/> collection nex time <see cref="M:GuiCookie.DataStructures.ElementContainer.flushQueues"/> is called. 
@@ -296,6 +366,43 @@
         <member name="M:GuiCookie.DataStructures.Space.#ctor(Microsoft.Xna.Framework.Point)">
             <summary> Creates a new space with the given absolute pixel <paramref name="point"/>. </summary>
             <param name="point"></param>
+        </member>
+        <member name="T:GuiCookie.DataStructures.TintedColour">
+            <summary> Represents a colour with a tint applied to it. </summary>
+        </member>
+        <member name="F:GuiCookie.DataStructures.TintedColour.TintAttributeName">
+            <summary> The name of the tint attribute. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.TintedColour.Colour">
+            <summary> The base colour. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.TintedColour.Tint">
+            <summary> The tint applied to the base colour. </summary>
+        </member>
+        <member name="P:GuiCookie.DataStructures.TintedColour.Mixed">
+            <summary> The combination of the <see cref="P:GuiCookie.DataStructures.TintedColour.Colour"/> and the <see cref="P:GuiCookie.DataStructures.TintedColour.Tint"/>. </summary>
+            <remarks> If both <see cref="P:GuiCookie.DataStructures.TintedColour.Colour"/> and <see cref="P:GuiCookie.DataStructures.TintedColour.Tint"/> have values, the mixed value is used. Otherwise; defaults to using the first non-null value in the order: Colour, Tint, <see cref="P:Microsoft.Xna.Framework.Color.White"/>.   </remarks>
+        </member>
+        <member name="M:GuiCookie.DataStructures.TintedColour.#ctor(GuiCookie.Styles.ResourceManager,GuiCookie.Attributes.IReadOnlyAttributes)">
+            <summary> Creates a new tinted colour loaded from the given <paramref name="attributes"/> and <paramref name="resourceManager"/>. </summary>
+            <param name="resourceManager"> The resources used to link colour references. </param>
+            <param name="attributes"> The attributes from which to take the colour data. </param>
+        </member>
+        <member name="M:GuiCookie.DataStructures.TintedColour.#ctor(System.Nullable{Microsoft.Xna.Framework.Color},System.Nullable{Microsoft.Xna.Framework.Color})">
+            <summary> Creates a tinted colour with the given <paramref name="colour"/> and <paramref name="tint"/>. </summary>
+            <param name="colour"> The base colour. </param>
+            <param name="tint"> The tint applied to the base colour. </param>
+        </member>
+        <member name="M:GuiCookie.DataStructures.TintedColour.CalculateMixedColour(System.Nullable{Microsoft.Xna.Framework.Color},System.Nullable{Microsoft.Xna.Framework.Color})">
+            <summary> Combines the given <paramref name="colour"/> and <paramref name="tint"/> to create a blended colour. </summary>
+            <param name="colour"> The base colour. </param>
+            <param name="tint"> The tint applied to the base colour. </param>
+            <returns> The combined colour. </returns>
+            <remarks> If both <paramref name="colour"/> and <paramref name="tint"/> have values, the mixed value is used. Otherwise; defaults to using the first non-null value in the order: Colour, Tint, <see cref="P:Microsoft.Xna.Framework.Color.White"/>.   </remarks>
+        </member>
+        <member name="M:GuiCookie.DataStructures.TintedColour.CombineOver(GuiCookie.DataStructures.TintedColour)">
+            <summary> Sets any <c>null</c> values to those in the given <paramref name="baseValue"/>. </summary>
+            <param name="baseValue"> The value over which to combine. </param>
         </member>
         <member name="F:GuiCookie.Elements.Button.mouseHandler">
             <summary> The component that handles mouse events. </summary>
@@ -481,6 +588,18 @@
         <member name="P:GuiCookie.Elements.ProgressBar.NormalisedValue">
             <summary> Gets or sets the <see cref="P:GuiCookie.Elements.ProgressBar.Value"/> of this progress bar with a normalised value from <c>0</c> to <c>1</c>. </summary>
         </member>
+        <member name="P:GuiCookie.Elements.ProgressBar.FillColour">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name for the fill. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ProgressBar.FillTint">
+            <summary> A shortcut to the <see cref="P:GuiCookie.Styles.Style.BaseVariant"/> property of the same name for the fill. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ProgressBar.FillPadding">
+            <summary> The padding applied to the fill, completely separate of <see cref="P:GuiCookie.DataStructures.Bounds.Padding"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ProgressBar.DrawFillBehind">
+            <summary> If this is <c>true</c>, the fill is drawn first; otherwise it is drawn last. </summary>
+        </member>
         <member name="M:GuiCookie.Elements.ProgressBar.onValueRecalculated(System.Single)">
             <summary> Called when the <see cref="P:GuiCookie.Elements.ProgressBar.Value"/> is recalculated. </summary>
             <param name="oldValue"> The value before it was recalculated. This may be the same as the value. </param>
@@ -496,6 +615,9 @@
         <member name="P:GuiCookie.Elements.SliderBar.ValueNoSignal">
             <summary> Gets or sets the value of the slider bar, not invoking <see cref="P:GuiCookie.Elements.SliderBar.OnValueChanged"/>, but still updating the position of the slider handle. </summary>
         </member>
+        <member name="P:GuiCookie.Elements.SliderBar.UsableSize">
+            <summary> The total usable space along this slider's axis that represents the value area. The <see cref="P:GuiCookie.Elements.SliderBar.Handle"/>'s size is taken into account. </summary>
+        </member>
         <member name="P:GuiCookie.Elements.SliderBar.OnValueChanged">
             <summary> Invoked whenever the <see cref="!:Value"/> is changed. </summary>
         </member>
@@ -504,6 +626,10 @@
         </member>
         <member name="P:GuiCookie.Elements.SliderBar.RightClicked">
             <summary> Access to <see cref="P:GuiCookie.Components.MouseHandler.RightClicked"/>. </summary>
+        </member>
+        <member name="M:GuiCookie.Elements.SliderBar.ResizeHandleRange(System.Single)">
+            <summary> Resizes the <see cref="P:GuiCookie.Elements.SliderBar.Handle"/> so that it covers the set range. For example; if the slider's minimum value is 0 and the maximum value is 2, and <paramref name="range"/> is 1, the handle will fill 50% of the slider bar. </summary>
+            <param name="range"> The range for the handle to cover. </param>
         </member>
         <member name="P:GuiCookie.Elements.TextBox.Text">
             <summary> The text of the box. </summary>
@@ -783,14 +909,38 @@
             <summary> Draws the UI. </summary>
             <param name="guiCamera"> The <see cref="T:GuiCookie.Rendering.IGuiCamera"/> with which to draw. </param>
         </member>
+        <member name="P:GuiCookie.Styles.Content.TintedColour">
+            <summary> The colour and tint applied to the frame. </summary>
+        </member>
         <member name="P:GuiCookie.Styles.Content.Colour">
-            <summary> The main colour applied to content (image blocks, etc.). </summary>
+            <summary> Accessor for <see cref="P:GuiCookie.DataStructures.TintedColour.Colour"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Content.Tint">
+            <summary> Accessor for <see cref="P:GuiCookie.DataStructures.TintedColour.Tint"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Content.MixedColour">
+            <summary> Accessor for <see cref="P:GuiCookie.DataStructures.TintedColour.Mixed"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Content.DropShadow">
+            <summary> The drop shadow data used to drop a shadow behind the content. </summary>
         </member>
         <member name="P:GuiCookie.Styles.Font.SpriteFont">
-            <summary> The <see cref="P:GuiCookie.Styles.Font.SpriteFont"/>. </summary>
+            <summary> The <see cref="T:Microsoft.Xna.Framework.Graphics.SpriteFont"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Font.TintedColour">
+            <summary> The colour and tint applied to the frame. </summary>
         </member>
         <member name="P:GuiCookie.Styles.Font.Colour">
-            <summary> The text colour. </summary>
+            <summary> Accessor for <see cref="P:GuiCookie.DataStructures.TintedColour.Colour"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Font.Tint">
+            <summary> Accessor for <see cref="P:GuiCookie.DataStructures.TintedColour.Tint"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Font.MixedColour">
+            <summary> Accessor for <see cref="P:GuiCookie.DataStructures.TintedColour.Mixed"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.Font.DropShadow">
+            <summary> The drop shadow data used to drop a shadow behind the text. </summary>
         </member>
         <member name="P:GuiCookie.Styles.Font.Offset">
             <summary> The amount of pixels to offset the final position by. This is useful for things like buttons that appear to be pushed inwards. </summary>
@@ -872,14 +1022,32 @@
             <returns> The parsed <see cref="T:Microsoft.Xna.Framework.Color"/> if the <paramref name="colourString"/> was parsed successfully into a colour; otherwise <paramref name="defaultTo"/>. </returns>
             <seealso cref="M:LiruGameHelperMonoGame.Parsers.Colour.TryParse(System.String,Microsoft.Xna.Framework.Color@)"/>
         </member>
+        <member name="P:GuiCookie.Styles.SliceFrame.Name">
+            <summary> The name of this attribute. </summary>
+        </member>
         <member name="P:GuiCookie.Styles.SliceFrame.Image">
-            <summary> Gets a value representing the name of the image atlas that this <see cref="T:GuiCookie.Styles.SliceFrame"/> sources from. </summary>
+            <summary> The image atlas that this <see cref="T:GuiCookie.Styles.SliceFrame"/> sources from. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.SliceFrame.NineSlice">
+            <summary> The <see cref="T:GuiCookie.DataStructures.NineSlice"/> used to slice the image into sections. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.SliceFrame.TintedColour">
+            <summary> The colour and tint applied to the frame. </summary>
         </member>
         <member name="P:GuiCookie.Styles.SliceFrame.Colour">
-            <summary> Gets a value representing the <see cref="T:Microsoft.Xna.Framework.Color"/> of the main tint, or <see cref="T:GuiCookie.Styles.SliceFrame"/> <see cref="T:Microsoft.Xna.Framework.Color"/> if no texture is supplied. </summary>
+            <summary> Accessor for <see cref="P:GuiCookie.DataStructures.TintedColour.Colour"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.SliceFrame.Tint">
+            <summary> Accessor for <see cref="P:GuiCookie.DataStructures.TintedColour.Tint"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.SliceFrame.MixedColour">
+            <summary> Accessor for <see cref="P:GuiCookie.DataStructures.TintedColour.Mixed"/>. </summary>
         </member>
         <member name="P:GuiCookie.Styles.SliceFrame.CacheTexture">
             <summary> True if any texture created from this SliceFrame should be cached to a separate texture, false if it should be drawn on-demand. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.SliceFrame.DropShadow">
+            <summary> The drop shadow data used to drop a shadow behind the element. </summary>
         </member>
         <member name="T:GuiCookie.Styles.Style">
             <summary> Represents the parameters of an <see cref="N:GuiCookie.Elements"/>'s style. </summary>
@@ -899,6 +1067,10 @@
         <member name="M:GuiCookie.Styles.Style.#ctor(GuiCookie.Styles.ResourceManager,LiruGameHelper.Reflection.ConstructorCache{GuiCookie.Styles.IStyleAttribute},System.Xml.XmlNode)">
             <summary> Creates a style from the given <paramref name="styleNode"/>. </summary>
             <param name="styleNode"> The <see cref="T:System.Xml.XmlNode"/> that contains the element style. </param>
+        </member>
+        <member name="M:GuiCookie.Styles.Style.AddVariant(GuiCookie.Styles.StyleVariant)">
+            <summary> Adds the given <paramref name="variant"/> to this style keyed by name. </summary>
+            <param name="variant"> The variant to add. </param>
         </member>
         <member name="P:GuiCookie.Styles.StyleAttributeCache`1.Name">
             <summary> The name of the style attribute to use. If this is <c>null</c> then unnamed attributes are used instead. </summary>
@@ -935,6 +1107,9 @@
         </member>
         <member name="P:GuiCookie.Styles.StyleStateMachine.Style">
             <summary> The style to work with. </summary>
+        </member>
+        <member name="M:GuiCookie.Styles.StyleStateMachine.RefreshStyleVariants">
+            <summary> Searches through the current <see cref="P:GuiCookie.Styles.StyleStateMachine.Style"/> and caches any variants. </summary>
         </member>
         <member name="F:GuiCookie.Styles.StyleVariant.styleAttributesByTypeAndName">
             <summary> The collection of style attributes keyed by a combination of the type and its name. </summary>

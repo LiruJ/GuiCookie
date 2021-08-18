@@ -10,9 +10,13 @@ namespace GuiCookie.Styles
     public class Style
     {
         #region Constants
-        private const string baseAttributeName = "Base";
+        public const string BaseVariantName = "Base";
 
-        private const string baseVariantName = "Base";
+        public const string HoveredVariantName = "Hovered";
+
+        public const string ClickedVariantName = "Clicked";
+
+        public const string DisabledVariantName = "Disabled";
         #endregion
 
         #region Fields
@@ -45,7 +49,7 @@ namespace GuiCookie.Styles
             IReadOnlyAttributes attributes = new AttributeCollection(styleNode);
 
             // Set the name of the base style if one was given.
-            BaseStyleName = attributes.GetAttributeOrDefault(baseAttributeName, string.Empty);
+            BaseStyleName = attributes.GetAttributeOrDefault(BaseVariantName, string.Empty);
 
             // Hold collections of the loaded variants and attributes.
             List<StyleVariant> variants = new List<StyleVariant>();
@@ -61,8 +65,8 @@ namespace GuiCookie.Styles
             }
 
             // Create the base variant using the loaded attributes.
-            BaseVariant = new StyleVariant(baseVariantName, styleAttributes);
-            styleVariantsByName.Add(BaseVariant.Name, BaseVariant);
+            BaseVariant = new StyleVariant(BaseVariantName, styleAttributes);
+            AddVariant(BaseVariant);
 
             // Create the derived variants using the base variant.
             foreach (StyleVariant variant in variants)
@@ -71,8 +75,7 @@ namespace GuiCookie.Styles
                 variant.CombineOverBase(BaseVariant);
 
                 // Add the variant to the dictionary using its name.
-                if (!styleVariantsByName.ContainsKey(variant.Name)) styleVariantsByName.Add(variant.Name, variant);
-                else throw new Exception($"Style variant with name {variant.Name} has already been defined for style {Name}.");
+                AddVariant(variant);
             }
         }
 
@@ -84,16 +87,25 @@ namespace GuiCookie.Styles
             BaseStyleName = original.BaseStyleName;
 
             // Copy each variant over.
-            foreach (KeyValuePair<string, StyleVariant> nameVariantPair in original.styleVariantsByName)
-                styleVariantsByName.Add(nameVariantPair.Key, nameVariantPair.Value.CreateCopy());
+            foreach (StyleVariant variant in original.styleVariantsByName.Values)
+                AddVariant(variant.CreateCopy());
 
             // Set the base variant to the base variant from the newly populated dictionary, ensuring it's the new copy and not the original.
-            BaseVariant = styleVariantsByName[baseVariantName];
+            BaseVariant = styleVariantsByName[BaseVariantName];
         }
         #endregion
 
-        #region Get Functions
+        #region Collection Functions
         public StyleVariant GetStyleVariantFromName(string name) => styleVariantsByName.TryGetValue(name, out StyleVariant styleVariant) ? styleVariant : null;
+
+        /// <summary> Adds the given <paramref name="variant"/> to this style keyed by name. </summary>
+        /// <param name="variant"> The variant to add. </param>
+        public void AddVariant(StyleVariant variant)
+        {
+            // Add the variant to the dictionary using its name.
+            if (!styleVariantsByName.ContainsKey(variant.Name)) styleVariantsByName.Add(variant.Name, variant);
+            else throw new Exception($"Style variant with name {variant.Name} has already been defined for style {Name}.");
+        }
         #endregion
 
         #region Copy Functions
@@ -118,7 +130,7 @@ namespace GuiCookie.Styles
                     baseVariantCopy.CombineOverBase(BaseVariant);
 
                     // Add the new copy.
-                    styleVariantsByName.Add(baseVariantCopy.Name, baseVariantCopy);
+                    AddVariant(baseVariantCopy);
                 }
             }
         }

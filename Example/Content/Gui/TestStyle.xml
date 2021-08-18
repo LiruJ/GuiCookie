@@ -19,7 +19,9 @@
 				<Pane/>
 				<Inlay/>
 				<VerticalSliderBar Bounds="0, 48, 16, 24"/>
+				<VerticalSliderBarFrame Bounds="0, 72, 16, 24"/>
 				<HorizontalSliderBar Bounds="32, 48, 24, 16"/>
+				<HorizontalSliderBarFrame Bounds="17, 80, 24, 16"/>
 				<VerticalSliderHandle Bounds="17, 49, 14, 10"/>
 				<HorizontalSliderHandle Bounds="33, 65, 10, 14"/>
 			</Main>
@@ -32,8 +34,10 @@
 
 	<!--The main content for the style-->
 	<Styles>
+		
+		<!--Panes-->
 		<Default>
-			<SliceFrame Image="Pane" NineSlice="Thirds, 1" Colour="$MainColour" Tint="$MainTint" ShadowOffset="-2, 2"/>
+			<SliceFrame Image="Pane" NineSlice="Thirds, 1" Colour="$MainColour" Tint="$MainTint" ShadowOffset="-2, 2" ShadowColour="#0002"/>
 			<Font Font="Default" Colour="#BBB" ShadowOffset="-1"/>
 
 			<Hovered>
@@ -50,24 +54,32 @@
 			</Disabled>
 		</Default>
 
+		<Inlay Base="Default">
+			<SliceFrame Image="Inlay" Colour="$InlayColour"/>
+			<Font Colour="#ddd"/>
+		</Inlay>
+
+		<!--Buttons-->
 		<Button Base="Default">
-			<SliceFrame Image="Button" ShadowOffset="-2, 2" ShadowColour="#444a"/>
+			<SliceFrame Image="Button"/>
 
 			<Clicked>
 				<SliceFrame Image="Pane"/>
 			</Clicked>
 		</Button>
 
+		<RemoveButton Base="Default">
+			<SliceFrame Image="RemoveButton" Colour="$InlayColour"/>
+		</RemoveButton>
+
+		<!--Text boxes-->
 		<TitleBar Base="Default">
 			<SliceFrame Tint="$ClickedTint"/>
 		</TitleBar>
-		
-		<HorizontalSliderHandle Base="Default">
-			<SliceFrame Image="HorizontalSliderHandle" NineSlice="Thirds" Colour="#575EA5"/>
-		</HorizontalSliderHandle>
 
-		<HorizontalSliderBar Base="Default">
-			<SliceFrame Image="HorizontalSliderBar" NineSlice="Thirds" Colour="#484D89"/>
+		<!--Slider bars-->
+		<SliderBar>
+			<SliceFrame NineSlice="Thirds" Colour="#484D89"/>
 
 			<Hovered>
 				<SliceFrame Tint="#FFF"/>
@@ -78,39 +90,44 @@
 			<Disabled>
 				<SliceFrame Tint="$DisabledTint"/>
 			</Disabled>
-		</HorizontalSliderBar>
+		</SliderBar>
 
-		<VerticalSliderBar Base="Default">
-			<SliceFrame Image="VerticalSliderBar" NineSlice="VSlice" Colour="#484D89"/>
+		<HorizontalSliderBar Base="SliderBar">
+			<SliceFrame Image="HorizontalSliderBar"/>
+		</HorizontalSliderBar>
+		
+		<VerticalSliderBar Base="SliderBar">
+			<SliceFrame Image="VerticalSliderBar"/>
 		</VerticalSliderBar>
 
-		<VerticalSliderHandle Base="Default">
-			<SliceFrame Image="VerticalSliderHandle" NineSlice="VSlice" Colour="#575EA5"/>
-		</VerticalSliderHandle>
-
-		<HorizontalProgressBar Base="Default">
-			<SliceFrame Image="HorizontalSliderBar" NineSlice="Thirds" Colour="#484D89"/>
-			<SliceFrame Colour="Green" Tint="$MainTint" Name="Fill"/>
+		<!--Progress bars-->
+		<ProgressBar>
+			<SliceFrame NineSlice="Thirds" Colour="$MainColour"/>
+			<SliceFrame Colour="Green" Tint="$ClickedTint" Name="Fill"/>
 
 			<Hovered>
-				<SliceFrame Tint="#FFF" Name="Fill"/>
+				<SliceFrame Tint="$MainTint" Name="Fill"/>
 			</Hovered>
 			<Clicked>
 				<SliceFrame Tint="$ClickedTint" Name="Fill"/>
 			</Clicked>
+		</ProgressBar>
+
+		<HorizontalProgressBar Base="ProgressBar">
+			<SliceFrame Image="HorizontalSliderBarFrame"/>
 		</HorizontalProgressBar>
-		
-		<Inlay Base="Default">
-			<SliceFrame Image="Inlay" Colour="$InlayColour"/>
-			<Font Colour="#ddd"/>
-		</Inlay>
 
-		<Add Base="Default">
-			<SliceFrame Image="AddButton" Colour="$InlayColour"/>
-		</Add>
+		<VerticalProgressBar Base="ProgressBar">
+			<SliceFrame Image="VerticalSliderBarFrame"/>
+		</VerticalProgressBar>
 
-		<Remove Base="Default">
-			<SliceFrame Image="RemoveButton" Colour="$InlayColour"/>
-		</Remove>
+		<!--Slider handles-->
+		<HorizontalSliderHandle>
+			<SliceFrame Image="HorizontalSliderHandle" NineSlice="Thirds" Colour="$MainColour"/>
+		</HorizontalSliderHandle>
+
+		<VerticalSliderHandle>
+			<SliceFrame Image="VerticalSliderHandle" NineSlice="Thirds" Colour="$MainColour"/>
+		</VerticalSliderHandle>
 	</Styles>
 </Main>

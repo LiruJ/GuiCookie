@@ -1,6 +1,5 @@
 ﻿using GuiCookie.Attributes;
 using GuiCookie.DataStructures;
-using LiruGameHelperMonoGame.Parsers;
 using Microsoft.Xna.Framework;
 using System;
 
@@ -11,44 +10,50 @@ namespace GuiCookie.Styles
         #region Constants
         private const string nameAttributeName = "Name";
         private const string imageAttributeName = "Image";
-
-        public const string ShadowColourAttributeName = "ShadowColour";
-        public const string ShadowOffsetAttributeName = "ShadowOffset";
-
-        public const string TintAttributeName = "Tint";
         #endregion
 
         #region Properties
+        /// <summary> The name of this attribute. </summary>
         public string Name { get; }
 
-        /// <summary> Gets a value representing the name of the image atlas that this <see cref="SliceFrame"/> sources from. </summary>
+        /// <summary> The image atlas that this <see cref="SliceFrame"/> sources from. </summary>
         public Image? Image { get; set; }
 
+        /// <summary> The <see cref="DataStructures.NineSlice"/> used to slice the image into sections. </summary>
         public NineSlice? NineSlice { get; set; }
 
-        /// <summary> Gets a value representing the <see cref="Color"/> of the main tint, or <see cref="SliceFrame"/> <see cref="Color"/> if no texture is supplied. </summary>
-        public Color? Colour { get; set; }
+        /// <summary> The colour and tint applied to the frame. </summary>
+        public TintedColour TintedColour { get; set; }
 
-        public Color? Tint { get; set; }
+        /// <summary> Accessor for <see cref="TintedColour.Colour"/>. </summary>
+        public Color? Colour
+        {
+            get => TintedColour.Colour;
+            set => TintedColour = new TintedColour(value, TintedColour.Tint);
+        }
 
-        public Color FinalColour => Colour.HasValue && Tint.HasValue 
-            ? new Color(Colour.Value.ToVector4() * Tint.Value.ToVector4()) 
-            : Colour ?? Tint ?? Color.White;
+        /// <summary> Accessor for <see cref="TintedColour.Tint"/>. </summary>
+        public Color? Tint
+        {
+            get => TintedColour.Tint;
+            set => TintedColour = new TintedColour(TintedColour.Colour, value);
+        }
+
+        /// <summary> Accessor for <see cref="TintedColour.Mixed"/>. </summary>
+        public Color MixedColour => TintedColour.Mixed;
 
         /// <summary> True if any texture created from this SliceFrame should be cached to a separate texture, false if it should be drawn on-demand. </summary>
         public bool? CacheTexture { get; set; }
 
-        public Vector2? DropShadowOffset { get; set; }
-
-        public Color? DropShadowColour { get; set; }
+        /// <summary> The drop shadow data used to drop a shadow behind the element. </summary>
+        public DropShadow DropShadow { get; set; }
         #endregion
 
         #region Constructors
         public SliceFrame(ResourceManager resourceManager, IReadOnlyAttributes attributes)
         {
             // Set the colour, slice, and cache texture.
-            Colour = resourceManager.GetColourOrDefault(attributes, ResourceManager.ColourAttributeName);
-            Tint = resourceManager.GetColourOrDefault(attributes, TintAttributeName);
+            TintedColour = new TintedColour(resourceManager, attributes);
             CacheTexture = attributes.GetAttributeOrDefault("Cached", (bool?)null, bool.TryParse);
             NineSlice = attributes.GetAttributeOrDefault("NineSlice", (NineSlice?)null, DataStructures.NineSlice.TryParse);
 
@@ -62,8 +67,7 @@ namespace GuiCookie.Styles
             Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
 
             // Set the drop shadow.
-            DropShadowOffset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
-            DropShadowColour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName);
+            DropShadow = new DropShadow(resourceManager, attributes);
         }
 
         private SliceFrame(SliceFrame original)
@@ -74,11 +78,9 @@ namespace GuiCookie.Styles
             Image = original.Image;
             NineSlice = original.NineSlice;
             CacheTexture = original.CacheTexture;
-            Colour = original.Colour;
-            Tint = original.Tint;
+            TintedColour = original.TintedColour;
 
-            DropShadowOffset = original.DropShadowOffset;
-            DropShadowColour = original.DropShadowColour;
+            DropShadow = original.DropShadow;
         }
         #endregion
 
@@ -97,14 +99,12 @@ namespace GuiCookie.Styles
 
             // Ensure the attribute is a SliceFrame.
             if (!(baseAttribute is SliceFrame baseSliceFrame)) throw new ArgumentException($"Cannot combine with attribute as it is not a SliceFrame. {baseAttribute}");
-            
+
             // Override the properties.
             if (Image == null) Image = baseSliceFrame.Image;
             if (NineSlice == null) NineSlice = baseSliceFrame.NineSlice;
-            if (Colour == null) Colour = baseSliceFrame.Colour;
-            if (Tint == null) Tint = baseSliceFrame.Tint;
-            if (DropShadowOffset == null) DropShadowOffset = baseSliceFrame.DropShadowOffset;
-            if (DropShadowColour == null) DropShadowColour = baseSliceFrame.DropShadowColour;
+            TintedColour = TintedColour.CreateCombination(baseSliceFrame.TintedColour, TintedColour);
+            DropShadow = DropShadow.CreateCombination(baseSliceFrame.DropShadow, DropShadow);
             if (CacheTexture == null) CacheTexture = baseSliceFrame.CacheTexture;
         }
         #endregion
