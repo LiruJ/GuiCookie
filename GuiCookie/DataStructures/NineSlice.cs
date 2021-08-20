@@ -105,27 +105,33 @@ namespace GuiCookie.DataStructures
         {
             return piece switch
             {
-                Piece.BottomLeft => new Rectangle(new Point(mainSource.X, mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
-                        new Point((int)Math.Floor(mainSource.Width * MinX), (int)Math.Floor(mainSource.Height * (1.0f - MaxY)))),
-                Piece.Bottom => new Rectangle(new Point(mainSource.X + (int)Math.Floor(mainSource.Width * MinX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Floor(mainSource.Height * (1.0f - MaxY)))),
-                Piece.BottomRight => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
-                        new Point((int)Math.Floor(mainSource.Width * (1.0f - MaxX)), (int)Math.Floor(mainSource.Height * (1.0f - MaxY)))),
-                Piece.Right => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y + (int)Math.Floor(mainSource.Height * MinY)),
-                        new Point((int)Math.Floor(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
-                Piece.TopRight => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y),
-                        new Point((int)Math.Floor(mainSource.Width * (1.0f - MaxX)), (int)Math.Floor(mainSource.Height * MinY))),
-                Piece.Top => new Rectangle(new Point(mainSource.X + (int)Math.Floor(mainSource.Width * MinX), mainSource.Y),
-                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Floor(mainSource.Height * MinY))),
+                Piece.BottomLeft => new Rectangle(new Point(mainSource.X, mainSource.Y + calculateMaxEdge(mainSource.Height, MaxY)),
+                        new Point(calculateMinEdge(mainSource.Width, MinX), mainSource.Height - calculateMaxEdge(mainSource.Height, MaxY))),
+                Piece.Bottom => new Rectangle(new Point(mainSource.X + calculateMinEdge(mainSource.Width, MinX), mainSource.Y + calculateMaxEdge(mainSource.Height, MaxY)),
+                        new Point(calculateCentreSize(mainSource.Width, MinX, MaxX), mainSource.Height - calculateMaxEdge(mainSource.Height, MaxY))),
+                Piece.BottomRight => new Rectangle(new Point(mainSource.X + calculateMaxEdge(mainSource.Width, MaxX), mainSource.Y + calculateMaxEdge(mainSource.Height, MaxY)),
+                        new Point(mainSource.Width - calculateMaxEdge(mainSource.Width, MaxX), mainSource.Height - calculateMaxEdge(mainSource.Height, MaxY))),
+                Piece.Right => new Rectangle(new Point(mainSource.X + calculateMaxEdge(mainSource.Width, MaxX), mainSource.Y + calculateMinEdge(mainSource.Height, MinY)),
+                        new Point(mainSource.Width - calculateMaxEdge(mainSource.Width, MaxX), calculateCentreSize(mainSource.Height, MinY, MaxY))),
+                Piece.TopRight => new Rectangle(new Point(mainSource.X + calculateMaxEdge(mainSource.Width, MaxX), mainSource.Y),
+                        new Point(mainSource.Width - calculateMaxEdge(mainSource.Width, MaxX), calculateMinEdge(mainSource.Height, MinY))),
+                Piece.Top => new Rectangle(new Point(mainSource.X + calculateMinEdge(mainSource.Width, MinX), mainSource.Y),
+                        new Point(calculateCentreSize(mainSource.Width, MinX, MaxX), calculateMinEdge(mainSource.Height, MinY))),
                 Piece.TopLeft => new Rectangle(new Point(mainSource.X, mainSource.Y),
-                        new Point((int)Math.Floor(mainSource.Width * MinX), (int)Math.Floor(mainSource.Height * MinY))),
-                Piece.Left => new Rectangle(new Point(mainSource.X, mainSource.Y + (int)Math.Floor(mainSource.Height * MinY)),
-                        new Point((int)Math.Floor(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
-                Piece.Centre => new Rectangle(new Point(mainSource.X + (int)Math.Floor(mainSource.Width * MinX), mainSource.Y + (int)Math.Floor(mainSource.Height * MinY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
+                        new Point(calculateMinEdge(mainSource.Width, MinX), calculateMinEdge(mainSource.Height, MinY))),
+                Piece.Left => new Rectangle(new Point(mainSource.X, mainSource.Y + calculateMinEdge(mainSource.Height, MinY)),
+                        new Point(calculateMinEdge(mainSource.Width, MinX), calculateCentreSize(mainSource.Height, MinY, MaxY))),
+                Piece.Centre => new Rectangle(new Point(mainSource.X + calculateMinEdge(mainSource.Width, MinX), mainSource.Y + calculateMinEdge(mainSource.Height, MinY)),
+                        new Point(calculateCentreSize(mainSource.Width, MinX, MaxX), calculateCentreSize(mainSource.Height, MinY, MaxY))),
                 _ => throw new Exception($"Invalid piece. {piece}"),
             };
         }
+
+        private int calculateMinEdge(int axisSize, float axisSlice) => axisSize % 2 == 0 ? (int)MathF.Floor(axisSize * axisSlice) : (int)MathF.Ceiling(axisSize * axisSlice);
+
+        private int calculateMaxEdge(int axisSize, float axisSlice) => (int)MathF.Ceiling(axisSize * axisSlice);
+
+        private int calculateCentreSize(int axisSize, float axisSliceMin, float axisSliceMax) => calculateMaxEdge(axisSize, axisSliceMax) - calculateMinEdge(axisSize, axisSliceMin);
         #endregion
 
         #region Parse Functions
@@ -144,7 +150,7 @@ namespace GuiCookie.DataStructures
         {
             // Start with an empty value.
             nineSlice = Empty;
-            
+
             // If the input is invalid, handle it.
             if (string.IsNullOrWhiteSpace(input)) return throwException ? throw new ArgumentNullException(nameof(input), "Given string cannot be null, empty, or whitespace.") : false;
 

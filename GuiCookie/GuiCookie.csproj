@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <Version>1.7.4.2-alpha</Version>
+	  <Version>1.7.4.2-alpha.1</Version>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>Liru</Authors>
     <Company>Lovebirb</Company>
@@ -18,12 +18,8 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <FileVersion>1.7.4.2</FileVersion>
     <AssemblyVersion>1.7.4.2</AssemblyVersion>
-    <PackageReleaseNotes>Added extra fill properties to progress bars.
-Fill colour and tint can now be set on the element itself rather than just the style.
-Tinted colours and drop shadows have been reorganised to use a single class rather than being implemented multiple times.
-Various changes to styles to make them more useful at runtime.
-SliderHandle controller has been deleted, all behaviour has been moved into SliderBar.
-Minor bug fixes.</PackageReleaseNotes>
+    <PackageReleaseNotes>Minor changes to NineSlice to allow for graphics with a size that is not divisible by 3.
+Made MouseHandler property of StyleStateMachine public so that an element's style state can be controlled by another element.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

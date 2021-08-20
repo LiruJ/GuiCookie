@@ -118,6 +118,27 @@ namespace GuiCookieTests.DataStructures
             assertRectangle(nineSlice, bounds, Piece.Centre, 1, 1, 2, 2);
         }
 
+        [TestMethod]
+        public void ThirdSourceTest()
+        {
+            // Create a basic thirds nineslice.
+            NineSlice nineSlice = NineSlice.Thirds;
+
+            // Create a bounds that is divisible by 3.
+            Rectangle bounds = new Rectangle(0, 0, 9, 9);
+
+            // Ensure the bounds have been sliced correctly.
+            assertRectangle(nineSlice, bounds, Piece.TopLeft, 0, 0, 3, 3);
+            assertRectangle(nineSlice, bounds, Piece.Left, 0, 3, 3, 3);
+            assertRectangle(nineSlice, bounds, Piece.BottomLeft, 0, 6, 3, 3);
+            assertRectangle(nineSlice, bounds, Piece.Bottom, 3, 6, 3, 3);
+            assertRectangle(nineSlice, bounds, Piece.BottomRight, 6, 6, 3, 3);
+            assertRectangle(nineSlice, bounds, Piece.Right, 6, 3, 3, 3);
+            assertRectangle(nineSlice, bounds, Piece.TopRight, 6, 0, 3, 3);
+            assertRectangle(nineSlice, bounds, Piece.Top, 3, 0, 3, 3);
+            assertRectangle(nineSlice, bounds, Piece.Centre, 3, 3, 3, 3);
+        }
+
         private void assertRectangle(NineSlice nineSlice, Rectangle bounds, Piece piece, int x, int y, int width, int height)
         {
             Rectangle slicedBounds = nineSlice.CalculateSource(bounds, piece);
