@@ -16,20 +16,15 @@ namespace GuiCookie.Styles
         public StyleVariant BaseVariant { get; protected set; }
 
         /// <summary> The variant of the current <see cref="Style"/> that is used when the element is moused over, defaulting to <see cref="BaseVariant"/> if none was defined. </summary>
-        /// <remarks> The element needs a <see cref="MouseHandler"/> in order for this variant to be used. </remarks>
+        /// <remarks> The element needs a <see cref="Components.MouseHandler"/> in order for this variant to be used. </remarks>
         public StyleVariant HoveredVariant { get; protected set; }
 
         /// <summary> The variant of the current <see cref="Style"/> that is used when the element is clicked, defaulting to <see cref="BaseVariant"/> if none was defined. </summary>
-        /// <remarks> The element needs a <see cref="MouseHandler"/> in order for this variant to be used. </remarks>
+        /// <remarks> The element needs a <see cref="Components.MouseHandler"/> in order for this variant to be used. </remarks>
         public StyleVariant ClickedVariant { get; protected set; }
 
         /// <summary> The variant of the current <see cref="Style"/> that is used when the element is disabled, defaulting to <see cref="BaseVariant"/> if none was defined. </summary>
         public StyleVariant DisabledVariant { get; protected set; }
-        #endregion
-
-        #region Components
-        /// <summary> The mouse handler of the parent element. </summary>
-        protected readonly MouseHandler mouseHandler;
         #endregion
 
         #region Properties
@@ -49,6 +44,9 @@ namespace GuiCookie.Styles
                 RefreshStyleVariants();
             }
         }
+
+        /// <summary> The mouse handler that determines what variant to use. This defaults to the element's mouse handler, but can be set to any element's mouse handler. </summary>
+        public MouseHandler MouseHandler { get; set; }
         #endregion
 
         #region Constructors
@@ -58,7 +56,7 @@ namespace GuiCookie.Styles
             this.element = element;
 
             // Set the mouse handler. This can be null, in which case it will be ignored.
-            mouseHandler = element.GetComponent<MouseHandler>();
+            MouseHandler = element.GetComponent<MouseHandler>();
         }
         #endregion
 
@@ -97,10 +95,10 @@ namespace GuiCookie.Styles
             else
             {
                 // If the element has a mouse handler, use it for the state.
-                if (mouseHandler != null)
+                if (MouseHandler != null)
                 {
-                    if (mouseHandler.IsLeftClicked || mouseHandler.IsRightClicked) CurrentStyleVariant = ClickedVariant;
-                    else if (mouseHandler.IsMainMousedOver) CurrentStyleVariant = HoveredVariant;
+                    if (MouseHandler.IsLeftClicked || MouseHandler.IsRightClicked) CurrentStyleVariant = ClickedVariant;
+                    else if (MouseHandler.IsMainMousedOver) CurrentStyleVariant = HoveredVariant;
                     else CurrentStyleVariant = BaseVariant;
                 }
                 // Otherwise, use the default style.

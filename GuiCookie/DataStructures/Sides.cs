@@ -21,7 +21,7 @@ namespace GuiCookie.DataStructures
         #endregion
 
         #region Side Properties
-        public float Top { get;  }
+        public float Top { get; }
 
         public float Right { get; }
 

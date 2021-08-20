@@ -1,12 +1,13 @@
 ﻿using GuiCookie.DataStructures;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Xna.Framework;
 using System;
 using System.Globalization;
 
-namespace GuiCookieTests.Parsers
+namespace GuiCookieTests.DataStructures
 {
     [TestClass]
-    public class NineSliceParsersTest
+    public class NineSliceTest
     {
         [TestMethod]
         public void NullStringTest()
@@ -94,6 +95,36 @@ namespace GuiCookieTests.Parsers
             Assert.IsFalse(nineSlice.IsPieceStretched(Piece.Right), "Right edge is stretched when it shouldn't be.");
             Assert.IsTrue(nineSlice.IsPieceStretched(Piece.Top), "Top edge is not stretched when it should be.");
             Assert.IsTrue(nineSlice.IsPieceStretched(Piece.Centre), "Centre is not stretched when it should be.");
+        }
+
+        [TestMethod]
+        public void NonThirdSourceTest()
+        {
+            // Create a basic thirds nineslice.
+            NineSlice nineSlice = NineSlice.Thirds;
+
+            // Create a bounds that is not divisible by 3.
+            Rectangle bounds = new Rectangle(0, 0, 4, 4);
+
+            // Ensure the bounds have been sliced correctly.
+            assertRectangle(nineSlice, bounds, Piece.TopLeft, 0, 0, 1, 1);
+            assertRectangle(nineSlice, bounds, Piece.Left, 0, 1, 1, 2);
+            assertRectangle(nineSlice, bounds, Piece.BottomLeft, 0, 3, 1, 1);
+            assertRectangle(nineSlice, bounds, Piece.Bottom, 1, 3, 2, 1);
+            assertRectangle(nineSlice, bounds, Piece.BottomRight, 3, 3, 1, 1);
+            assertRectangle(nineSlice, bounds, Piece.Right, 3, 1, 1, 2);
+            assertRectangle(nineSlice, bounds, Piece.TopRight, 3, 0, 1, 1);
+            assertRectangle(nineSlice, bounds, Piece.Top, 1, 0, 2, 1);
+            assertRectangle(nineSlice, bounds, Piece.Centre, 1, 1, 2, 2);
+        }
+
+        private void assertRectangle(NineSlice nineSlice, Rectangle bounds, Piece piece, int x, int y, int width, int height)
+        {
+            Rectangle slicedBounds = nineSlice.CalculateSource(bounds, piece);
+            Assert.AreEqual(width, slicedBounds.Width, $"{piece} Rectangle's width incorrect.");
+            Assert.AreEqual(height, slicedBounds.Height, $"{piece} Rectangle's height incorrect.");
+            Assert.AreEqual(x, slicedBounds.X, $"{piece} Rectangle's x incorrect.");
+            Assert.AreEqual(y, slicedBounds.Y, $"{piece} Rectangle's y incorrect.");
         }
     }
 }

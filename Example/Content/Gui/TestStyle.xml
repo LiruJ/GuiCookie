@@ -122,12 +122,26 @@
 		</VerticalProgressBar>
 
 		<!--Slider handles-->
-		<HorizontalSliderHandle>
-			<SliceFrame Image="HorizontalSliderHandle" NineSlice="Thirds" Colour="$MainColour"/>
+		<SliderHandle>
+			<SliceFrame NineSlice="Thirds" Colour="$MainColour" Tint="#DDD"/>
+
+			<Hovered>
+				<SliceFrame Tint="#EEE"/>
+			</Hovered>
+			<Clicked>
+				<SliceFrame Tint="#FFF"/>
+			</Clicked>
+			<Disabled>
+				<SliceFrame Tint="$DisabledTint"/>
+			</Disabled>
+		</SliderHandle>
+		
+		<HorizontalSliderHandle Base="SliderHandle">
+			<SliceFrame Image="HorizontalSliderHandle"/>
 		</HorizontalSliderHandle>
 
-		<VerticalSliderHandle>
-			<SliceFrame Image="VerticalSliderHandle" NineSlice="Thirds" Colour="$MainColour"/>
+		<VerticalSliderHandle Base="SliderHandle">
+			<SliceFrame Image="VerticalSliderHandle"/>
 		</VerticalSliderHandle>
 	</Styles>
 </Main>

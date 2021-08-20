@@ -59,6 +59,10 @@ namespace GuiCookie.Elements
             // Get the handle element.
             Handle = GetChildByName("Handle");
 
+            // If there is a handle and it has no mouse handler, set its mouse handler.
+            if (Handle != null && Handle.StyleState.MouseHandler == null)
+                Handle.StyleState.MouseHandler = mouseHandler;
+
             // Set up the base progress bar.
             base.OnFullSetup();
         }
@@ -92,8 +96,8 @@ namespace GuiCookie.Elements
 
             // Resize and reposition the handle.
             Handle.Bounds.ScaledSize = LayoutDirection == Direction.Horizontal
-                ? new Space(range / (MaximumValue - MinimumValue + 1), 1f, Axes.Both)
-                : new Space(1f, range / (MaximumValue - MinimumValue + 1), Axes.Both);
+                ? new Space(range / (MaximumValue - MinimumValue + 1), Handle.Bounds.ScaledSize.Y, Handle.Bounds.ScaledSize.IsYRelative ? Axes.Both : Axes.X)
+                : new Space(Handle.Bounds.ScaledSize.X, range / (MaximumValue - MinimumValue + 1), Handle.Bounds.ScaledSize.IsXRelative ? Axes.Both : Axes.Y);
             CalculateHandlePosition();
         }
 

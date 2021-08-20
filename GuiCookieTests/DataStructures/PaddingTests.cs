@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Xna.Framework;
 
-namespace GuiCookieTests.Components
+namespace GuiCookieTests.DataStructures
 {
     [TestClass()]
     public class PaddingTests

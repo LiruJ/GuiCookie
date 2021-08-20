@@ -352,6 +352,12 @@
             <param name="child"></param>
             <returns></returns>
         </member>
+        <member name="M:GuiCookie.DataStructures.NineSlice.CalculateSource(Microsoft.Xna.Framework.Rectangle,GuiCookie.DataStructures.Piece)">
+            <summary> Calculates the sliced rectangle for a given <paramref name="piece"/> from the given <paramref name="mainSource"/>. </summary>
+            <param name="mainSource"> The main rectangle to slice. </param>
+            <param name="piece"> The piece of the rectangle to calculate. </param>
+            <returns> The sliced bounds. </returns>
+        </member>
         <member name="T:GuiCookie.DataStructures.SideMask">
             <summary> Represents four different directions. </summary>
         </member>
@@ -1099,14 +1105,14 @@
         <member name="P:GuiCookie.Styles.StyleStateMachine.DisabledVariant">
             <summary> The variant of the current <see cref="P:GuiCookie.Styles.StyleStateMachine.Style"/> that is used when the element is disabled, defaulting to <see cref="P:GuiCookie.Styles.StyleStateMachine.BaseVariant"/> if none was defined. </summary>
         </member>
-        <member name="F:GuiCookie.Styles.StyleStateMachine.mouseHandler">
-            <summary> The mouse handler of the parent element. </summary>
-        </member>
         <member name="P:GuiCookie.Styles.StyleStateMachine.CurrentStyleVariant">
             <summary> The current style variant according to the state of the element. </summary>
         </member>
         <member name="P:GuiCookie.Styles.StyleStateMachine.Style">
             <summary> The style to work with. </summary>
+        </member>
+        <member name="P:GuiCookie.Styles.StyleStateMachine.MouseHandler">
+            <summary> The mouse handler that determines what variant to use. This defaults to the element's mouse handler, but can be set to any element's mouse handler. </summary>
         </member>
         <member name="M:GuiCookie.Styles.StyleStateMachine.RefreshStyleVariants">
             <summary> Searches through the current <see cref="P:GuiCookie.Styles.StyleStateMachine.Style"/> and caches any variants. </summary>

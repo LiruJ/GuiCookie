@@ -97,27 +97,31 @@ namespace GuiCookie.DataStructures
             return (stretchMask & pieceMask) == pieceMask;
         }
 
+        /// <summary> Calculates the sliced rectangle for a given <paramref name="piece"/> from the given <paramref name="mainSource"/>. </summary>
+        /// <param name="mainSource"> The main rectangle to slice. </param>
+        /// <param name="piece"> The piece of the rectangle to calculate. </param>
+        /// <returns> The sliced bounds. </returns>
         public Rectangle CalculateSource(Rectangle mainSource, Piece piece)
         {
             return piece switch
             {
                 Piece.BottomLeft => new Rectangle(new Point(mainSource.X, mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * (1.0f - MaxY)))),
-                Piece.Bottom => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MinX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Ceiling(mainSource.Height * (1.0f - MaxY)))),
+                        new Point((int)Math.Floor(mainSource.Width * MinX), (int)Math.Floor(mainSource.Height * (1.0f - MaxY)))),
+                Piece.Bottom => new Rectangle(new Point(mainSource.X + (int)Math.Floor(mainSource.Width * MinX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
+                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Floor(mainSource.Height * (1.0f - MaxY)))),
                 Piece.BottomRight => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MaxY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * (1.0f - MaxY)))),
-                Piece.Right => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MinY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
+                        new Point((int)Math.Floor(mainSource.Width * (1.0f - MaxX)), (int)Math.Floor(mainSource.Height * (1.0f - MaxY)))),
+                Piece.Right => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y + (int)Math.Floor(mainSource.Height * MinY)),
+                        new Point((int)Math.Floor(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
                 Piece.TopRight => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MaxX), mainSource.Y),
-                        new Point((int)Math.Ceiling(mainSource.Width * (1.0f - MaxX)), (int)Math.Ceiling(mainSource.Height * MinY))),
-                Piece.Top => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MinX), mainSource.Y),
-                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Ceiling(mainSource.Height * MinY))),
+                        new Point((int)Math.Floor(mainSource.Width * (1.0f - MaxX)), (int)Math.Floor(mainSource.Height * MinY))),
+                Piece.Top => new Rectangle(new Point(mainSource.X + (int)Math.Floor(mainSource.Width * MinX), mainSource.Y),
+                        new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Floor(mainSource.Height * MinY))),
                 Piece.TopLeft => new Rectangle(new Point(mainSource.X, mainSource.Y),
-                        new Point((int)Math.Ceiling(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * MinY))),
-                Piece.Left => new Rectangle(new Point(mainSource.X, mainSource.Y + (int)Math.Ceiling(mainSource.Height * MinY)),
-                        new Point((int)Math.Ceiling(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
-                Piece.Centre => new Rectangle(new Point(mainSource.X + (int)Math.Ceiling(mainSource.Width * MinX), mainSource.Y + (int)Math.Ceiling(mainSource.Height * MinY)),
+                        new Point((int)Math.Floor(mainSource.Width * MinX), (int)Math.Floor(mainSource.Height * MinY))),
+                Piece.Left => new Rectangle(new Point(mainSource.X, mainSource.Y + (int)Math.Floor(mainSource.Height * MinY)),
+                        new Point((int)Math.Floor(mainSource.Width * MinX), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
+                Piece.Centre => new Rectangle(new Point(mainSource.X + (int)Math.Floor(mainSource.Width * MinX), mainSource.Y + (int)Math.Floor(mainSource.Height * MinY)),
                         new Point((int)Math.Ceiling(mainSource.Width * (MaxX - MinX)), (int)Math.Ceiling(mainSource.Height * (MaxY - MinY)))),
                 _ => throw new Exception($"Invalid piece. {piece}"),
             };
