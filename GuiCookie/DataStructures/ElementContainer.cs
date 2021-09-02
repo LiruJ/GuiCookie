@@ -111,7 +111,7 @@ namespace GuiCookie.DataStructures
 
         #region Properties
         /// <summary> The Element that this container represents. </summary>
-        public Element Element { get; set; }
+        public Element Element { get; private set; }
 
         public Root Root => root ?? Element?.Root;
 
@@ -162,6 +162,13 @@ namespace GuiCookie.DataStructures
         #endregion
 
         #region Element Functions
+        internal void onElementDestroyed()
+        {
+            // Disconnect all events.
+            onChildAdded.DisconnectAll();
+            onChildRemoved.DisconnectAll();
+        }
+
         private int calculateCount()
         {
             // Start with the elements within the main collection.

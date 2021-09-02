@@ -24,10 +24,6 @@ namespace Example.Elements
         private int totalItems = 0;
         #endregion
 
-        #region Backing Fields
-        private Point desiredSize;
-        #endregion
-
         #region Constructors
         public ListPane(Random random)
         {

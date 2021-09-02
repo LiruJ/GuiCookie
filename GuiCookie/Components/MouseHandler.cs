@@ -1,4 +1,5 @@
-﻿using GuiCookie.Elements;
+﻿using GuiCookie.DataStructures;
+using GuiCookie.Elements;
 using GuiCookie.Input;
 using LiruGameHelper.Signals;
 using Microsoft.Xna.Framework;
@@ -79,6 +80,16 @@ namespace GuiCookie.Components
         {
             // Set the click type.
             ClickType = Element.Attributes.GetEnumAttributeOrDefault(clickTypeAttributeName, ClickType.OnMouseUp);
+        }
+        #endregion
+
+        #region Event Functions
+        public override void OnDestroyed()
+        {
+            mouseEntered.DisconnectAll();
+            mouseLeft.DisconnectAll();
+            leftClicked.DisconnectAll();
+            rightClicked.DisconnectAll();
         }
         #endregion
 

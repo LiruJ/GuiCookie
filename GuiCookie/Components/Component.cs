@@ -60,6 +60,8 @@ namespace GuiCookie.Components
         public virtual bool ValidateSizeChanged() => true;
 
         public virtual void OnStyleChanged() { }
+
+        public virtual void OnDestroyed() { }
         #endregion
 
         #region Update Functions

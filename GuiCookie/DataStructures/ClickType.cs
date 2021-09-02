@@ -1,4 +1,4 @@
-﻿namespace GuiCookie.Elements
+﻿namespace GuiCookie.DataStructures
 {
     public enum ClickType
     {

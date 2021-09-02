@@ -77,7 +77,7 @@
 					<TextBox Name="Label"/>
 					<HorizontalSliderBar DecimalDigits="0" MaximumValue="5" Name="Slider"/>
 				</LabelledSlider>
-				
+
 				<!--The grid itself-->
 				<Partition Components="Frame, GridLayout" Size="100%, 260" CellSize="20" Spacing="1" Padding="5" Name="Grid"/>
 			</Pane>
@@ -102,6 +102,19 @@
 				<Pane Components="DirectionalLayout" Size="100%, 245" Padding="5" Name="List"/>
 
 			</ListPane>
+		</Panel>
+
+		<Panel Size="40%, 20%">
+			<TextBox Size="100%, 20" Text="Portrait Bar" Style="TitleBar" Name="TitleBar"/>
+
+			<Pane Components="DirectionalLayout" Layout="Horizontal" Size="100%, 50" Spacing="4" Padding="5" Style="Inlay" Name="Content">
+				<BoxIcon Size="0, 100%" RatioMode="HeightControlsWidth" Ratio="1"/>
+				<BoxIcon Size="0, 100%" RatioMode="HeightControlsWidth" Ratio="1"/>
+				<BoxIcon Size="0, 100%" RatioMode="HeightControlsWidth" Ratio="1"/>
+				<BoxIcon Size="0, 100%" RatioMode="HeightControlsWidth" Ratio="1"/>
+				<BoxIcon Size="0, 100%" RatioMode="HeightControlsWidth" Ratio="1"/>
+				<BoxIcon Size="0, 100%" RatioMode="HeightControlsWidth" Ratio="1"/>
+			</Pane>
 		</Panel>
 	</Partition>
 

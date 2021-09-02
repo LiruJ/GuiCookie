@@ -323,7 +323,7 @@ namespace GuiCookie.Elements
 
         protected virtual void OnSizeChanged() { }
 
-        internal void onStyleChanged() 
+        internal void onStyleChanged()
         {
             // Call the function on every component.
             foreach (Component component in components.Values)
@@ -401,7 +401,38 @@ namespace GuiCookie.Elements
 
         public bool RemoveChild(Element child) => ElementContainer.RemoveChild(child?.ElementContainer);
 
-        public void Destroy() => elementManager.Destroy(this);
+        public void Destroy()
+        {
+            // Allow this element to clean itself up before it is destroyed.
+            internalOnDestroyed();
+
+            // Destroy the element.
+            elementManager.Destroy(this);
+
+            // TODO: Set some stuff to null just to clean up references and make it easier on the GC.
+            // Tell the element container about the destruction.
+            ElementContainer.onElementDestroyed();
+        }
+
+        internal void internalOnDestroyed()
+        {
+            // Tell this element about the destruction.
+            OnDestroyed();
+
+            // Disconnect all signals.
+            onDisabled.DisconnectAll();
+            onEnabled.DisconnectAll();
+
+            // Tell each component about the destruction.
+            foreach (Component component in components.Values)
+                component.OnDestroyed();
+
+            // Tell each child about the destruction.
+            foreach (Element child in this)
+                child.internalOnDestroyed();
+        }
+
+        protected virtual void OnDestroyed() { }
 
         public IEnumerator<Element> GetEnumerator() => ElementContainer.GetEnumerator();
 

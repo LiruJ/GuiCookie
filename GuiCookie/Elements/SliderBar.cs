@@ -70,6 +70,8 @@ namespace GuiCookie.Elements
 
         #region Bind Functions
         public void ConnectValueChanged(Action action) => OnValueChanged.Connect(action);
+
+        protected override void OnDestroyed() => onValueChanged.DisconnectAll();
         #endregion
 
         #region Calculation Functions
@@ -80,8 +82,8 @@ namespace GuiCookie.Elements
             if (Handle == null) return;
 
             Handle.Bounds.RelativeTotalPosition = LayoutDirection == Direction.Horizontal 
-                ? new Point((Handle.Bounds.TotalSize.X / 2) + (int)MathF.Floor((UsableSize * NormalisedValue) - (Bounds.RelativeContentPosition.X - Bounds.RelativeTotalPosition.X)), Bounds.TotalSize.Y / 2)
-                : new Point(Bounds.TotalSize.X / 2, (Handle.Bounds.TotalSize.Y / 2) + (int)MathF.Floor((UsableSize * NormalisedValue) - (Bounds.RelativeContentPosition.Y - Bounds.RelativeTotalPosition.Y)));
+                ? new Point((Handle.Bounds.TotalSize.X / 2) + (int)MathF.Floor((UsableSize * NormalisedValue) - (Bounds.RelativeContentPosition.X - Bounds.RelativeTotalPosition.X)), Bounds.ContentSize.Y / 2)
+                : new Point(Bounds.ContentSize.X / 2, (Handle.Bounds.TotalSize.Y / 2) + (int)MathF.Floor((UsableSize * NormalisedValue) - (Bounds.RelativeContentPosition.Y - Bounds.RelativeTotalPosition.Y)));
         }
 
         /// <summary> Resizes the <see cref="Handle"/> so that it covers the set range. For example; if the slider's minimum value is 0 and the maximum value is 2, and <paramref name="range"/> is 1, the handle will fill 50% of the slider bar. </summary>

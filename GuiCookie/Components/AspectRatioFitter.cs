@@ -1,4 +1,5 @@
 ﻿using GuiCookie.DataStructures;
+using LiruGameHelperMonoGame.Helpers;
 using Microsoft.Xna.Framework;
 using System;
 
@@ -67,47 +68,54 @@ namespace GuiCookie.Components
             {
                 case AspectRatioMode.WidthControlsHeight:
                     // Calculate the adjusted dimension.
-                    float adjustedHeight = currentSize.X / Ratio;
+                    //float adjustedHeight = currentSize.X / Ratio;
 
                     // If the dimension is within the correct aspect ratio, do nothing.
-                    if (Math.Abs(adjustedHeight - currentSize.Y) <= allowedDeviance) return true;
+                    //if (Math.Abs(adjustedHeight - currentSize.Y) <= allowedDeviance) return true;
 
                     // Change the size.
-                    newSize.Y = (int)Math.Ceiling(adjustedHeight);
+                    //newSize.Y = (int)Math.Ceiling(adjustedHeight);
 
-                    return false;
+                    //return false;
+
+                    return !AspectRatioHelpers.AdjustHeight(ref newSize, Ratio, allowedDeviance);
+
                 case AspectRatioMode.HeightControlsWidth:
-                    // Calculate the adjusted dimension.
-                    float adjustedWidth = currentSize.Y * Ratio;
+                    //// Calculate the adjusted dimension.
+                    //float adjustedWidth = currentSize.Y * Ratio;
 
-                    // If the dimension is within the correct aspect ratio, do nothing.
-                    if (Math.Abs(adjustedWidth - currentSize.X) <= allowedDeviance) return true;
+                    //// If the dimension is within the correct aspect ratio, do nothing.
+                    //if (Math.Abs(adjustedWidth - currentSize.X) <= allowedDeviance) return true;
 
-                    // Change the size.
-                    newSize.X = (int)Math.Ceiling(adjustedWidth);
+                    //// Change the size.
+                    //newSize.X = (int)Math.Ceiling(adjustedWidth);
 
-                    return false;
+                    //return false;
+
+                    return !AspectRatioHelpers.AdjustWidth(ref newSize, Ratio, allowedDeviance);
                 case AspectRatioMode.EnvelopeParent:
+                    return !AspectRatioHelpers.FitAroundBounds(ref newSize, Bounds.Parent.TotalSize, Ratio, allowedDeviance);
                 case AspectRatioMode.FitInParent:
-                    // Create a point to hold the new size.
-                    newSize = Bounds.Parent.TotalSize;
+                    return !AspectRatioHelpers.FitInBounds(ref newSize, Bounds.Parent.TotalSize, Ratio, allowedDeviance);
+                    //// Create a point to hold the new size.
+                    //newSize = Bounds.Parent.TotalSize;
 
-                    // Calculate the ratio of the parent.
-                    float parentRatio = (float)Bounds.Parent.TotalSize.X / Bounds.Parent.TotalSize.Y;
+                    //// Calculate the ratio of the parent.
+                    //float parentRatio = (float)Bounds.Parent.TotalSize.X / Bounds.Parent.TotalSize.Y;
 
-                    // If the ratio of this element is bigger than that of the parent, use the width.
-                    if (Ratio > parentRatio ^ Mode == AspectRatioMode.EnvelopeParent)
-                    {
-                        newSize.Y = (int)Math.Ceiling(Bounds.Parent.TotalSize.X / Ratio);
-                        if (Math.Abs(newSize.Y - currentSize.Y) <= allowedDeviance) return true;
-                    }
-                    else
-                    {
-                        newSize.X = (int)Math.Ceiling(Bounds.Parent.TotalSize.Y * Ratio);
-                        if (Math.Abs(newSize.X - currentSize.X) <= allowedDeviance) return true;
-                    }
+                    //// If the ratio of this element is bigger than that of the parent, use the width.
+                    //if (Ratio > parentRatio ^ Mode == AspectRatioMode.EnvelopeParent)
+                    //{
+                    //    newSize.Y = (int)Math.Ceiling(Bounds.Parent.TotalSize.X / Ratio);
+                    //    if (Math.Abs(newSize.Y - currentSize.Y) <= allowedDeviance) return true;
+                    //}
+                    //else
+                    //{
+                    //    newSize.X = (int)Math.Ceiling(Bounds.Parent.TotalSize.Y * Ratio);
+                    //    if (Math.Abs(newSize.X - currentSize.X) <= allowedDeviance) return true;
+                    //}
 
-                    return false;
+                    //return false;
                 case AspectRatioMode.None:
                 default:
                     return true;
