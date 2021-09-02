@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <Version>1.7.4.2-alpha.4</Version>
+	  <Version>1.7.4.2-alpha.5</Version>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>Liru</Authors>
     <Company>Lovebirb</Company>
@@ -18,9 +18,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <FileVersion>1.7.4.2</FileVersion>
     <AssemblyVersion>1.7.4.2</AssemblyVersion>
-    <PackageReleaseNotes>Added functions for element and component destruction, allowing for cleanup to happen. Should remove any memory leaks that may have existed.
-
-New version of LiruGameHelper with updated signals.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added attributes property to Root. This allows settings for the entire layout sheet to be set in one place and accessed without needing to cast the root.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

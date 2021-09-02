@@ -39,6 +39,9 @@ namespace GuiCookie
 
         public IReadOnlyTemplateManager TemplateManager { get; private set; }
 
+        /// <summary> The attributes of the main node. </summary>
+        public IReadOnlyAttributes Attributes { get; private set; }
+
         /// <summary> The bounds of the game window. </summary>
         public Bounds Bounds { get; private set; }
 
@@ -80,8 +83,11 @@ namespace GuiCookie
             // Select the main node, if it does not exist, throw an exception.
             XmlNode mainNode = guiSheet.SelectSingleNode(mainNodeName) ?? throw new Exception($"Gui sheet's main node must be named {mainNodeName}.");
 
+            // Set the attributes to the attributes loaded from the main node.
+            Attributes = new AttributeCollection(mainNode);
+
             // Initialise the bounds to the size of the window and the parsed padding.
-            Bounds = new Bounds(elementManager.ElementContainer, gameWindow.ClientBounds.Size, new AttributeCollection(mainNode));
+            Bounds = new Bounds(elementManager.ElementContainer, gameWindow.ClientBounds.Size, Attributes);
             
             // Load the built-in templates.
             templateManager.LoadDefault();

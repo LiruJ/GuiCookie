@@ -843,6 +843,9 @@
         <member name="T:GuiCookie.Root">
             <summary> The base class for a UI controller, inherit from this and create a new inherited class via the <see cref="T:GuiCookie.UIManager"/> to create a custom UI controller. </summary>
         </member>
+        <member name="P:GuiCookie.Root.Attributes">
+            <summary> The attributes of the main node. </summary>
+        </member>
         <member name="P:GuiCookie.Root.Bounds">
             <summary> The bounds of the game window. </summary>
         </member>
@@ -903,7 +906,7 @@
         <member name="M:GuiCookie.Root.RemoveElement(GuiCookie.Elements.Element)">
             <summary> Creates, adds, and returns an <see cref="T:GuiCookie.Elements.Element"/> loaded from the given <paramref name="templateName"/>, using the <paramref name="attributes"/>, and as a child of the given <paramref name="parent"/>. </summary>
             <param name="template"> The <see cref="T:GuiCookie.Templates.Template"/> from which to create the <see cref="T:GuiCookie.Elements.Element"/>. </param>
-            <param name="attributes"> The <see cref="N:GuiCookie.Attributes"/> of the new <see cref="T:GuiCookie.Elements.Element"/>. </param>
+            <param name="attributes"> The <see cref="P:GuiCookie.Root.Attributes"/> of the new <see cref="T:GuiCookie.Elements.Element"/>. </param>
             <param name="parent"> The parent <see cref="T:GuiCookie.Elements.Element"/> of the new <see cref="T:GuiCookie.Elements.Element"/>, or <c>null</c> to add it to the <see cref="T:GuiCookie.Root"/> instead. </param>
             <returns> The created <see cref="T:GuiCookie.Elements.Element"/>. </returns>
         </member>
