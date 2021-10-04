@@ -492,7 +492,7 @@
             <summary> Called after the element has been fully set up. Use this to set references to components, although other elements may not exist yet. </summary>
         </member>
         <member name="M:GuiCookie.Elements.Element.OnFullSetup">
-            <summary> Called after every element has been fully set up. Use this to set references to other elements. </summary>
+            <summary> Called after every element has been fully created. Use this to set references to other elements. </summary>
         </member>
         <member name="M:GuiCookie.Elements.Element.OnPostFullSetup">
             <summary> Called after every element's <see cref="M:GuiCookie.Elements.Element.OnFullSetup"/> function has been called. Use this to initialise elements who required element references from <see cref="M:GuiCookie.Elements.Element.OnFullSetup"/>. </summary>
@@ -505,9 +505,9 @@
             <summary> Called when this element's <see cref="P:GuiCookie.Elements.Element.Style"/> or <see cref="P:GuiCookie.Elements.Element.StyleState"/> is changed. Fired after <see cref="M:GuiCookie.Components.Component.OnStyleChanged"/>. </summary>
         </member>
         <member name="M:GuiCookie.Elements.Element.GetChild``1">
-            <summary> </summary>
-            <typeparam name="T"></typeparam>
-            <returns></returns>
+            <summary> Returns the first child of this element that is of the given type <typeparamref name="T"/>, or <c>null</c> if no such child exists. </summary>
+            <typeparam name="T"> The type of the desired element. </typeparam>
+            <returns> The first element of the given <typeparamref name="T"/>, or <c>null</c> if no such child exists. </returns>
         </member>
         <member name="M:GuiCookie.Elements.Element.GetComponent``1">
             <summary> Gets the component with the type <typeparamref name="T"/>, or null if the component does not exist. </summary>
@@ -543,6 +543,45 @@
         <member name="P:GuiCookie.Elements.IElement.Bounds">
             <summary> The bounds of the element. </summary>
         </member>
+        <member name="T:GuiCookie.Elements.ImageBox">
+            <summary> Represents an element that displays an image. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ImageBox.ImageBlock">
+            <summary> The underlying <see cref="P:GuiCookie.Elements.ImageBox.ImageBlock"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ImageBox.ClippingMode">
+            <summary> The <see cref="P:GuiCookie.Elements.ImageBox.ClippingMode"/> of the current image. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ImageBox.Texture">
+            <summary> The texture of the current image. If this is set to a texture, then the image will be of the entire texture. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ImageBox.Colour">
+            <summary> The colour of the current image. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ImageBox.Image">
+            <summary> The current image. </summary>
+        </member>
+        <member name="T:GuiCookie.Elements.ImageButton">
+            <summary> Represents a button with an <see cref="P:GuiCookie.Elements.ImageButton.ImageBlock"/> component. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ImageButton.ImageBlock">
+            <summary> The underlying <see cref="P:GuiCookie.Elements.ImageButton.ImageBlock"/>. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ImageButton.ClippingMode">
+            <summary> The <see cref="P:GuiCookie.Elements.ImageButton.ClippingMode"/> of the current image. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ImageButton.Texture">
+            <summary> The texture of the current image. If this is set to a texture, then the image will be of the entire texture. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ImageButton.Colour">
+            <summary> The colour of the current image. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.ImageButton.Image">
+            <summary> The current image. </summary>
+        </member>
+        <member name="T:GuiCookie.Elements.LabelledSlider">
+            <summary> Represents a slider and a text label displaying the current value. </summary>
+        </member>
         <member name="P:GuiCookie.Elements.LabelledSlider.Slider">
             <summary> The <see cref="T:GuiCookie.Elements.SliderBar"/>. </summary>
         </member>
@@ -556,8 +595,11 @@
             <summary> The string attached to the end of the label. </summary>
         </member>
         <member name="P:GuiCookie.Elements.LabelledSlider.IsPercentage">
-            <summary> If this is <c>true</c>, then the label will use the <see cref="!:SliderBar.NormalisedValue"/> property and format the text as a percentage. </summary>
+            <summary> If this is <c>true</c>, then the label will use the <see cref="P:GuiCookie.Elements.ProgressBar.NormalisedValue"/> property and format the text as a percentage. </summary>
             <remarks> Note that the <c>%</c> character is automatically added and is not needed as a suffix. </remarks>
+        </member>
+        <member name="T:GuiCookie.Elements.NumberCounter">
+            <summary> Represents a integer value with a label, increment button, and decrement button. </summary>
         </member>
         <member name="P:GuiCookie.Elements.NumberCounter.Label">
             <summary> The value label. </summary>
@@ -633,18 +675,39 @@
         <member name="P:GuiCookie.Elements.SliderBar.RightClicked">
             <summary> Access to <see cref="P:GuiCookie.Components.MouseHandler.RightClicked"/>. </summary>
         </member>
+        <member name="M:GuiCookie.Elements.SliderBar.CalculateHandlePosition">
+            <summary> Recalculates the position of the <see cref="P:GuiCookie.Elements.SliderBar.Handle"/> so that it properly reflects the current <see cref="P:GuiCookie.Elements.ProgressBar.Value"/>. </summary>
+        </member>
         <member name="M:GuiCookie.Elements.SliderBar.ResizeHandleRange(System.Single)">
             <summary> Resizes the <see cref="P:GuiCookie.Elements.SliderBar.Handle"/> so that it covers the set range. For example; if the slider's minimum value is 0 and the maximum value is 2, and <paramref name="range"/> is 1, the handle will fill 50% of the slider bar. </summary>
             <param name="range"> The range for the handle to cover. </param>
         </member>
+        <member name="T:GuiCookie.Elements.TextBox">
+            <summary> Represents an element that displays text. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.TextBox.TextBlock">
+            <summary> The underlying <see cref="P:GuiCookie.Elements.TextBox.TextBlock"/>. </summary>
+        </member>
         <member name="P:GuiCookie.Elements.TextBox.Text">
             <summary> The text of the box. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.TextBox.Colour">
+            <summary> The colour of the text. </summary>
+        </member>
+        <member name="T:GuiCookie.Elements.TextButton">
+            <summary> Represents a button with a <see cref="P:GuiCookie.Elements.TextButton.TextBlock"/> component. </summary>
         </member>
         <member name="P:GuiCookie.Elements.TextButton.TextBlock">
             <summary> The text block that holds the actual text. </summary>
         </member>
         <member name="P:GuiCookie.Elements.TextButton.Text">
             <summary> The text of the button. </summary>
+        </member>
+        <member name="P:GuiCookie.Elements.TextButton.Colour">
+            <summary> The colour of the button's text. </summary>
+        </member>
+        <member name="M:GuiCookie.Elements.TextButton.OnCreated">
+            <summary> Calls <see cref="M:GuiCookie.Elements.Button.OnCreated"/> then sets the <see cref="P:GuiCookie.Elements.TextButton.TextBlock"/> property. </summary>
         </member>
         <member name="T:GuiCookie.Helpers.GridLayoutHelper">
             <summary> Helps with aligning elements to a grid. </summary>
@@ -770,19 +833,19 @@
         </member>
         <member name="M:GuiCookie.Input.InputManager.IsKeyDown(Microsoft.Xna.Framework.Input.Keys)">
             <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> is pressed on the current frame; otherwise, <c>false</c>. </summary>
-            <param name="key"> The <see cref="!:Key"/> to check. </param>
+            <param name="key"> The <see cref="T:Microsoft.Xna.Framework.Input.Keys"/> to check. </param>
         </member>
         <member name="M:GuiCookie.Input.InputManager.IsKeyUp(Microsoft.Xna.Framework.Input.Keys)">
             <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> is unpressed on the current frame; otherwise, <c>false</c>. </summary>
-            <param name="key"> The <see cref="!:Key"/> to check. </param>
+            <param name="key"> The <see cref="T:Microsoft.Xna.Framework.Input.Keys"/> to check. </param>
         </member>
         <member name="M:GuiCookie.Input.InputManager.WasKeyDown(Microsoft.Xna.Framework.Input.Keys)">
             <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> was pressed on the previous frame; otherwise, <c>false</c>. </summary>
-            <param name="key"> The <see cref="!:Key"/> to check. </param>
+            <param name="key"> The <see cref="T:Microsoft.Xna.Framework.Input.Keys"/> to check. </param>
         </member>
         <member name="M:GuiCookie.Input.InputManager.WasKeyUp(Microsoft.Xna.Framework.Input.Keys)">
             <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> was unpressed on the previous frame; otherwise, <c>false</c>. </summary>
-            <param name="key"> The <see cref="!:Key"/> to check. </param>
+            <param name="key"> The <see cref="T:Microsoft.Xna.Framework.Input.Keys"/> to check. </param>
         </member>
         <member name="P:GuiCookie.Input.InputManager.IsLeftMouseDown">
             <summary> Gets a value that is <c>true</c> when the left mouse button is clicked on the current frame; otherwise, <c>false</c>. </summary>
@@ -808,7 +871,13 @@
         <member name="P:GuiCookie.Input.InputManager.WasRightMouseUp">
             <summary> Gets a value that is <c>true</c> when the right mouse button was unclicked on the previous frame; otherwise, <c>false</c>. </summary>
         </member>
-        <member name="M:GuiCookie.Input.InputManager.#ctor">
+        <member name="P:GuiCookie.Input.InputManager.OnCharacterTyped">
+            <summary> Is invoked every time a character is typed. Note that typing a character is not the same as a character being held down. </summary>
+        </member>
+        <member name="P:GuiCookie.Input.InputManager.OnKeyTyped">
+            <summary> Is invoked every time a character is typed. Note that typing a character is not the same as a character being held down. </summary>
+        </member>
+        <member name="M:GuiCookie.Input.InputManager.#ctor(Microsoft.Xna.Framework.GameWindow)">
             <summary> Creates a new <see cref="T:GuiCookie.Input.InputManager"/> using the default Monogame input. </summary>
         </member>
         <member name="M:GuiCookie.Input.InputManager.UpdateMouseAndKeyboardStates">
@@ -843,6 +912,21 @@
         <member name="T:GuiCookie.Root">
             <summary> The base class for a UI controller, inherit from this and create a new inherited class via the <see cref="T:GuiCookie.UIManager"/> to create a custom UI controller. </summary>
         </member>
+        <member name="P:GuiCookie.Root.ElementManager">
+            <summary> Holds the root-level elements and handles element creation. </summary>
+        </member>
+        <member name="P:GuiCookie.Root.InputManager">
+            <summary> Handles all mouse and keyboard input. </summary>
+        </member>
+        <member name="P:GuiCookie.Root.DragAndDropManager">
+            <summary> Keeps track of any dragged element and handles interaction between draggables and drop targets. </summary>
+        </member>
+        <member name="P:GuiCookie.Root.StyleManager">
+            <summary> Handles the loading and storage of styles and resources. </summary>
+        </member>
+        <member name="P:GuiCookie.Root.TemplateManager">
+            <summary> Handles the loading and storage of templates. </summary>
+        </member>
         <member name="P:GuiCookie.Root.Attributes">
             <summary> The attributes of the main node. </summary>
         </member>
@@ -853,7 +937,7 @@
             <summary> Gets a value that is <c>true</c> when the mouse is over an element; otherwise, <c>false</c>. </summary>
         </member>
         <member name="P:GuiCookie.Root.HasSetUp">
-            <summary> Is true if the layout file has been loaded and the starting elements set up; otherwise false. </summary>
+            <summary> Is <c>true</c> if the layout file has been loaded and the starting elements set up; otherwise <c>false</c>. </summary>
         </member>
         <member name="M:GuiCookie.Root.InternalInitialise(System.Xml.XmlDocument,GuiCookie.Styles.StyleManager,GuiCookie.Templates.TemplateManager,GuiCookie.Input.InputManager,GuiCookie.Input.DragAndDrop.DragAndDropManager,GuiCookie.Elements.ElementManager,Microsoft.Xna.Framework.GameWindow)">
             <summary> Creates a new root from the given <paramref name="guiSheet"/> and dependencies. </summary>
@@ -902,13 +986,6 @@
             <typeparam name="T"> The type of <see cref="N:GuiCookie.Elements"/> to find. </typeparam>
             <param name="tag"> The tag of the <see cref="N:GuiCookie.Elements"/>. </param>
             <returns> The <see cref="N:GuiCookie.Elements"/> with the given <paramref name="tag"/>. </returns>
-        </member>
-        <member name="M:GuiCookie.Root.RemoveElement(GuiCookie.Elements.Element)">
-            <summary> Creates, adds, and returns an <see cref="T:GuiCookie.Elements.Element"/> loaded from the given <paramref name="templateName"/>, using the <paramref name="attributes"/>, and as a child of the given <paramref name="parent"/>. </summary>
-            <param name="template"> The <see cref="T:GuiCookie.Templates.Template"/> from which to create the <see cref="T:GuiCookie.Elements.Element"/>. </param>
-            <param name="attributes"> The <see cref="P:GuiCookie.Root.Attributes"/> of the new <see cref="T:GuiCookie.Elements.Element"/>. </param>
-            <param name="parent"> The parent <see cref="T:GuiCookie.Elements.Element"/> of the new <see cref="T:GuiCookie.Elements.Element"/>, or <c>null</c> to add it to the <see cref="T:GuiCookie.Root"/> instead. </param>
-            <returns> The created <see cref="T:GuiCookie.Elements.Element"/>. </returns>
         </member>
         <member name="M:GuiCookie.Root.Update(Microsoft.Xna.Framework.GameTime)">
             <summary> Updates the UI. </summary>

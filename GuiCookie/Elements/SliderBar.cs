@@ -54,7 +54,7 @@ namespace GuiCookie.Elements
         public override void OnFullSetup()
         {
             // Get the mouse handler.
-            mouseHandler = GetComponent<MouseHandler>();
+            mouseHandler = GetComponent<MouseHandler>() ?? throw new Exception($"{nameof(SliderBar)} is missing {nameof(MouseHandler)} component.");
 
             // Get the handle element.
             Handle = GetChildByName("Handle");
@@ -77,6 +77,7 @@ namespace GuiCookie.Elements
         #region Calculation Functions
         protected override void OnSizeChanged() => CalculateHandlePosition();
 
+        /// <summary> Recalculates the position of the <see cref="Handle"/> so that it properly reflects the current <see cref="ProgressBar.Value"/>. </summary>
         public void CalculateHandlePosition()
         {
             if (Handle == null) return;

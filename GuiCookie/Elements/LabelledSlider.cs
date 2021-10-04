@@ -1,5 +1,6 @@
 ﻿namespace GuiCookie.Elements
 {
+    /// <summary> Represents a slider and a text label displaying the current value. </summary>
     public class LabelledSlider : Element
     {
         #region Constants
@@ -59,7 +60,7 @@
             }
         }
 
-        /// <summary> If this is <c>true</c>, then the label will use the <see cref="SliderBar.NormalisedValue"/> property and format the text as a percentage. </summary>
+        /// <summary> If this is <c>true</c>, then the label will use the <see cref="ProgressBar.NormalisedValue"/> property and format the text as a percentage. </summary>
         /// <remarks> Note that the <c>%</c> character is automatically added and is not needed as a suffix. </remarks>
         public bool IsPercentage
         {

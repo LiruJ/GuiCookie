@@ -1,6 +1,7 @@
 ﻿using GuiCookie.Components;
 using GuiCookie.DataStructures;
 using GuiCookie.Elements;
+using LiruGameHelper.Signals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
@@ -43,19 +44,19 @@ namespace GuiCookie.Input
 
         #region Key Properties
         /// <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> is pressed on the current frame; otherwise, <c>false</c>. </summary>
-        /// <param name="key"> The <see cref="Key"/> to check. </param>
+        /// <param name="key"> The <see cref="Keys"/> to check. </param>
         public bool IsKeyDown(Keys key) => currentKeyboardState.IsKeyDown(key);
 
         /// <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> is unpressed on the current frame; otherwise, <c>false</c>. </summary>
-        /// <param name="key"> The <see cref="Key"/> to check. </param>
+        /// <param name="key"> The <see cref="Keys"/> to check. </param>
         public bool IsKeyUp(Keys key) => !IsKeyDown(key);
 
         /// <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> was pressed on the previous frame; otherwise, <c>false</c>. </summary>
-        /// <param name="key"> The <see cref="Key"/> to check. </param>
+        /// <param name="key"> The <see cref="Keys"/> to check. </param>
         public bool WasKeyDown(Keys key) => previousKeyboardState.IsKeyDown(key);
 
         /// <summary> Gets a value that is <c>true</c> when the given <paramref name="key"/> was unpressed on the previous frame; otherwise, <c>false</c>. </summary>
-        /// <param name="key"> The <see cref="Key"/> to check. </param>
+        /// <param name="key"> The <see cref="Keys"/> to check. </param>
         public bool WasKeyUp(Keys key) => !WasKeyDown(key);
         #endregion
 
@@ -85,9 +86,30 @@ namespace GuiCookie.Input
         public bool WasRightMouseUp => !WasRightMouseDown;
         #endregion
 
+        #region Key Signals
+        /// <summary> Is invoked every time a character is typed. Note that typing a character is not the same as a character being held down. </summary>
+        public IConnectableSignal<char> OnCharacterTyped => onCharacterTyped;
+        private readonly Signal<char> onCharacterTyped = new Signal<char>();
+
+        /// <summary> Is invoked every time a character is typed. Note that typing a character is not the same as a character being held down. </summary>
+        public IConnectableSignal<Keys> OnKeyTyped => onKeyTyped;
+        private readonly Signal<Keys> onKeyTyped = new Signal<Keys>();
+        #endregion
+
         #region Constructors
         /// <summary> Creates a new <see cref="InputManager"/> using the default Monogame input. </summary>
-        public InputManager() { }
+        public InputManager(GameWindow gameWindow) 
+        {
+            // Forward the text input event to the text input signals.
+            gameWindow.TextInput += onTextInput;
+        }
+
+        private void onTextInput(object sender, TextInputEventArgs e)
+        {
+            // Invoke the signals.
+            onKeyTyped.Invoke(e.Key);
+            onCharacterTyped.Invoke(e.Character);
+        }
         #endregion
 
         #region Update Functions
@@ -97,11 +119,11 @@ namespace GuiCookie.Input
             // Set the previous keyboard and mouse states to the current states, before they are changed.
             previousKeyboardState = currentKeyboardState;
             previousMouseState = currentMouseState;
-
+            
             // Get the states of the keyboard and mouse.
             currentKeyboardState = Keyboard.GetState();
             currentMouseState = Mouse.GetState();
-
+            
             // Get the position of the mouse.
             MousePosition = currentMouseState.Position;
 

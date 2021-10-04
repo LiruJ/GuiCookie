@@ -198,6 +198,9 @@ namespace GuiCookie.DataStructures
 
         public Element GetChildByName(string name, bool recursive = false)
         {
+            // Ensure the given name is correct.
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Cannot find a child by name with the given name as it is null or empty.", nameof(name));
+
             // Try to get the element with the name, if it is found then return it.
             if (childrenByName.TryGetValue(name, out ElementContainer child)) return child.Element;
             // Otherwise; if the element could not be found, handle it.
@@ -227,6 +230,10 @@ namespace GuiCookie.DataStructures
         {
             // Check for range.
             if (index < 0 || index >= Count) throw new IndexOutOfRangeException(nameof(index));
+
+            // If the addition and removal queue are both empty, use the quick indexing method.
+            if (additionQueue.Count == 0 && removalQueue.Count == 0)
+                return children[index].Element;
 
             // This is an annoying way of doing this, but essentially there's no way to know which indices are valid without just going through the entire valid collection.
             int i = 0;

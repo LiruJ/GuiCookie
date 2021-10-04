@@ -34,7 +34,7 @@ namespace GuiCookie.Elements
             //  TODO: CORRECT THIS WITH SPACING.
             //
 
-            // If a both components were given, bind left click to select a cell.
+            // If both components were given, bind left click to select a cell.
             if (mouseHandler != null && cellLayout != null)
             {
                 mouseHandler.LeftClicked.Connect(() => { if (Enabled) cellLeftClicked.Invoke(GridLayoutHelper.PixelToCellPosition(mouseHandler.RelativeMousePosition, cellLayout.CellSize)); });

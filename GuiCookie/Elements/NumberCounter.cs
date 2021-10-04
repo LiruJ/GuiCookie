@@ -2,6 +2,7 @@
 
 namespace GuiCookie.Elements
 {
+    /// <summary> Represents a integer value with a label, increment button, and decrement button. </summary>
     public class NumberCounter : Element
     {
         #region Elements

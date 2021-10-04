@@ -96,7 +96,7 @@ namespace GuiCookie
             catch (Exception exception) { throw new Exception("Root creation failed.", exception); }
 
             // Create the managers, adding each one to the service provider.
-            InputManager inputManager = new InputManager();
+            InputManager inputManager = new InputManager(gameWindow);
             serviceProvider.AddService(inputManager);
 
             DragAndDropManager dragAndDropManager = new DragAndDropManager(inputManager);

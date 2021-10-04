@@ -22,21 +22,20 @@ namespace GuiCookie
         private const string templatesAttributeName = "Templates";
         #endregion
 
-        #region Dependencies
-        #endregion
-
-        #region Fields
-        #endregion
-
         #region Properties
+        /// <summary> Holds the root-level elements and handles element creation. </summary>
         public ElementManager ElementManager { get; private set; }
 
+        /// <summary> Handles all mouse and keyboard input. </summary>
         public InputManager InputManager { get; private set; }
 
+        /// <summary> Keeps track of any dragged element and handles interaction between draggables and drop targets. </summary>
         public DragAndDropManager DragAndDropManager { get; private set; }
 
+        /// <summary> Handles the loading and storage of styles and resources. </summary>
         public StyleManager StyleManager { get; private set; }
 
+        /// <summary> Handles the loading and storage of templates. </summary>
         public IReadOnlyTemplateManager TemplateManager { get; private set; }
 
         /// <summary> The attributes of the main node. </summary>
@@ -48,7 +47,7 @@ namespace GuiCookie
         /// <summary> Gets a value that is <c>true</c> when the mouse is over an element; otherwise, <c>false</c>. </summary>
         public bool IsMousedOver => InputManager.MousedOverElement != null;
 
-        /// <summary> Is true if the layout file has been loaded and the starting elements set up; otherwise false. </summary>
+        /// <summary> Is <c>true</c> if the layout file has been loaded and the starting elements set up; otherwise <c>false</c>. </summary>
         public bool HasSetUp { get; private set; } = false;
         #endregion
 
@@ -189,13 +188,6 @@ namespace GuiCookie
         /// <returns> The <see cref="Elements"/> with the given <paramref name="tag"/>. </returns>
         public T GetElementFromTag<T>(string tag) where T : Element => ElementManager.GetElementFromTag<T>(tag);
 
-        /// <summary> Creates, adds, and returns an <see cref="Element"/> loaded from the given <paramref name="templateName"/>, using the <paramref name="attributes"/>, and as a child of the given <paramref name="parent"/>. </summary>
-        /// <param name="template"> The <see cref="Template"/> from which to create the <see cref="Element"/>. </param>
-        /// <param name="attributes"> The <see cref="Attributes"/> of the new <see cref="Element"/>. </param>
-        /// <param name="parent"> The parent <see cref="Element"/> of the new <see cref="Element"/>, or <c>null</c> to add it to the <see cref="Root"/> instead. </param>
-        /// <returns> The created <see cref="Element"/>. </returns>
-        //protected Element CreateElement(Template template, AttributeCollection attributes, Element parent = null) => elementManager.CreateElementFromTemplate(template, attributes, parent);
-
         protected void RemoveElement(Element child) => ElementManager.Remove(child);
         #endregion
 
@@ -220,6 +212,7 @@ namespace GuiCookie
         }
 
         protected virtual void PreUpdate(GameTime gameTime) { }
+
         protected virtual void PostUpdate(GameTime gameTime) { }
         #endregion
 

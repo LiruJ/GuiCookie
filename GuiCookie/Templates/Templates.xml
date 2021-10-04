@@ -53,11 +53,11 @@
 	<!--Boxes and labels-->
 	<TextBox Components="Frame, TextBlock" Controller="TextBox"/>
 	<ImageBox Components="Frame, ImageBlock" Controller="ImageBox"/>
-	<BoxIcon Components="Frame, ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze"/>
+	<BoxIcon Components="Frame, ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze" Ratio="1" RatioMode="WidthControlsHeight"/>
 	
 	<TextLabel Components="TextBlock" Controller="TextBox"/>
 	<ImageLabel Components="ImageBlock" Controller="ImageBox"/>
-	<LabelIcon Components="ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze"/>
+	<LabelIcon Components="ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze" Ratio="1" RatioMode="WidthControlsHeight"/>
 
 	<!--Layout controllers-->
 	<CellGrid Components="GridLayout, MouseHandler" Controller="CellGrid"/>

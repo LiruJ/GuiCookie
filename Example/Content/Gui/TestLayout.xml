@@ -103,7 +103,7 @@
 
 			</ListPane>
 		</Panel>
-
+		
 		<Panel Size="40%, 20%">
 			<TextBox Size="100%, 20" Text="Portrait Bar" Style="TitleBar" Name="TitleBar"/>
 

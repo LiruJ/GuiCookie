@@ -255,7 +255,7 @@ namespace GuiCookie.Elements
             foreach (Component component in components.Values) component.OnSetup();
         }
 
-        /// <summary> Called after every element has been fully set up. Use this to set references to other elements. </summary>
+        /// <summary> Called after every element has been fully created. Use this to set references to other elements. </summary>
         public virtual void OnFullSetup() { }
 
         internal void internalOnPostFullSetup()
@@ -335,14 +335,34 @@ namespace GuiCookie.Elements
 
         /// <summary> Called when this element's <see cref="Style"/> or <see cref="StyleState"/> is changed. Fired after <see cref="Component.OnStyleChanged"/>. </summary>
         public virtual void OnStyleChanged() { }
+
+        internal void internalOnDestroyed()
+        {
+            // Tell this element about the destruction.
+            OnDestroyed();
+
+            // Disconnect all signals.
+            onDisabled.DisconnectAll();
+            onEnabled.DisconnectAll();
+
+            // Tell each component about the destruction.
+            foreach (Component component in components.Values)
+                component.OnDestroyed();
+
+            // Tell each child about the destruction.
+            foreach (Element child in this)
+                child.internalOnDestroyed();
+        }
+
+        protected virtual void OnDestroyed() { }
         #endregion
 
         #region Child Functions
         public bool ContainsChild(Element child) => ElementContainer.Contains(child?.ElementContainer);
 
-        /// <summary> </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <summary> Returns the first child of this element that is of the given type <typeparamref name="T"/>, or <c>null</c> if no such child exists. </summary>
+        /// <typeparam name="T"> The type of the desired element. </typeparam>
+        /// <returns> The first element of the given <typeparamref name="T"/>, or <c>null</c> if no such child exists. </returns>
         public T GetChild<T>() where T : Element => ElementContainer.GetChild<T>();
 
         public T GetInterfacedChild<T>() where T : class
@@ -354,26 +374,18 @@ namespace GuiCookie.Elements
             if (!typeof(T).IsInterface) return false;
 
             foreach (Element child in ElementContainer)
-            {
                 if (child is T interfacedElement)
                 {
                     interfacedChild = interfacedElement;
                     return true;
                 }
-            }
 
             return false;
         }
 
         public Element GetChildByName(string name, bool recursive = false) => ElementContainer.GetChildByName(name, recursive);
 
-        public T GetChildByName<T>(string name, bool recursive = false) where T : Element
-        {
-            // Ensure the given name is correct.
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Given name cannot be null.", nameof(name));
-
-            return ElementContainer.GetChildByName<T>(name, recursive);
-        }
+        public T GetChildByName<T>(string name, bool recursive = false) where T : Element => ElementContainer.GetChildByName<T>(name, recursive);
 
         public T GetInterfacedChildByName<T>(string name, bool recursive = false) where T : class
             => TryGetInterfacedChildByName(name, out T interfacedChild, recursive) ? interfacedChild : null;
@@ -413,26 +425,6 @@ namespace GuiCookie.Elements
             // Tell the element container about the destruction.
             ElementContainer.onElementDestroyed();
         }
-
-        internal void internalOnDestroyed()
-        {
-            // Tell this element about the destruction.
-            OnDestroyed();
-
-            // Disconnect all signals.
-            onDisabled.DisconnectAll();
-            onEnabled.DisconnectAll();
-
-            // Tell each component about the destruction.
-            foreach (Component component in components.Values)
-                component.OnDestroyed();
-
-            // Tell each child about the destruction.
-            foreach (Element child in this)
-                child.internalOnDestroyed();
-        }
-
-        protected virtual void OnDestroyed() { }
 
         public IEnumerator<Element> GetEnumerator() => ElementContainer.GetEnumerator();
 
