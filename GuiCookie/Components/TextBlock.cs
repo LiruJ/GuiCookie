@@ -5,6 +5,7 @@ using LiruGameHelperMonoGame.Parsers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Text;
 
 namespace GuiCookie.Components
 {
@@ -174,28 +175,52 @@ namespace GuiCookie.Components
         #endregion
 
         #region Draw Functions
-        public override void Draw(IGuiCamera guiCamera)
+        public override void Draw(IGuiCamera guiCamera) => DrawText(guiCamera, Text);
+
+        public Vector2 CalculateTextPosition(Font fontVariant, Vector2 textSize)
+        {
+            // Get the anchor and pivot, defaulting to the centre.
+            Space textAnchor = fontVariant.TextAnchor ?? new Space(0.5f, Axes.Both);
+            Space textPivot = fontVariant.TextPivot ?? new Space(0.5f, Axes.Both);
+
+            // Calculate the position based on the anchor and pivot. Round this down to avoid blurry text.
+            Vector2 position = Bounds.AbsoluteContentPosition.ToVector2() + (textAnchor.GetScaledSpace(Bounds.ContentSize.ToVector2()) - textPivot.GetScaledSpace(textSize))
+                               + (fontVariant.Offset ?? Vector2.Zero);
+            position.X = (float)Math.Floor(position.X);
+            position.Y = (float)Math.Floor(position.Y);
+            return position;
+        }
+
+        public void DrawText(IGuiCamera guiCamera, string text)
         {
             // Ensure there is text and a font to draw.
-            if (!string.IsNullOrWhiteSpace(Text) && fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font fontVariant))
-            {
-                // Get the anchor and pivot, defaulting to the centre.
-                Space textAnchor = fontVariant.TextAnchor ?? new Space(0.5f, Axes.Both);
-                Space textPivot = fontVariant.TextPivot ?? new Space(0.5f, Axes.Both);
+            if (string.IsNullOrWhiteSpace(text) || !fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font fontVariant)) return;
+            
+            // Calculate the position of the text.
+            Vector2 position = CalculateTextPosition(fontVariant, TextSize);
 
-                // Calculate the position based on the anchor and pivot. Round this down to avoid blurry text.
-                Vector2 position = Bounds.AbsoluteContentPosition.ToVector2() + (textAnchor.GetScaledSpace(Bounds.ContentSize.ToVector2()) - textPivot.GetScaledSpace(TextSize))
-                                   + (fontVariant.Offset ?? Vector2.Zero);
-                position.X = (float)Math.Floor(position.X);
-                position.Y = (float)Math.Floor(position.Y);
+            // If a drop shadow is to be drawn, draw it first.
+            if (fontVariant.DropShadow.HasData)
+                guiCamera.DrawString(fontVariant.SpriteFont, text, position + fontVariant.DropShadow.Offset.Value, fontVariant.DropShadow.Colour.Value);
 
-                // If a drop shadow is to be drawn, draw it first.
-                if (fontVariant.DropShadow.HasData)
-                    guiCamera.DrawString(fontVariant.SpriteFont, Text, position + fontVariant.DropShadow.Offset.Value, fontVariant.DropShadow.Colour.Value);
+            // Draw the text itself.
+            guiCamera.DrawString(fontVariant.SpriteFont, text, position, fontVariant.MixedColour);
+        }
 
-                // Draw the text itself.
-                guiCamera.DrawString(fontVariant.SpriteFont, Text, position, fontVariant.MixedColour);
-            }
+        public void DrawText(IGuiCamera guiCamera, StringBuilder text)
+        {
+            // Ensure there is text and a font to draw.
+            if (text.Length == 0 || !fontCache.TryGetVariantAttribute(CurrentStyleVariant, out Font fontVariant)) return;
+            
+            // Calculate the position of the text.
+            Vector2 position = CalculateTextPosition(fontVariant, fontVariant.SpriteFont.MeasureString(text));
+
+            // If a drop shadow is to be drawn, draw it first.
+            if (fontVariant.DropShadow.HasData)
+                guiCamera.DrawString(fontVariant.SpriteFont, text, position + fontVariant.DropShadow.Offset.Value, fontVariant.DropShadow.Colour.Value);
+
+            // Draw the text itself.
+            guiCamera.DrawString(fontVariant.SpriteFont, text, position, fontVariant.MixedColour);
         }
         #endregion
     }

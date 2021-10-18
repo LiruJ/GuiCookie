@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <Version>1.7.4.2-alpha.5</Version>
+	  <Version>1.7.4.2-alpha.8</Version>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <Authors>Liru</Authors>
     <Company>Lovebirb</Company>
@@ -18,7 +18,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <FileVersion>1.7.4.2</FileVersion>
     <AssemblyVersion>1.7.4.2</AssemblyVersion>
-    <PackageReleaseNotes>Added attributes property to Root. This allows settings for the entire layout sheet to be set in one place and accessed without needing to cast the root.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed small bug with text positions.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
