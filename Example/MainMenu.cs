@@ -1,6 +1,5 @@
 ﻿using GuiCookie;
 using GuiCookie.Elements;
-using GuiCookie.Input;
 
 namespace Example
 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Text;
 
 namespace GuiCookie.Rendering
 {
@@ -9,7 +10,7 @@ namespace GuiCookie.Rendering
         SpriteBatch SpriteBatch { get; }
 
         void DrawString(SpriteFont font, string text, Vector2 position, Color colour);
-
+        void DrawString(SpriteFont font, StringBuilder text, Vector2 position, Color colour);
         void DrawTextureAt(Texture2D texture, Rectangle target);
 
         void DrawTextureAt(Texture2D texture, Rectangle target, Rectangle source, Color colour);
