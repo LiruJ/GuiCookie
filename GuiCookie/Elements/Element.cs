@@ -76,7 +76,7 @@ namespace GuiCookie.Elements
                 name = value ?? string.Empty;
 
                 // Tell the parent container that this element has been renamed, if this element has a parent.
-                if (ElementContainer.Parent != null) ElementContainer.Parent.renameChild(ElementContainer, oldName);
+                ElementContainer.Parent?.renameChild(ElementContainer, oldName);
             }
         }
 

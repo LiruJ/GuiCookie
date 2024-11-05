@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Templates\Templates.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\Templates.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lovebirb.LiruGameHelper" Version="1.1.1" />
+  </ItemGroup>
+
+</Project>

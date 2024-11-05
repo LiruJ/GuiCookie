@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Resources\GuiCookieEffect.mgfxo" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\GuiCookieEffect.mgfxo" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Lovebirb.MonoGame.LiruGameHelper" Version="1.1.0" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GuiCookie.Core\GuiCookie.Core.csproj" />
+  </ItemGroup>
+  <Target Name="CompileShaders" AfterTargets="Build">
+    <Exec Command="dotnet mgfxc Content\Effects\GuiCookieEffect.fx Resources\GuiCookieEffect.mgfxo /Profile:OpenGL" />
+  </Target>
+</Project>

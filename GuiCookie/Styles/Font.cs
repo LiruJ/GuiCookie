@@ -117,10 +117,12 @@ namespace GuiCookie.Styles
             if (!(baseAttribute is Font baseFont)) throw new ArgumentException($"Cannot combine with attribute as it is not a font. {baseAttribute}");
 
             // Override the base's properties.
-            if (SpriteFont == null) SpriteFont = baseFont.SpriteFont;
+            SpriteFont ??= baseFont.SpriteFont;
             TintedColour = TintedColour.CreateCombination(baseFont.TintedColour, TintedColour);
             DropShadow = DropShadow.CreateCombination(baseFont.DropShadow, DropShadow);
-            if (Offset == null) Offset = baseFont.Offset;
+            Offset ??= baseFont.Offset;
+            TextAnchor ??= baseFont.TextAnchor;
+            TextPivot ??= baseFont.TextPivot;
         }
         #endregion
     }

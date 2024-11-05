@@ -1,0 +1,41 @@
+<Project>
+  <!-- https://learn.microsoft.com/nuget/consume-packages/central-package-management -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <!--<GlobalPackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />-->
+  </ItemGroup>
+  <!-- Package versions for package references across all projects -->
+  <PropertyGroup>
+    <UltravioletVersion>2023.7.0.11</UltravioletVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Common -->
+    <PackageVersion Include="Lovebirb.LiruGameHelper" Version="1.1.1" />
+    <PackageVersion Include="Ultraviolet.Core" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.BASS" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.BASS.Native" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.FMOD" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.FMOD.Native" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.FreeType2" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.FreeType2.Native" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.ImGuiViewProvider" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.ImGuiViewProvider.Bindings" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.ImGuiViewProvider.Native" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.OpenGL" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.OpenGL.Bindings" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.OpenGL.Environment" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.Presentation" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.Presentation.Compiler" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.SDL2" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.SDL2.Native" Version="$(UltravioletVersion)" />
+    <!-- NETCore -->
+    <PackageVersion Include="Ultraviolet.Shims.NETCore" Version="$(UltravioletVersion)" />
+    <!-- Android -->
+    <PackageVersion Include="Ultraviolet.Shims.Android" Version="$(UltravioletVersion)" />
+    <PackageVersion Include="Ultraviolet.Shims.Android.FMOD" Version="$(UltravioletVersion)" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+    <RootNamespace>GuiCookie.Ultraviolet</RootNamespace>
+    <AssemblyName>GuiCookie.Ultraviolet</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove=".template.config\**" />
+    <EmbeddedResource Remove=".template.config\**" />
+    <None Remove=".template.config\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lovebirb.LiruGameHelper" />
+    <PackageReference Include="Ultraviolet" />
+    <PackageReference Include="Ultraviolet.BASS" />
+    <PackageReference Include="Ultraviolet.FreeType2" />
+    <PackageReference Include="Ultraviolet.OpenGL" />
+    <PackageReference Include="Ultraviolet.SDL2" />
+    <PackageReference Include="Ultraviolet.Shims.NETCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\GuiCookie.Core\GuiCookie.Core.csproj" />
+  </ItemGroup>
+
+</Project>

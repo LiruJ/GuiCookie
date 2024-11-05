@@ -10,9 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.IO;
 using System.Reflection;
-using System.Xml;
 
 namespace GuiCookie
 {
@@ -117,29 +115,14 @@ namespace GuiCookie
             ElementManager elementManager = new ElementManager(root, componentManager, templateManager, styleManager, elementCache, serviceProvider);
             serviceProvider.AddService(elementManager);
 
-            // Add an extension to the path if it is missing.
-            if (!Path.HasExtension(sheetPath))
-                sheetPath = Path.ChangeExtension(sheetPath, ".xml");
-
-            // Convert the path to be relative to the content.
-            sheetPath = Path.Combine(contentManager.RootDirectory, sheetPath);
-
-            // If the file does not exist, throw an exception.
-            if (!File.Exists(sheetPath)) 
-                throw new FileNotFoundException("The given gui sheet file path does not exist.", sheetPath);
-
-            // Load the sheet.
-            XmlDocument guiSheet = new XmlDocument();
-            guiSheet.Load(sheetPath);
-
             // Initialise the root.
-            root.InternalInitialise(guiSheet, styleManager, templateManager, inputManager, dragAndDropManager, elementManager, gameWindow);
+            root.InternalInitialise(sheetPath, contentManager, styleManager, templateManager, inputManager, dragAndDropManager, elementManager, gameWindow);
 
             // Return the root.
             return root;
         }
 
-        /// <summary> Creates the default Monogame <see cref="GuiCamera"/> with a new <see cref="SpriteBatch"/>. </summary>
+        /// <summary> Creates the default MonoGame <see cref="GuiCamera"/> with a new <see cref="SpriteBatch"/>. </summary>
         /// <returns></returns>
         public GuiCamera CreateGuiCamera() => new GuiCamera(new SpriteBatch(graphicsDevice));
         #endregion

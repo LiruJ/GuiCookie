@@ -8,7 +8,9 @@ using GuiCookie.Styles;
 using GuiCookie.Templates;
 using LiruGameHelper.XML;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using System;
+using System.IO;
 using System.Xml;
 
 namespace GuiCookie
@@ -23,6 +25,12 @@ namespace GuiCookie
         #endregion
 
         #region Properties
+        /// <summary> The location of the layout sheet relative to the content folder. </summary>
+        public string ContentSheetPath { get; private set; }
+
+        /// <summary> The location of the layout sheet relative to the build/solution folder. </summary>
+        public string MainSheetPath { get; private set; }
+
         /// <summary> Holds the root-level elements and handles element creation. </summary>
         public ElementManager ElementManager { get; private set; }
 
@@ -57,15 +65,32 @@ namespace GuiCookie
 
         #region Initialisation Functions       
         /// <summary> Creates a new root from the given <paramref name="guiSheet"/> and dependencies. </summary>
-        /// <param name="guiSheet"> The XML layout document. </param>
+        /// <param name="sheetPath"> The path of the .xml file relative to the content's root directory. </param>
+        /// <param name="contentManager"> The MonoGame <see cref="ContentManager"/>. </param>
         /// <param name="styleManager"> The styles. </param>
         /// <param name="templateManager"> The templates. </param>
         /// <param name="inputManager"> The object for handling user input. </param>
         /// <param name="dragAndDropManager"> The drag and drop manager. </param>
         /// <param name="elementManager"> The elements. </param>
         /// <param name="gameWindow"> The MonoGame <see cref="GameWindow"/>. </param>
-        internal void InternalInitialise(XmlDocument guiSheet, StyleManager styleManager, TemplateManager templateManager, InputManager inputManager, DragAndDropManager dragAndDropManager, ElementManager elementManager, GameWindow gameWindow)
+        internal void InternalInitialise(string sheetPath, ContentManager contentManager, StyleManager styleManager, TemplateManager templateManager, InputManager inputManager, DragAndDropManager dragAndDropManager, ElementManager elementManager, GameWindow gameWindow)
         {
+            // Add an extension to the path if it is missing.
+            if (!Path.HasExtension(sheetPath))
+                sheetPath = Path.ChangeExtension(sheetPath, ".xml");
+
+            // Convert the path to be relative to the content.
+            ContentSheetPath = sheetPath;
+            MainSheetPath = Path.Combine(contentManager.RootDirectory, sheetPath);
+
+            // If the file does not exist, throw an exception.
+            if (!File.Exists(MainSheetPath))
+                throw new FileNotFoundException("The given gui sheet file path does not exist.", MainSheetPath);
+
+            // Load the sheet.
+            XmlDocument guiSheet = new XmlDocument();
+            guiSheet.Load(MainSheetPath);
+
             // Bind the window changing size.
             gameWindow.ClientSizeChanged += screenResized;
             
@@ -130,6 +155,19 @@ namespace GuiCookie
         #endregion
 
         #region Load Functions
+        /// <summary> Reloads the entire GUI, including all required templates and styles. </summary>
+        /// <param name="loadFromBuiltFolder">
+        /// If this is <c>true</c>, the .xml file will be found relative to the folder of the built project.
+        /// Otherwise; the file is found relative to the solution (where it is usually edited before building).
+        /// </param>
+        public virtual void Reload(bool loadFromBuiltFolder = false)
+        {
+            // Create the file path depending on the given boolean.
+            string filePath = loadFromBuiltFolder ? MainSheetPath : '\\' + MainSheetPath;
+
+            throw new NotImplementedException();
+        }
+
         /// <summary> Loads and saves the style sheets from the given <paramref name="mainNode"/> into the given <paramref name="styleManager"/>. </summary>
         /// <param name="styleManager"> The <see cref="Styles.StyleManager"/> into which the <paramref name="mainNode"/> is loaded. </param>
         /// <param name="mainNode"> The main <see cref="XmlNode"/> of the layout sheet. </param>

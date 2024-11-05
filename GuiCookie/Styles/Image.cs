@@ -14,7 +14,7 @@ namespace GuiCookie.Styles
 
         public Rectangle Source { get; set; }
 
-        public bool IsEmpty => string.IsNullOrWhiteSpace(Name) && Texture == null && Source == Rectangle.Empty;
+        public readonly bool IsEmpty => !(!string.IsNullOrWhiteSpace(Name) || Texture != null || Source != Rectangle.Empty);
         #endregion
 
         #region Constructors
@@ -33,16 +33,10 @@ namespace GuiCookie.Styles
         #region Equality Functions
         public override bool Equals(object obj) => obj is Image image && Equals(image);
 
-        public bool Equals(Image other) => EqualityComparer<Texture2D>.Default.Equals(Texture, other.Texture) &&
+        public readonly bool Equals(Image other) => EqualityComparer<Texture2D>.Default.Equals(Texture, other.Texture) &&
                    Source.Equals(other.Source);
 
-        public override int GetHashCode()
-        {
-            int hashCode = 363494572;
-            hashCode = hashCode * -1521134295 + EqualityComparer<Texture2D>.Default.GetHashCode(Texture);
-            hashCode = hashCode * -1521134295 + Source.GetHashCode();
-            return hashCode;
-        }
+        public override readonly int GetHashCode() => HashCode.Combine(Texture, Source);
 
         public static bool operator ==(Image left, Image right) => left.Equals(right);
 

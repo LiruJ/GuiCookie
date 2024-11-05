@@ -410,7 +410,7 @@
             <summary> Sets any <c>null</c> values to those in the given <paramref name="baseValue"/>. </summary>
             <param name="baseValue"> The value over which to combine. </param>
         </member>
-        <member name="F:GuiCookie.Elements.Button.mouseHandler">
+        <member name="P:GuiCookie.Elements.Button.MouseHandler">
             <summary> The component that handles mouse events. </summary>
         </member>
         <member name="P:GuiCookie.Elements.Button.LeftClicked">
@@ -912,6 +912,12 @@
         <member name="T:GuiCookie.Root">
             <summary> The base class for a UI controller, inherit from this and create a new inherited class via the <see cref="T:GuiCookie.UIManager"/> to create a custom UI controller. </summary>
         </member>
+        <member name="P:GuiCookie.Root.ContentSheetPath">
+            <summary> The location of the layout sheet relative to the content folder. </summary>
+        </member>
+        <member name="P:GuiCookie.Root.MainSheetPath">
+            <summary> The location of the layout sheet relative to the build/solution folder. </summary>
+        </member>
         <member name="P:GuiCookie.Root.ElementManager">
             <summary> Holds the root-level elements and handles element creation. </summary>
         </member>
@@ -939,9 +945,10 @@
         <member name="P:GuiCookie.Root.HasSetUp">
             <summary> Is <c>true</c> if the layout file has been loaded and the starting elements set up; otherwise <c>false</c>. </summary>
         </member>
-        <member name="M:GuiCookie.Root.InternalInitialise(System.Xml.XmlDocument,GuiCookie.Styles.StyleManager,GuiCookie.Templates.TemplateManager,GuiCookie.Input.InputManager,GuiCookie.Input.DragAndDrop.DragAndDropManager,GuiCookie.Elements.ElementManager,Microsoft.Xna.Framework.GameWindow)">
+        <member name="M:GuiCookie.Root.InternalInitialise(System.String,Microsoft.Xna.Framework.Content.ContentManager,GuiCookie.Styles.StyleManager,GuiCookie.Templates.TemplateManager,GuiCookie.Input.InputManager,GuiCookie.Input.DragAndDrop.DragAndDropManager,GuiCookie.Elements.ElementManager,Microsoft.Xna.Framework.GameWindow)">
             <summary> Creates a new root from the given <paramref name="guiSheet"/> and dependencies. </summary>
-            <param name="guiSheet"> The XML layout document. </param>
+            <param name="sheetPath"> The path of the .xml file relative to the content's root directory. </param>
+            <param name="contentManager"> The MonoGame <see cref="T:Microsoft.Xna.Framework.Content.ContentManager"/>. </param>
             <param name="styleManager"> The styles. </param>
             <param name="templateManager"> The templates. </param>
             <param name="inputManager"> The object for handling user input. </param>
@@ -960,6 +967,13 @@
         </member>
         <member name="M:GuiCookie.Root.PostInitialise">
             <summary> Is called once everything has been set up. </summary>
+        </member>
+        <member name="M:GuiCookie.Root.Reload(System.Boolean)">
+            <summary> Reloads the entire GUI, including all required templates and styles. </summary>
+            <param name="loadFromBuiltFolder">
+            If this is <c>true</c>, the .xml file will be found relative to the folder of the built project.
+            Otherwise; the file is found relative to the solution (where it is usually edited before building).
+            </param>
         </member>
         <member name="M:GuiCookie.Root.loadStyleSheets(GuiCookie.Styles.StyleManager,System.Xml.XmlNode)">
             <summary> Loads and saves the style sheets from the given <paramref name="mainNode"/> into the given <paramref name="styleManager"/>. </summary>
@@ -1252,7 +1266,7 @@
             <returns> A <see cref="T:GuiCookie.Root"/> object with the given type, constructed with the given parameters. </returns>
         </member>
         <member name="M:GuiCookie.UIManager.CreateGuiCamera">
-            <summary> Creates the default Monogame <see cref="T:GuiCookie.Rendering.GuiCamera"/> with a new <see cref="T:Microsoft.Xna.Framework.Graphics.SpriteBatch"/>. </summary>
+            <summary> Creates the default MonoGame <see cref="T:GuiCookie.Rendering.GuiCamera"/> with a new <see cref="T:Microsoft.Xna.Framework.Graphics.SpriteBatch"/>. </summary>
             <returns></returns>
         </member>
     </members>

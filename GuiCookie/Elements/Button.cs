@@ -8,22 +8,22 @@ namespace GuiCookie.Elements
     {
         #region Components
         /// <summary> The component that handles mouse events. </summary>
-        protected MouseHandler mouseHandler;
+        public MouseHandler MouseHandler { get; protected set; }
         #endregion
 
         #region Signals
         /// <summary> Fired when the button is left clicked. </summary>
-        public IConnectableSignal LeftClicked => mouseHandler.LeftClicked;
+        public IConnectableSignal LeftClicked => MouseHandler.LeftClicked;
 
         /// <summary> Fired when the button is right clicked. </summary>
-        public IConnectableSignal RightClicked => mouseHandler.RightClicked;
+        public IConnectableSignal RightClicked => MouseHandler.RightClicked;
         #endregion
 
         #region Initialisation Functions
         public override void OnCreated()
         { 
             // Set components.
-            mouseHandler = GetComponent<MouseHandler>() ?? throw new Exception("Button's mouse handler is missing.");
+            MouseHandler = GetComponent<MouseHandler>() ?? throw new Exception("Button's mouse handler is missing.");
         }
         #endregion
 
