@@ -1,5 +1,6 @@
 ﻿using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Elements;
+using GuiCookie.Core.Rendering;
 using System.Drawing;
 
 namespace GuiCookie.Core.Components

@@ -22,16 +22,16 @@ namespace GuiCookie.MonoGame.Rendering
         #endregion
 
         #region Equality Functions
-        public override bool Equals(object obj) => obj is MonoGameImage image && Equals(image);
+        public override bool Equals(object? obj) => obj is MonoGameImage image && Equals(image);
 
         public bool Equals(MonoGameImage other) => EqualityComparer<Texture2D>.Default.Equals(Texture, other.Texture) &&
                    Source.Equals(other.Source);
 
         public override int GetHashCode() => HashCode.Combine(Texture, Source);
 
-        public static bool operator ==(MonoGameImage left, MonoGameImage right) => left.Equals(right);
+        public static bool operator ==(MonoGameImage? left, MonoGameImage? right) => left != null && left.Equals(right);
 
-        public static bool operator !=(MonoGameImage left, MonoGameImage right) => !(left == right);
+        public static bool operator !=(MonoGameImage? left, MonoGameImage? right) => !(left == right);
         #endregion
     }
 }

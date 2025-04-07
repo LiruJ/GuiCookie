@@ -82,7 +82,10 @@ namespace GuiCookie.Core.Styles.DataStructures
         /// <returns> The combined colour. </returns>
         /// <remarks> If both <paramref name="colour"/> and <paramref name="tint"/> have values, the mixed value is used. Otherwise; defaults to using the first non-null value in the order: Colour, Tint, <see cref="Color.White"/>.   </remarks>
         public static Color CalculateMixedColour(Color? colour, Color? tint) => colour.HasValue && tint.HasValue
-            ? new Color(colour.Value.ToVector4() * tint.Value.ToVector4())
+            ? Color.FromArgb((int)MathF.Floor((colour.Value.A / byte.MaxValue) * (tint.Value.A / byte.MaxValue) * byte.MaxValue),
+                (int)MathF.Floor((colour.Value.R / byte.MaxValue) * (tint.Value.R / byte.MaxValue) * byte.MaxValue),
+                (int)MathF.Floor((colour.Value.G / byte.MaxValue) * (tint.Value.G / byte.MaxValue) * byte.MaxValue),
+                (int)MathF.Floor((colour.Value.B / byte.MaxValue) * (tint.Value.B / byte.MaxValue) * byte.MaxValue))
             : colour ?? tint ?? Color.White;
         #endregion
 

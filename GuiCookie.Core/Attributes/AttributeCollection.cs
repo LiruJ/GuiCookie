@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.DataStructures;
+using LiruGameHelper.Parsers;
 using System.Collections;
 using System.Drawing;
 using System.Globalization;
@@ -163,9 +164,9 @@ namespace GuiCookie.Core.Attributes
 
         public Sides GetAttributeOrDefault(string attributeName, Sides defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, Sides.TryParse);
 
-        public Vector2 GetAttributeOrDefault(string attributeName, Vector2 defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, ToVector2.TryParse);
+        public Vector2 GetAttributeOrDefault(string attributeName, Vector2 defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, ToVector.TryParse);
 
-        public Vector3 GetAttributeOrDefault(string attributeName, Vector3 defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, ToVector3.TryParse);
+        public Vector3 GetAttributeOrDefault(string attributeName, Vector3 defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, ToVector.TryParse);
 
         public Color GetAttributeOrDefault(string attributeName, Color defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, Colour.TryParse);
         #endregion

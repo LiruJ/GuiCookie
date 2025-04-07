@@ -2,6 +2,7 @@
 using GuiCookie.Core.Components;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Rendering;
+using GuiCookie.Core.Roots;
 using GuiCookie.Core.Styles;
 using GuiCookie.Core.Templates;
 using LiruGameHelper.Signals;
@@ -432,12 +433,12 @@ namespace GuiCookie.Core.Elements
         /// <summary> Gets the component with the type <typeparamref name="T"/>, or null if the component does not exist. </summary>
         /// <typeparam name="T"> The type of <see cref="Component"/> to get. </typeparam>
         /// <returns></returns>
-        public T GetComponent<T>() where T : Component
-            => components.TryGetValue(typeof(T), out Component component) ? (T)component : null;
+        public T? GetComponent<T>() where T : Component
+            => components.TryGetValue(typeof(T), out Component? component) ? (T)component : null;
 
-        public bool TryGetComponent<T>(out T component) where T : Component
+        public bool TryGetComponent<T>(out T? component) where T : Component
         {
-            if (components.TryGetValue(typeof(T), out Component childComponent))
+            if (components.TryGetValue(typeof(T), out Component? childComponent))
             {
                 component = (T)childComponent;
                 return true;
@@ -452,10 +453,10 @@ namespace GuiCookie.Core.Elements
         /// <summary> Gets the first component that implements the given interface <typeparamref name="T"/>, or null if none exist or <typeparamref name="T"/> was not an interface. </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetInterfacedComponent<T>() where T : class
-            => TryGetInterfacedComponent(out T interfacedComponent) ? interfacedComponent : null;
+        public T? GetInterfacedComponent<T>() where T : class
+            => TryGetInterfacedComponent(out T? interfacedComponent) ? interfacedComponent : null;
 
-        public bool TryGetInterfacedComponent<T>(out T interfacedComponent) where T : class
+        public bool TryGetInterfacedComponent<T>(out T? interfacedComponent) where T : class
         {
             interfacedComponent = null;
             if (!typeof(T).IsInterface) return false;

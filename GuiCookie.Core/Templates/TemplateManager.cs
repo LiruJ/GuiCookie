@@ -11,15 +11,7 @@ namespace GuiCookie.Core.Templates
         #endregion
 
         #region Fields
-        private readonly Dictionary<string, Template> templatesByName;
-        #endregion
-
-        #region Constructors
-        internal TemplateManager()
-        {
-            // Initialise the templates collection.
-            templatesByName = new Dictionary<string, Template>();
-        }
+        private readonly Dictionary<string, Template> templatesByName = [];
         #endregion
 
         #region Get Functions

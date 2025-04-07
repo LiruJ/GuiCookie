@@ -10,10 +10,10 @@ namespace GuiCookie.MonoGame.Input
         #endregion
 
         #region Key Functions
-        public bool IsKeyDown(GUIKey key) => KeyboardState.IsKeyDown(key);
+        public bool IsKeyDown(GUIKey key) => KeyboardState.IsKeyDown((Keys)key);
         public bool IsKeyDown(Keys key) => KeyboardState.IsKeyDown(key);
 
-        public bool IsKeyUp(GUIKey key) => KeyboardState.IsKeyUp(key);
+        public bool IsKeyUp(GUIKey key) => KeyboardState.IsKeyUp((Keys)key);
         public bool IsKeyUp(Keys key) => KeyboardState.IsKeyUp(key);
         #endregion
     }

@@ -6,14 +6,24 @@ namespace GuiCookie.Core.Input
 {
     public abstract class InputManager(IKeyboardState currentKeyboardState, IKeyboardState previousKeyboardState, IMouseState currentMouseState, IMouseState previousMouseState) : IUpdateableUIService
     {
+        #region Properties
+        public int Order { get; } = 0;
+        #endregion
+
         #region State Properties
-        /// <summary> The current position of the mouse. </summary>
+        /// <summary>
+        /// The current position of the mouse.
+        /// </summary>
         public Point MousePosition => CurrentMouseState.Position;
 
-        /// <summary> Gets the value representing the position of the <see cref="Mouse"/> when the left click button was pressed, only changing when the button is released then pressed again. </summary>
+        /// <summary>
+        /// Gets the value representing the position of the <see cref="Mouse"/> when the left click button was pressed, only changing when the button is released then pressed again.
+        /// </summary>
         public Point MouseLeftClickPosition { get; private set; }
 
-        /// <summary> Gets the value representing the position of the <see cref="Mouse"/> when the right click button was pressed, only changing when the button is released then pressed again. </summary>
+        /// <summary> 
+        /// Gets the value representing the position of the <see cref="Mouse"/> when the right click button was pressed, only changing when the button is released then pressed again.
+        /// </summary>
         public Point MouseRightClickPosition { get; private set; }
 
         /// <summary>
@@ -89,9 +99,19 @@ namespace GuiCookie.Core.Input
         #endregion
 
         #region Update Functions
-        public virtual void Update(TimeSpan elapsedTime, TimeSpan totalTime)
+        public virtual void PreUpdate(TimeSpan elapsedTime, TimeSpan totalTime)
         {
             TextInput.Clear();
+        }
+
+        public virtual void Update(TimeSpan elapsedTime, TimeSpan totalTime)
+        {
+
+        }
+
+        public virtual void PostUpdate(TimeSpan elapsedTime, TimeSpan totalTime)
+        {
+
         }
         #endregion
     }

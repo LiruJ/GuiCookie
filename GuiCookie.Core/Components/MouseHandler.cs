@@ -6,44 +6,52 @@ using System.Drawing;
 
 namespace GuiCookie.Core.Components
 {
-    /// <summary> Use this <see cref="Component"/> on an <see cref="Element"/> to handle click detection and mouse events. </summary>
-    /// <param name="inputManager"> The <see cref="InputManager"/> used for click detection. </param>
-    public class MouseHandler(InputManager inputManager) : Component
+    /// <summary>
+    /// Use this <see cref="Component"/> on an <see cref="Element"/> to handle click detection and mouse events.
+    /// </summary>
+    /// <param name="elementInputManager"> The <see cref="ElementInputManager"/> used for click detection. </param>
+    public class MouseHandler(ElementInputManager elementInputManager) : Component
     {
         #region Constants
         private const string clickTypeAttributeName = "ClickType";
         #endregion
 
-        #region Dependencies
-        /// <summary> The <see cref="inputManager"/> used to determine if the handler was clicked. </summary>
-        private readonly InputManager inputManager = inputManager;
-        #endregion
-
         #region Properties
-        /// <summary> Quick access for <see cref="InputManager.MousePosition"/>. </summary>
-        public Point AbsoluteMousePosition => inputManager.MousePosition;
+        /// <summary>
+        /// The position of the mouse relative to this component's <see cref="Element"/>.
+        /// </summary>
+        public Point RelativeMousePosition => PointExtensions.Subtract(elementInputManager.InputManager.MousePosition, Element.Bounds.AbsoluteTotalPosition);
 
-        /// <summary> The position of the mouse relative to this component's <see cref="Element"/>. </summary>
-        public Point RelativeMousePosition => PointExtensions.Subtract(inputManager.MousePosition, Element.Bounds.AbsoluteTotalPosition);
-
-        /// <summary> Is <c>true</c> if the mouse was left clicked on the <see cref="Element"/> and is currently being held down, regardless of mouse position. </summary>
+        /// <summary>
+        /// Is <c>true</c> if the mouse was left clicked on the <see cref="Element"/> and is currently being held down, regardless of mouse position.
+        /// </summary>
         public bool IsClickDragged { get; private set; }
 
-        /// <summary> Is <c>true</c> if the mouse is over the <see cref="Element"/>. </summary>
+        /// <summary>
+        /// Is <c>true</c> if the mouse is over the <see cref="Element"/>.
+        /// </summary>
         public bool IsMousedOver { get; private set; }
 
-        /// <summary> Is <c>true</c> if the mouse is over the <see cref="Element"/> and the <see cref="InputManager.MousedOverClickable"/> is the <see cref="Element"/>. </summary>
+        /// <summary>
+        /// Is <c>true</c> if the mouse is over the <see cref="Element"/> and the <see cref="InputManager.MousedOverClickable"/> is the <see cref="Element"/>.
+        /// </summary>
         public bool IsMainMousedOver { get; private set; }
 
-        /// <summary> <c>true</c> if the mouse is over the <see cref="Element"/> and the left click button is pressed. </summary>
+        /// <summary>
+        /// <c>true</c> if the mouse is over the <see cref="Element"/> and the left click button is pressed.
+        /// </summary>
         /// <remarks> Will be true for every frame that the mouse is over the element and clicked, hence it is better to add a listener for the LeftClicked signal. </remarks>
         public bool IsLeftClicked { get; private set; }
 
-        /// <summary> <c>true</c> if the mouse is over the <see cref="Element"/> and the right click button is pressed. </summary>
+        /// <summary>
+        /// <c>true</c> if the mouse is over the <see cref="Element"/> and the right click button is pressed.
+        /// </summary>
         /// <remarks> Will be true for every frame that the mouse is over the element and clicked, hence it is better to add a listener for the RightClicked signal. </remarks>
         public bool IsRightClicked { get; private set; }
 
-        /// <summary> The mode of click detection to use. </summary>
+        /// <summary>
+        /// The mode of click detection to use.
+        /// </summary>
         public ClickType ClickType { get; set; }
         #endregion
 
@@ -96,10 +104,12 @@ namespace GuiCookie.Core.Components
 
             // If the element is moused over by the input manager, and the mouse is within the bounds of the element, mousedOver is true.
             // Also check against the previous frame's moused over value to check if the mouse has entered or left the element's bounds.
-            bool isMousedOver = Element.Bounds.AbsoluteContains(inputManager.MousePosition);
-            bool isMainMousedOver = inputManager.MousedOverClickable == Element && isMousedOver;
-            if (IsMousedOver && !isMousedOver && Element.Enabled) mouseLeft.Invoke();
-            if (!IsMousedOver && isMousedOver && Element.Enabled) mouseEntered.Invoke();
+            bool isMousedOver = Element.Bounds.AbsoluteContains(elementInputManager.InputManager.MousePosition);
+            bool isMainMousedOver = elementInputManager.MousedOverClickable == Element && isMousedOver;
+            if (IsMousedOver && !isMousedOver && Element.Enabled)
+                mouseLeft.Invoke();
+            if (!IsMousedOver && isMousedOver && Element.Enabled)
+                mouseEntered.Invoke();
 
             // If the element is moused over, and the mouse was clicked within the element, fire the clicked events.
             // The left clicked function only fires when there is a change in the mouse state in the previous frame, and the mouse started and ended within the element.
@@ -107,12 +117,16 @@ namespace GuiCookie.Core.Components
                 switch (ClickType)
                 {
                     case ClickType.OnMouseDown:
-                        if (inputManager.IsLeftMouseDown && inputManager.WasLeftMouseUp && Element.Bounds.AbsoluteContains(inputManager.MouseLeftClickPosition)) leftClicked.Invoke();
-                        if (inputManager.IsRightMouseDown && inputManager.WasRightMouseUp && Element.Bounds.AbsoluteContains(inputManager.MouseRightClickPosition)) rightClicked.Invoke();
+                        if (elementInputManager.InputManager.IsLeftMouseDown && elementInputManager.InputManager.WasLeftMouseUp && Element.Bounds.AbsoluteContains(elementInputManager.InputManager.MouseLeftClickPosition))
+                            leftClicked.Invoke();
+                        if (elementInputManager.InputManager.IsRightMouseDown && elementInputManager.InputManager.WasRightMouseUp && Element.Bounds.AbsoluteContains(elementInputManager.InputManager.MouseRightClickPosition))
+                            rightClicked.Invoke();
                         break;
                     case ClickType.OnMouseUp:
-                        if (inputManager.IsLeftMouseUp && inputManager.WasLeftMouseDown && Element.Bounds.AbsoluteContains(inputManager.MouseLeftClickPosition)) leftClicked.Invoke();
-                        if (inputManager.IsRightMouseUp && inputManager.WasRightMouseDown && Element.Bounds.AbsoluteContains(inputManager.MouseRightClickPosition)) rightClicked.Invoke();
+                        if (elementInputManager.InputManager.IsLeftMouseUp && elementInputManager.InputManager.WasLeftMouseDown && Element.Bounds.AbsoluteContains(elementInputManager.InputManager.MouseLeftClickPosition))
+                            leftClicked.Invoke();
+                        if (elementInputManager.InputManager.IsRightMouseUp && elementInputManager.InputManager.WasRightMouseDown && Element.Bounds.AbsoluteContains(elementInputManager.InputManager.MouseRightClickPosition))
+                            rightClicked.Invoke();
                         break;
                 }
 
@@ -121,9 +135,9 @@ namespace GuiCookie.Core.Components
             IsMainMousedOver = isMainMousedOver;
 
             // Set the left and right clicked.
-            IsClickDragged = Element.Bounds.AbsoluteContains(inputManager.MouseLeftClickPosition) && inputManager.IsLeftMouseDown;
-            IsLeftClicked = IsMainMousedOver && inputManager.IsLeftMouseDown;
-            IsRightClicked = IsMainMousedOver && inputManager.IsRightMouseDown;
+            IsClickDragged = Element.Bounds.AbsoluteContains(elementInputManager.InputManager.MouseLeftClickPosition) && elementInputManager.InputManager.IsLeftMouseDown;
+            IsLeftClicked = IsMainMousedOver && elementInputManager.InputManager.IsLeftMouseDown;
+            IsRightClicked = IsMainMousedOver && elementInputManager.InputManager.IsRightMouseDown;
         }
         #endregion
     }

@@ -1,9 +1,10 @@
-﻿using GuiCookie.Core.DataStructures;
-using GuiCookie.Core.Rendering;
+﻿using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles;
+using GuiCookie.MonoGame.Extensions;
 using GuiCookie.MonoGame.Rendering;
-using LiruGameHelper.Parsers;
 using LiruGameHelper.XML;
+using LiruGameHelperMonoGame.Parsers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -43,18 +44,19 @@ namespace GuiCookie.MonoGame.Styles
             Texture2D texture = ContentManager.Load<Texture2D>(Path.Combine(rootFolder, imageURI));
 
             // Add the root image to the dictionary.
-            AddImage(new Image(imageNode.Name, texture, texture.Bounds));
+            AddImage(new MonoGameImage(imageNode.Name, texture, texture.Bounds.ToDrawingRectangle()));
 
             // If a tilemap tag was given and it parses into a point, use the image as a tilemap.
             bool usingGrid = imageNode.TryParseAttributeValue(tilemapTagName, ToPoint.TryParse, out Point tilemapSize);
-            GUIPoint currentGridCell = GUIPoint.Zero;
-            GUIPoint tileSize = usingGrid ? (texture.Bounds.Size.ToVector2() / tilemapSize.ToVector2()).ToPoint() : GUIPoint.Zero;
+            Point currentGridCell = Point.Zero;
+            Point tileSize = usingGrid ? (texture.Bounds.Size.ToVector2() / tilemapSize.ToVector2()).ToPoint() : Point.Zero;
 
+            
             // If there are child nodes, add them as images.
             foreach (XmlNode sourceNode in imageNode)
             {
                 // Create a new source rectangle to be used.
-                GUIRectangle sourceRectangle = GUIRectangle.Empty;
+                Rectangle sourceRectangle = Rectangle.Empty;
 
                 // If a bounds tag was given, try to use that.
                 if (sourceNode.GetAttributeValue(boundsTagName, out string boundsString))
@@ -97,7 +99,7 @@ namespace GuiCookie.MonoGame.Styles
                     throw new Exception($"Image source with name {sourceNode.Name} does not have enough information to be created. Must have either a {tilePositionTagName} or {boundsTagName} attribute.");
 
                 // Create a new image with the root texture and user-defined bounds.
-                Image image = new Image(sourceNode.Name, texture, sourceRectangle);
+                Image image = new MonoGameImage(sourceNode.Name, texture, sourceRectangle.ToDrawingRectangle());
 
                 // Add the image to the dictionary.
                 AddImage(image);

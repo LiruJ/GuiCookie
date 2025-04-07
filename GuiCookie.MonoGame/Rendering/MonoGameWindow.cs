@@ -1,5 +1,4 @@
-﻿using GuiCookie.Core.DataStructures;
-using GuiCookie.Core.Rendering;
+﻿using GuiCookie.Core.Rendering;
 using GuiCookie.MonoGame.Extensions;
 using Microsoft.Xna.Framework;
 using System;
@@ -12,6 +11,10 @@ namespace GuiCookie.MonoGame.Rendering
         private readonly GameWindow gameWindow;
         #endregion
 
+        #region Properties
+        public override System.Drawing.Point Size => gameWindow.ClientBounds.Size.ToDrawingPoint();
+        #endregion
+
         #region Constructors
         public MonoGameWindow(GameWindow gameWindow)
         {
@@ -22,14 +25,13 @@ namespace GuiCookie.MonoGame.Rendering
         #endregion
 
         #region Event Functions
-        private void onMonoGameWindowSizeChanged(object state, EventArgs e)
+        private void onMonoGameWindowSizeChanged(object? state, EventArgs e)
         {
             if (state is not GameWindow resizedWindow)
                 return;
 
             // Invoke the event.
-            GUIPoint newSize = resizedWindow.ClientBounds.Size.ToGUIPoint();
-            onSizeChanged.Invoke(newSize);
+            onSizeChanged.Invoke(resizedWindow.ClientBounds.Size.ToDrawingPoint());
         }
         #endregion
 

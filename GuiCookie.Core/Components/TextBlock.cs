@@ -1,6 +1,7 @@
 ﻿using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
+using GuiCookie.Core.Styles;
 using GuiCookie.Core.Styles.Attributes;
 using GuiCookie.Core.Styles.DataStructures;
 using LiruGameHelper.Parsers;
@@ -10,7 +11,7 @@ using System.Text;
 
 namespace GuiCookie.Core.Components
 {
-    public class TextBlock : Component
+    public class TextBlock(ResourceManager resourceManager) : Component
     {
         #region Constants
         private const string textAttributeName = "Text";
@@ -121,20 +122,20 @@ namespace GuiCookie.Core.Components
             if (Element.Attributes.HasAttribute(FontStyleAttribute.PivotAttributeName)) TextPivot = Element.Attributes.GetAttribute(FontStyleAttribute.PivotAttributeName, Space.Parse);
 
             // Set the drop shadow.
-            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(Root.StyleManager.ResourceManager, Element.Attributes));
+            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, Element.Attributes));
 
             // Set the offet.
             if (Element.Attributes.HasAttribute(FontStyleAttribute.OffsetAttributeName)) Offset = Element.Attributes.GetAttribute(FontStyleAttribute.OffsetAttributeName, ToVector.Parse2);
 
             // Set the colour and tint.
             if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font))
-                font!.TintedColour = TintedColour.CreateCombination(font.TintedColour, new TintedColour(Root.StyleManager.ResourceManager, Element.Attributes));
+                font!.TintedColour = TintedColour.CreateCombination(font.TintedColour, new TintedColour(resourceManager, Element.Attributes));
 
             if (Element.Attributes.HasAttribute(FontStyleAttribute.FontAttributeName))
             {
                 string fontName = Element.Attributes.GetAttributeOrDefault(FontStyleAttribute.FontAttributeName, string.Empty);
                 Font = !string.IsNullOrWhiteSpace(fontName) ?
-                    Root.StyleManager.ResourceManager.FontsByName.TryGetValue(fontName, out SpriteFont spriteFont) ? spriteFont : throw new Exception($"Font resource named \"{fontName}\" does not exist.")
+                    resourceManager.FontsByName.TryGetValue(fontName, out Font? spriteFont) ? spriteFont : throw new Exception($"Font resource named \"{fontName}\" does not exist.")
                     : null;
             }
         }

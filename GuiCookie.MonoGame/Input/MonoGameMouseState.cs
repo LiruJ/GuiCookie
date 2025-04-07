@@ -1,14 +1,14 @@
-﻿using GuiCookie.Core.DataStructures;
-using GuiCookie.Core.Input;
+﻿using GuiCookie.Core.Input;
 using GuiCookie.MonoGame.Extensions;
 using Microsoft.Xna.Framework.Input;
+using System.Drawing;
 
 namespace GuiCookie.MonoGame.Input
 {
     public class MonoGameMouseState : IMouseState
     {
         #region Position Properties
-        public GUIPoint Position => MouseState.Position.ToGUIPoint();
+        public Point Position => MouseState.Position.ToDrawingPoint();
         #endregion
 
         #region Mouse Properties

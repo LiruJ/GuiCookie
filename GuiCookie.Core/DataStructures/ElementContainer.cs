@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Elements;
+using GuiCookie.Core.Roots;
 using LiruGameHelper.Signals;
 using System.Collections;
 
@@ -101,18 +102,18 @@ namespace GuiCookie.Core.DataStructures
         #endregion
 
         #region Backing Fields
-        private readonly Root root;
+        private readonly Root? root;
 
-        private ElementContainer parent;
+        private ElementContainer? parent;
         #endregion
 
         #region Properties
         /// <summary> The Element that this container represents. </summary>
-        public Element Element { get; private set; }
+        public Element? Element { get; private set; }
 
-        public Root Root => root ?? Element?.Root;
+        public Root? Root => root ?? Element?.Root;
 
-        public ElementContainer Parent
+        public ElementContainer? Parent
         {
             get => parent;
             set
@@ -122,9 +123,11 @@ namespace GuiCookie.Core.DataStructures
 
                 // If the given value is null, then just remove this container from its parent.
                 if (value == null)
-                    { if (!parent.RemoveChild(this)) throw new Exception("Child could not be removed from its parent."); }
+                    { if (!parent.RemoveChild(this)) 
+                        throw new Exception("Child could not be removed from its parent."); }
                 // Otherwise; if the given value is another container, add this child to it. This will handle setting the parent and handling the switch.
-                else if (!value.AddChild(this)) throw new Exception("Child could not be added to new parent.");
+                else if (!value.AddChild(this)) 
+                    throw new Exception("Child could not be added to new parent.");
             }
         }
 

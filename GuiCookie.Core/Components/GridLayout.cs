@@ -1,12 +1,13 @@
 ﻿using GuiCookie.Core.Elements;
 using GuiCookie.Core.Helpers;
+using GuiCookie.Core.Rendering;
 using LiruGameHelper.Parsers;
 using System.Drawing;
 
 namespace GuiCookie.Core.Components
 {
     /// <summary> Holds elements in a 2D array and maintains a grid layout. </summary>
-    public class GridLayout(ElementManager elementManager) : Component
+    public class GridLayout : Component
     {
         #region Constants
         private const string cellSizeAttributeName = "CellSize";

@@ -1,6 +1,7 @@
 ﻿using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Rendering;
+using GuiCookie.Core.Roots;
 using GuiCookie.Core.Styles;
 
 namespace GuiCookie.Core.Components

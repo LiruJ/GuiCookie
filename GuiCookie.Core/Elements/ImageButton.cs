@@ -15,14 +15,12 @@ namespace GuiCookie.Core.Elements
         /// <summary> The <see cref="ClippingMode"/> of the current image. </summary>
         public ClippingMode ClippingMode { get => ImageBlock.ClippingMode; set => ImageBlock.ClippingMode = value; }
 
-        /// <summary> The texture of the current image. If this is set to a texture, then the image will be of the entire texture. </summary>
-        public Image Texture { get => ImageBlock.Texture; set => ImageBlock.Texture = value; }
 
         /// <summary> The colour of the current image. </summary>
         public Color? Colour { get => ImageBlock.Colour; set => ImageBlock.Colour = value; }
 
         /// <summary> The current image. </summary>
-        public Image Image { get => ImageBlock.Image; set => ImageBlock.Image = value; }
+        public Image? Image { get => ImageBlock.Image; set => ImageBlock.Image = value; }
         #endregion
 
         #region Initialisation Functions

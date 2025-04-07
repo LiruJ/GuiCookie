@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace GuiCookie.Core.Components
 {
-    public class Frame(StyleManager styleManager) : Component
+    public class Frame(ResourceManager resourceManager, StyleManager styleManager) : Component
     {
         #region Constants
         private const string frameImageAttributeName = "FrameImage";
@@ -58,15 +58,15 @@ namespace GuiCookie.Core.Components
         {
             // Set the frame image.
             if (Element.Attributes.HasAttribute(frameImageAttributeName))
-                FrameImage = Root.StyleManager.ResourceManager.ImagesByName.TryGetValue(Element.Attributes.GetAttribute(frameImageAttributeName), out Image image) ?
+                FrameImage = resourceManager.ImagesByName.TryGetValue(Element.Attributes.GetAttribute(frameImageAttributeName), out Image image) ?
                     image : throw new Exception($"Image with name {Element.Attributes.GetAttribute(frameImageAttributeName)} has not been loaded.");
 
             // Set the drop shadow.
-            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(Root.StyleManager.ResourceManager, Element.Attributes));
+            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, Element.Attributes));
 
             // Set the colour and tint.
             if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame))
-                sliceFrame!.TintedColour = TintedColour.CreateCombination(sliceFrame.TintedColour, new TintedColour(Root.StyleManager.ResourceManager, Element.Attributes));
+                sliceFrame!.TintedColour = TintedColour.CreateCombination(sliceFrame.TintedColour, new TintedColour(resourceManager, Element.Attributes));
         }
         #endregion
 
@@ -125,12 +125,12 @@ namespace GuiCookie.Core.Components
             if (!sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrameStyleAttribute? sliceFrame)) return;
 
 
-            // If a shadow is to be drawn, do that first.
-            if (sliceFrame.DropShadow.HasData)
-                NineSliceDrawer.DrawFrameOnDemand(sliceFrame, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadow.Offset.Value.ToPoint(), Bounds.TotalSize), guiCamera, sliceFrame.DropShadow.Colour.Value);
+            //// If a shadow is to be drawn, do that first.
+            //if (sliceFrame.DropShadow.HasData)
+            //    NineSliceDrawer.DrawFrameOnDemand(sliceFrame, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadow.Offset.Value.ToPoint(), Bounds.TotalSize), guiCamera, sliceFrame.DropShadow.Colour.Value);
 
-            // Draw the frame.
-            NineSliceDrawer.DrawFrameOnDemand(sliceFrame, Bounds.AbsoluteTotalArea, guiCamera, sliceFrame.MixedColour);
+            //// Draw the frame.
+            //NineSliceDrawer.DrawFrameOnDemand(sliceFrame, Bounds.AbsoluteTotalArea, guiCamera, sliceFrame.MixedColour);
         
         }
         #endregion

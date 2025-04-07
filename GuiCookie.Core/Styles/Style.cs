@@ -5,7 +5,7 @@ using System.Xml;
 
 namespace GuiCookie.Core.Styles
 {
-    /// <summary> Represents the parameters of an <see cref="Elements"/>'s style. </summary>
+    /// <summary> Represents the parameters of an element's style. </summary>
     public class Style
     {
         #region Constants
@@ -45,7 +45,7 @@ namespace GuiCookie.Core.Styles
             Name = styleNode.Name;
 
             // Create attributes from this style node.
-            IReadOnlyAttributes attributes = new AttributeCollection(styleNode);
+            AttributeCollection attributes = new(styleNode);
 
             // Set the name of the base style if one was given.
             BaseStyleName = attributes.GetAttributeOrDefault(BaseVariantName, string.Empty);
@@ -58,9 +58,11 @@ namespace GuiCookie.Core.Styles
             foreach (XmlNode childNode in styleNode)
             {
                 // If the child node has children, load it as a variant.
-                if (childNode.HasChildNodes) variants.Add(new StyleVariant(childNode, resourceManager, attributeCache));
+                if (childNode.HasChildNodes)
+                    variants.Add(new StyleVariant(childNode, resourceManager, attributeCache));
                 // Otherwise; dynamically create the style attribute and add it to the list.
-                else styleAttributes.Add(attributeCache.CreateInstance(childNode.Name, resourceManager, new AttributeCollection(childNode)));
+                else
+                    styleAttributes.Add(attributeCache.CreateInstance(childNode.Name, resourceManager, new AttributeCollection(childNode)));
             }
 
             // Create the base variant using the loaded attributes.

@@ -1,6 +1,6 @@
 ﻿namespace GuiCookie.Core.Services
 {
-    public class UIServiceProvider : IServiceProvider, IUIServiceProvider
+    public class UIServiceProvider : IUIServiceProvider
     {
         #region Fields
         private readonly Dictionary<Type, object> services = [];
@@ -26,6 +26,30 @@
             bool hasService = services.TryGetValue(typeof(T), out object? serviceObject) && serviceObject != null;
             service = (T?)(hasService ? serviceObject : null);
             return hasService;
+        }
+
+        public IEnumerator<(Type type, object service)> GetServicesEnumerator()
+            => services.Select(x => (x.Key, x.Value)).GetEnumerator();
+
+        public IEnumerable<(Type type, object service)> GetServicesEnumerable()
+            => services.Select(x => (x.Key, x.Value)).AsEnumerable();
+        #endregion
+
+        #region Clone Functions
+        public IUIServiceProvider Clone()
+        {
+            UIServiceProvider clone = new();
+            foreach (var service in services)
+                clone.services.Add(service.Key, service.Value);
+            return clone;
+        }
+
+        public static UIServiceProvider Clone(IUIServiceProvider serviceProvider)
+        {
+            UIServiceProvider clone = new();
+            foreach ((Type type, object service) in serviceProvider.GetServicesEnumerable())
+                clone.services.Add(type, service);
+            return clone;
         }
         #endregion
     }

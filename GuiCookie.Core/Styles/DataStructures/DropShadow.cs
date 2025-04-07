@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Attributes;
+using LiruGameHelper.Parsers;
 using System.Drawing;
 using System.Numerics;
 
@@ -25,14 +26,14 @@ namespace GuiCookie.Core.Styles.DataStructures
         /// <summary> The alpha of the shadow's colour, where <c>1</c> is completely opaque and <c>0</c> is completely transparent. </summary>
         public float Alpha
         {
-            get => Colour.HasValue ? (float)Colour.Value.A / byte.MaxValue : 0f;
+            readonly get => Colour.HasValue ? (float)Colour.Value.A / byte.MaxValue : 0f;
             set
             {
                 // Do nothing if there is no colour.
                 if (!Colour.HasValue) return;
 
                 // Set the alpha of the colour.
-                Colour = new Color(Colour.Value, Alpha);
+                Colour = Color.FromArgb((int)MathF.Floor(Alpha * byte.MaxValue), Colour.Value);
             }
         }
 
@@ -51,7 +52,7 @@ namespace GuiCookie.Core.Styles.DataStructures
             ArgumentNullException.ThrowIfNull(attributes);
 
             // Set the properties.
-            Offset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector2.TryParse);
+            Offset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector.TryParse);
             Colour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName);
         }
 

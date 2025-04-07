@@ -4,12 +4,8 @@ using System.Drawing;
 
 namespace GuiCookie.Core.Input.DragAndDrop
 {
-    public class DragAndDropManager(InputManager inputManager)
+    public class DragAndDropManager(ElementInputManager elementInputManager)
     {
-        #region Dependencies
-        private readonly InputManager inputManager = inputManager ?? throw new ArgumentNullException(nameof(inputManager));
-        #endregion
-
         #region Properties
         /// <summary> The current <see cref="IDraggable"/> that is being dragged. </summary>
         public IDraggable? CurrentDraggable { get; private set; }
@@ -79,35 +75,35 @@ namespace GuiCookie.Core.Input.DragAndDrop
             if (CurrentDraggable != null)
             {
                 // Get the DropTarget under the mouse, ignoring the currently dragged item.
-                IDropTarget dropTarget = inputManager.FindInBoundsWithInterfacedComponent<IDropTarget>(elementManager, CurrentDraggable.Bounds.AbsoluteContentArea, CurrentDraggable.Element);
+                IDropTarget dropTarget = elementInputManager.FindInBoundsWithInterfacedComponent<IDropTarget>(elementManager, CurrentDraggable.Bounds.AbsoluteContentArea, CurrentDraggable.Element);
 
                 // Calculate the offset relative to the drop target.
-                Point relativeMousePosition = dropTarget == null ? new(0, 0) : PointExtensions.Subtract(inputManager.MousePosition, dropTarget.Bounds.AbsoluteTotalPosition);
+                Point relativeMousePosition = dropTarget == null ? new(0, 0) : PointExtensions.Subtract(elementInputManager.InputManager.MousePosition, dropTarget.Bounds.AbsoluteTotalPosition);
 
                 // If the mouse is now up, drop the current draggable.
-                if (inputManager.IsLeftMouseUp)
+                if (elementInputManager.InputManager.IsLeftMouseUp)
                     StopDragging(dropTarget, relativeMousePosition);
                 // Otherwise; keep the dragged element pinned to the mouse.
                 else
                 {
                     // Move the element.
-                    CurrentDraggable.Bounds.AbsoluteTotalPosition = PointExtensions.Subtract(inputManager.MousePosition, DraggableOffset);
+                    CurrentDraggable.Bounds.AbsoluteTotalPosition = PointExtensions.Subtract(elementInputManager.InputManager.MousePosition, DraggableOffset);
 
                     // If there's a drop target under the mouse, tell it that it's being hovered over.
                     dropTarget?.OnDraggableHovered(CurrentDraggable, relativeMousePosition);
                 }
             }
             // Otherwise; if the draggable is null but the mouse is down, check to see if a draggable can be dragged.
-            else if (inputManager.IsLeftMouseDown && !inputManager.WasLeftMouseDown)
+            else if (elementInputManager.InputManager.IsLeftMouseDown && !elementInputManager.InputManager.WasLeftMouseDown)
             {
                 // Find the draggable object under the mouse
-                IDraggable draggable = inputManager.FindInBoundsWithInterfacedComponent<IDraggable>(elementManager, new Rectangle(inputManager.MousePosition, new(0, 0)));
+                IDraggable draggable = elementInputManager.FindInBoundsWithInterfacedComponent<IDraggable>(elementManager, new Rectangle(elementInputManager.InputManager.MousePosition, new(0, 0)));
 
                 // If there is no draggable object, do nothing.
                 if (draggable == null) return;
 
                 // Calculate the position of the mouse relative to the element.
-                Point relativeMousePosition = PointExtensions.Subtract(inputManager.MousePosition, draggable.Bounds.AbsoluteTotalPosition);
+                Point relativeMousePosition = PointExtensions.Subtract(elementInputManager.InputManager.MousePosition, draggable.Bounds.AbsoluteTotalPosition);
 
                 // Begin dragging the draggable.
                 BeginDragging(draggable, relativeMousePosition);

@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.DataStructures;
+﻿using GuiCookie.Core.Attributes;
+using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Input;
 using GuiCookie.Core.Rendering;
@@ -6,7 +7,7 @@ using GuiCookie.Core.Services;
 using LiruGameHelper.Signals;
 using System.Drawing;
 
-namespace GuiCookie.Core
+namespace GuiCookie.Core.Roots
 {
     /// <summary>
     /// The base class for a UI controller, inherit from this and create a new inherited class via the <see cref="UIManager"/> to create a custom UI controller.
@@ -14,7 +15,7 @@ namespace GuiCookie.Core
     public abstract class Root : IDisposable
     {
         #region Dependencies
-        public InputManager InputManager { get; }
+        public ElementInputManager? ElementInputManager { get; }
         #endregion
 
         #region Fields
@@ -22,7 +23,7 @@ namespace GuiCookie.Core
 
         private readonly List<SignalConnection> connections = [];
 
-        private readonly List<IUpdateableUIService> updateableServices;
+        private readonly List<IUpdateableUIService> updateableServices = [];
         #endregion
 
         #region Properties
@@ -33,10 +34,12 @@ namespace GuiCookie.Core
 
         public ElementContainer Elements { get; }
 
+        public AttributeCollection Attributes { get; private set; }
+
         /// <summary>
         /// Gets a value that is <c>true</c> when the mouse is over an element; otherwise, <c>false</c>.
         /// </summary>
-        public bool IsMousedOver => InputManager.MousedOverElement != null;
+        public bool IsMousedOver => ElementInputManager?.MousedOverElement != null;
         #endregion
 
         #region Constructors
@@ -46,9 +49,21 @@ namespace GuiCookie.Core
 
             if (serviceProvider.TryGetService(out Window? window))
             {
-                SignalConnection connection = window.OnSizeChanged.Connect(onWindowResized);
+                SignalConnection connection = window!.OnSizeChanged.Connect(onWindowResized);
                 connections.Add(connection);
+                Bounds = new(Elements, window.Size);
             }
+            else
+                Bounds = new Bounds(Elements, new Point(0, 0));
+
+            foreach ((Type type, object service) in serviceProvider.GetServicesEnumerable())
+            {
+                if (service is IUpdateableUIService serviceUpdateableService)
+                    updateableServices.Add(serviceUpdateableService);
+            }
+            updateableServices.Sort((left, right) => left.Order.CompareTo(right.Order));
+
+            ElementInputManager = serviceProvider.GetService<ElementInputManager>();
         }
         #endregion
 
@@ -67,6 +82,22 @@ namespace GuiCookie.Core
                 element.Bounds.recalculatePosition();
             }
         }
+        #endregion
+
+        #region Update Functions
+        public void Update(TimeSpan elapsedTime, TimeSpan totalTime)
+        {
+            foreach (IUpdateableUIService service in updateableServices)
+                service.PreUpdate(elapsedTime, totalTime);
+            foreach (IUpdateableUIService service in updateableServices)
+                service.Update(elapsedTime, totalTime);
+            foreach (IUpdateableUIService service in updateableServices)
+                service.PostUpdate(elapsedTime, totalTime);
+        }
+        #endregion
+
+        #region Draw Functions
+
         #endregion
 
         #region Disposable Functions

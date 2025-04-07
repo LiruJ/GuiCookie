@@ -1,6 +1,9 @@
 ﻿using GuiCookie.Core.Attributes;
 using GuiCookie.Core.Components;
 using GuiCookie.Core.DataStructures;
+using GuiCookie.Core.Rendering;
+using GuiCookie.Core.Roots;
+using GuiCookie.Core.Services;
 using GuiCookie.Core.Styles;
 using GuiCookie.Core.Templates;
 using LiruGameHelper.Reflection;
@@ -10,7 +13,7 @@ using System.Xml;
 namespace GuiCookie.Core.Elements
 {
     /// <summary> Allows for elements to be created from templates. </summary>
-    public class ElementManager : IEnumerable<Element>
+    public class ElementManager : IEnumerable<Element>, IUpdateableUIService
     {
         #region Constants
         private const string styleAttributeName = "Style";
@@ -28,18 +31,22 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Fields
-        private readonly Dictionary<string, Element> elementsByTag;
+        private readonly Dictionary<string, Element> elementsByTag = [];
         #endregion
 
         #region Internal Properties
         internal ElementContainer ElementContainer { get; private set; }
         #endregion
 
+        #region Properties
+        public int Order => 10;
+        #endregion
+
         #region Constructors
-        public ElementManager(Root root, ComponentManager componentManager, TemplateManager templateManager, StyleManager styleManager, ConstructorCache<Element> elementCache, IServiceProvider serviceProvider)
+        public ElementManager(ComponentManager componentManager, TemplateManager templateManager, StyleManager styleManager, ConstructorCache<Element> elementCache, IServiceProvider serviceProvider)
         {
             // Set dependencies.
-            this.root = root ?? throw new ArgumentNullException(nameof(root));
+            //this.root = root ?? throw new ArgumentNullException(nameof(root));
             this.componentManager = componentManager ?? throw new ArgumentNullException(nameof(componentManager));
             this.templateManager = templateManager ?? throw new ArgumentNullException(nameof(templateManager));
             this.styleManager = styleManager ?? throw new ArgumentNullException(nameof(styleManager));
@@ -48,11 +55,17 @@ namespace GuiCookie.Core.Elements
             
             // Initialise the elements list.
             ElementContainer = new ElementContainer(root);
-            elementsByTag = [];
 
             // Bind to signals.
             //ElementContainer.OnChildAdded.Connect(addTaggedElement);
             ElementContainer.OnChildRemoved.Connect(removeTaggedElement);
+        }
+        #endregion
+
+        #region Root Functions
+        internal void onRootCreated(Root root)
+        {
+
         }
         #endregion
 
@@ -212,7 +225,12 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Update Functions
-        internal void Update(TimeSpan elapsedTime, TimeSpan totalTime)
+        public void PreUpdate(TimeSpan elapsedTime, TimeSpan totalTime)
+        {
+
+        }
+
+        public void Update(TimeSpan elapsedTime, TimeSpan totalTime)
         {
             // Update root-level elements, they will then recursively update their children.
             foreach (Element element in ElementContainer) element.InternalUpdate(elapsedTime, totalTime);
@@ -223,13 +241,19 @@ namespace GuiCookie.Core.Elements
             // Late update all root-level elements.
             foreach (Element element in ElementContainer) element.InternalLateUpdate(elapsedTime, totalTime);
         }
+
+        public void PostUpdate(TimeSpan elapsedTime, TimeSpan totalTime)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region Draw Functions
         internal void Draw(IGuiCamera guiCamera)
         {
             // Draw root-level elements, they will then recursively draw their children.
-            foreach (Element element in ElementContainer) element.InternalDraw(guiCamera);
+            foreach (Element element in ElementContainer) 
+                element.InternalDraw(guiCamera);
         }
         #endregion
     }

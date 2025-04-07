@@ -33,8 +33,8 @@ namespace Example.MonoGame
             UIManager uiManager = new UIManagerBuilder()
                 .WithMonoGameWindow(Window)
                 .WithMonoGameInput(Window)
-                .WithDragAndDropManager()
-                .WithDefaultElements()
+                //.WithDragAndDropManager()
+                //.WithDefaultElements()
                 .Build();
 
             // TODO: use this.Content to load your game content here

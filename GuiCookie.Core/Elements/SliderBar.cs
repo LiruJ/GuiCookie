@@ -2,13 +2,14 @@
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
+using GuiCookie.Core.Styles;
 using GuiCookie.Core.Styles.Attributes;
 using LiruGameHelper.Signals;
 using System.Drawing;
 
 namespace GuiCookie.Core.Elements
 {
-    public class SliderBar : ProgressBar, IClickable
+    public class SliderBar(ResourceManager resourceManager) : ProgressBar(resourceManager), IClickable
     {
         #region Components
         private MouseHandler mouseHandler;
@@ -164,7 +165,7 @@ namespace GuiCookie.Core.Elements
                 else fillArea.Height = Handle.Bounds.AbsoluteTotalArea.GetCentre().Y - fillArea.Y;
 
                 // Draw the fill.
-                NineSliceDrawer.DrawFrameOnDemand(fill, fillArea, guiCamera, fill!.MixedColour);
+                //NineSliceDrawer.DrawFrameOnDemand(fill, fillArea, guiCamera, fill!.MixedColour);
             }
         }
         #endregion

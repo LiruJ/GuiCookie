@@ -235,6 +235,23 @@ namespace GuiCookie.Core.DataStructures
             maximumSize = elementAttributes.GetAttributeOrDefault(maximumSizeAttributeName, new Space(0, Axes.None));
         }
 
+        internal Bounds(ElementContainer elementContainer, Point windowSize)
+        {
+            ElementContainer = elementContainer ?? throw new ArgumentNullException(nameof(elementContainer));
+
+            baseRectangle = new Rectangle(0, 0, windowSize.X, windowSize.Y);
+
+            // The root fills the entire window unless otherwise stated.
+            scaledSize = new Space(windowSize.X, windowSize.Y, Axes.None);
+
+            // The root has no padding unless otherwise specified.
+            padding = new Sides(0, SideMask.None);
+
+            // Calculate the bounds from the parsed properties.
+            recalculateSize();
+            recalculatePosition();
+        }
+
         internal Bounds(ElementContainer elementContainer, Point windowSize, IReadOnlyAttributes rootAttributes)
         {
             ElementContainer = elementContainer ?? throw new ArgumentNullException(nameof(elementContainer));

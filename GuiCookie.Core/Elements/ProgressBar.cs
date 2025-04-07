@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace GuiCookie.Core.Elements
 {
-    public class ProgressBar : Element
+    public class ProgressBar(ResourceManager resourceManager) : Element
     {
         #region Constants
         private const string directionAttributeName = "Direction";
@@ -247,7 +247,7 @@ namespace GuiCookie.Core.Elements
             if (!fillCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? fillFrame) && fillFrame != null)
             {
                 // Create an empty slice frame.
-                fillFrame = new SliceFrameStyleAttribute(Root.StyleManager.ResourceManager, new AttributeCollection() { { "Name", fillName } });
+                fillFrame = new SliceFrameStyleAttribute(resourceManager, new AttributeCollection() { { "Name", fillName } });
 
                 // Add the fill frame to the base variant of the style. Do the same for the hovered, clicked, and disabled.
                 Style.BaseVariant.AddAttribute(fillFrame);
@@ -293,7 +293,7 @@ namespace GuiCookie.Core.Elements
             else fillArea.Height = (int)MathF.Floor(fillArea.Height * NormalisedValue);
 
             // Draw the fill.
-            NineSliceDrawer.DrawFrameOnDemand(fill, fillArea, guiCamera, fill!.MixedColour);
+            //NineSliceDrawer.DrawFrameOnDemand(fill, fillArea, guiCamera, fill!.MixedColour);
         }
         #endregion
     }

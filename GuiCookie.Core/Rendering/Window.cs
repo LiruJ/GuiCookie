@@ -9,6 +9,7 @@ namespace GuiCookie.Core.Rendering
         #region Properties
         protected bool disposedValue { get; private set; }
 
+        public abstract Point Size { get; }
         #endregion
 
         #region Signals

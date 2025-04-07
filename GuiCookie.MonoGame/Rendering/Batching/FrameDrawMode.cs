@@ -1,6 +1,6 @@
 ﻿namespace GuiCookie.MonoGame.Rendering.Batching
 {
-    internal enum FrameDrawMode : int
+    public enum FrameDrawMode : int
     {
         NineSlice,
         Stretch,

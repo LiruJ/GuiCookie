@@ -36,8 +36,6 @@ namespace GuiCookie.Core.Components
 
         public float Scale { get; private set; } = 1;
 
-        public Texture2D Texture { get => Image.Texture; set => Image = new Image(value); }
-
         /// <summary> The current colour of the current content. </summary>
         public Color? Colour
         {
@@ -60,7 +58,7 @@ namespace GuiCookie.Core.Components
         }
 
         /// <summary> The current image that is being displayed. </summary>
-        public Image Image { get; set; }
+        public Image? Image { get; set; }
         #endregion
 
         #region Initialisation Functions
@@ -73,10 +71,10 @@ namespace GuiCookie.Core.Components
 
             // Set the colour and tint.
             if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content))
-                content!.TintedColour = TintedColour.CreateCombination(content.TintedColour, new TintedColour(Root.StyleManager.ResourceManager, Element.Attributes));
+                content!.TintedColour = TintedColour.CreateCombination(content.TintedColour, new TintedColour(resourceManager, Element.Attributes));
 
             // Set the drop shadow.
-            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(Root.StyleManager.ResourceManager, Element.Attributes));
+            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, Element.Attributes));
 
             // Set clipping mode.
             ClippingMode = Element.Attributes.GetEnumAttributeOrDefault(clippingModeAttributeName, ClippingMode.Squeeze);
@@ -103,7 +101,8 @@ namespace GuiCookie.Core.Components
         public override void Draw(IGuiCamera guiCamera)
         {
             // If the current image is empty, don't draw.
-            if (Texture == null) return;
+            if (Image == null)
+                return;
 
             // Get the current content.
             if (!contentCache.TryGetVariantAttribute(CurrentStyleVariant, out ContentStyleAttribute? content))
@@ -115,6 +114,9 @@ namespace GuiCookie.Core.Components
 
         private void drawImage(IGuiCamera guiCamera, ContentStyleAttribute content)
         {
+            if (Image == null)
+                return;
+
             // Calculate the size.
             Size size = Size.HasValue ? Size.Value.ToSize() : (Size)Element.Bounds.ContentSize;
 
@@ -172,10 +174,10 @@ namespace GuiCookie.Core.Components
 
             // Draw the shadow first, if one exists.
             if (content != null && content.DropShadow.HasData)
-                guiCamera.DrawTextureAt(Image.Texture, new Rectangle(PointExtensions.Add(target.Location, content!.DropShadow!.Offset!.Value.ToPoint()), target.Size), source, content!.DropShadow!.Colour!.Value);
+                guiCamera.DrawStretched(Image, new Rectangle(PointExtensions.Add(target.Location, content.DropShadow.Offset!.Value.ToPoint()), target.Size), source, content.DropShadow.Colour!.Value);
 
             // Draw the image at the calculated target with the calculated source.
-            guiCamera.DrawTextureAt(Image.Texture, target, source, content?.MixedColour ?? Color.White);
+            guiCamera.DrawStretched(Image, target, source, content?.MixedColour ?? Color.White);
         }
         #endregion
     }

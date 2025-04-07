@@ -9,7 +9,7 @@ namespace GuiCookie.MonoGame.Input
     public class MonoGameInputManager : InputManager
     {
         #region Properties
-        public Point CurrentCursorPosition => CurrentMouseState.Position.ToPoint();
+        public Point CurrentCursorPosition => CurrentMouseState.Position.ToMonoGamePoint();
 
         public override MonoGameKeyboardState CurrentKeyboardState { get; }
 
@@ -23,12 +23,12 @@ namespace GuiCookie.MonoGame.Input
         #region Constructors
         public MonoGameInputManager(GameWindow gameWindow) : base(new MonoGameKeyboardState(), new MonoGameKeyboardState(), new MonoGameMouseState(), new MonoGameMouseState())
         {
-            gameWindow.TextInput += (object sender, TextInputEventArgs e) => TextInput.Append(e.Character);
+            gameWindow.TextInput += (object? sender, TextInputEventArgs e) => TextInput.Append(e.Character);
         }
         #endregion
 
         #region Update Functions
-        public override void Update(TimeSpan elapsedTime, TimeSpan totalTime)
+        public override void PreUpdate(TimeSpan elapsedTime, TimeSpan totalTime)
         {
             base.Update(elapsedTime, totalTime);
             
