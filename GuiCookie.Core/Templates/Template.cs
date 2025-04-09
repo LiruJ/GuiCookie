@@ -1,5 +1,4 @@
-﻿using GuiCookie.Core.Attributes;
-using System.Xml;
+﻿using GuiCookie.Core.Data;
 
 namespace GuiCookie.Core.Templates
 {
@@ -18,7 +17,7 @@ namespace GuiCookie.Core.Templates
         #endregion
 
         #region Backing Fields
-        private string controllerName;
+        private string? controllerName;
         private readonly List<string> componentNames;
         private readonly List<Template> children;
         private readonly Dictionary<string, Template> childrenByIdentifierName;
@@ -28,8 +27,10 @@ namespace GuiCookie.Core.Templates
         #region Properties
         public string Name { get; }
 
-        /// <summary> The name used to identify this template as a child. This is the name attribute in the xml. </summary>
-        public string IdentifierName { get; }
+        /// <summary>
+        /// The name used to identify this template as a child. This is the name attribute in the xml.
+        /// </summary>
+        public string? IdentifierName { get; }
 
         public string ControllerName => controllerName ?? defaultControllerName;
 
@@ -39,11 +40,11 @@ namespace GuiCookie.Core.Templates
 
         public IReadOnlyDictionary<string, Template> ChildrenByIdentifierName => childrenByIdentifierName;
 
-        public IReadOnlyAttributes Attributes => attributes;
+        public IReadOnlyAttributeCollection Attributes => attributes;
         #endregion
 
         #region Constructors
-        public Template(string name, string identifierName, string controllerName, List<Template> childTemplates, List<string> componentNames, AttributeCollection attributes)
+        public Template(string name, string? identifierName, string? controllerName, List<Template> childTemplates, List<string> componentNames, AttributeCollection attributes)
         {
             Name = !string.IsNullOrWhiteSpace(name) ? name : throw new ArgumentException("Name cannot be null or empty.", nameof(controllerName));
             this.controllerName = !string.IsNullOrWhiteSpace(controllerName) ? controllerName : null;
@@ -52,7 +53,7 @@ namespace GuiCookie.Core.Templates
 
             // Set the children.
             children = childTemplates ?? throw new ArgumentNullException(nameof(childTemplates));
-            childrenByIdentifierName = new Dictionary<string, Template>();
+            childrenByIdentifierName = [];
             foreach (Template child in children)
                 if (child.IdentifierName != null) childrenByIdentifierName.Add(child.IdentifierName, child);
 
@@ -68,11 +69,11 @@ namespace GuiCookie.Core.Templates
         /// <returns></returns>
         public Template CreateCopy()
         {
-            List<Template> newChildren = new List<Template>(children.Count);
+            List<Template> newChildren = new(children.Count);
             foreach (Template child in children)
                 newChildren.Add(child.CreateCopy());
 
-            return new Template(Name, IdentifierName, controllerName, newChildren, new List<string>(componentNames), attributes.CreateCopy());
+            return new Template(Name, IdentifierName, controllerName, newChildren, [.. componentNames], attributes.CreateCopy());
         }
         #endregion
 
@@ -80,7 +81,7 @@ namespace GuiCookie.Core.Templates
         public void CombineOver(Template root)
         {
             // If the controller of this template is null, take the root's one.
-            if (controllerName == null) controllerName = root.controllerName;
+            controllerName ??= root.controllerName;
 
             // Go over each component in the root and add it to this template, avoiding duplicates.
             foreach (string rootComponent in root.componentNames)
@@ -100,7 +101,7 @@ namespace GuiCookie.Core.Templates
                     else
                     {
                         Template newChild = childTemplate.CreateCopy();
-                        childrenByIdentifierName.Add(newChild.IdentifierName, newChild);
+                        childrenByIdentifierName.Add(newChild.IdentifierName!, newChild);
                         children.Add(newChild);
                     }
                 }
@@ -116,10 +117,10 @@ namespace GuiCookie.Core.Templates
         public Template CombineOver(AttributeCollection derivedAttributes)
         {
             // Prepare the attributes.
-            prepareFromAttributes(ref derivedAttributes, out List<string> componentNames, out string controllerName, out string identifierName, out string _);
+            prepareFromAttributes(ref derivedAttributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? _);
 
             // Create a template with the derived attributes and combine it over this template.
-            Template derivedTemplate = new Template(Name, identifierName, controllerName, new List<Template>(), componentNames, derivedAttributes);
+            Template derivedTemplate = new(Name, identifierName, controllerName, [], componentNames, derivedAttributes);
             //Template derivedTemplate = new Template(Name, identifierName, controllerName, children, componentNames, derivedAttributes);
             derivedTemplate.CombineOver(CreateCopy());
 
@@ -129,26 +130,23 @@ namespace GuiCookie.Core.Templates
         #endregion
 
         #region Load Functions
-        internal static Template LoadFromXML(TemplateManager templateManager, XmlNode mainNode, XmlNode templateNode)
+        public static Template Load(TemplateManager templateManager, IReadOnlySheetDataNode mainNode, IReadOnlySheetDataNode templateNode)
         {
-            // Create an attribute collection for the node.
-            AttributeCollection attributes = new AttributeCollection(templateNode);
+            // Copy the attributes.
+            AttributeCollection attributes = templateNode.Attributes.CreateCopy();
 
             // Prepare the attributes.
-            prepareFromAttributes(ref attributes, out List<string> componentNames, out string controllerName, out string identifierName, out string baseName);
+            prepareFromAttributes(ref attributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? baseName);
 
             // Recursively load the templates and save them to a list.
-            List<Template> childTemplates = new List<Template>(templateNode.ChildNodes.Count);
-            foreach (XmlNode childNode in templateNode)
+            List<Template> childTemplates = new(templateNode.ChildNodes.Count);
+            foreach (SheetDataNode childNode in templateNode.ChildNodes)
             {
-                // If the node is a comment, skip it.
-                if (childNode.NodeType == XmlNodeType.Comment) continue;
-
                 // Get the root template from the node's name.
                 Template rootTemplate = templateManager.getRootTemplate(mainNode, childNode.Name);
 
                 // Load the child node itself as a template.
-                Template childTemplate = LoadFromXML(templateManager, mainNode, childNode);
+                Template childTemplate = Load(templateManager, mainNode, childNode);
 
                 // Merge the child over the root template.
                 childTemplate.CombineOver(rootTemplate);
@@ -158,7 +156,7 @@ namespace GuiCookie.Core.Templates
             }
 
             // Create a new template with the loaded values.
-            Template loadedTemplate = new Template(templateNode.Name, identifierName, controllerName, childTemplates, componentNames, attributes);
+            Template loadedTemplate = new(templateNode.Name, identifierName, controllerName, childTemplates, componentNames, attributes);
 
             // If a base name was given, get it from the template manager.
             if (baseName != null)
@@ -171,21 +169,21 @@ namespace GuiCookie.Core.Templates
             return loadedTemplate;
         }
 
-        private static void prepareFromAttributes(ref AttributeCollection attributes, out List<string> componentNames, out string controllerName, out string identifierName, out string baseName)
+        private static void prepareFromAttributes(ref AttributeCollection attributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? baseName)
         {
             // Get the component names from the comma-separated component name list attribute.
-            string componentListString = attributes.GetAttributeOrDefault(componentListAttributeName, (string)null);
+            string? componentListString = attributes.GetAttributeOrDefault(componentListAttributeName, (string?)null);
 
             // Remove the component names string from the collection as it's not needed for the element itself.
             attributes.Remove(componentListAttributeName);
 
             // Split the component name list by commas and save the results.
-            componentNames = componentListString == null ? new List<string>() : new List<string>(componentListString.Split(','));
+            componentNames = componentListString == null ? [] : [.. componentListString.Split(',')];
 
             // If an explicit controller name was given, use that as the controller name; otherwise, default to null. Do the same with the identifier name and base name.
-            controllerName = attributes.GetAttributeOrDefault(controllerAttributeName, (string)null);
-            identifierName = attributes.GetAttributeOrDefault(nameAttributeName, (string)null);
-            baseName = attributes.GetAttributeOrDefault(baseAttributeName, (string)null);
+            controllerName = attributes.GetAttributeOrDefault(controllerAttributeName, (string?)null);
+            identifierName = attributes.GetAttributeOrDefault(nameAttributeName, (string?)null);
+            baseName = attributes.GetAttributeOrDefault(baseAttributeName, (string?)null);
 
             // Remove the controller name as it's not needed for the element itself.
             attributes.Remove(controllerAttributeName);

@@ -4,11 +4,10 @@ using System.Collections;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
-using System.Xml;
 
-namespace GuiCookie.Core.Attributes
+namespace GuiCookie.Core.Data
 {
-    public class AttributeCollection : IReadOnlyAttributes, IEnumerable<string>
+    public class AttributeCollection : IReadOnlyAttributeCollection, IEnumerable<string>
     {
         #region Delegates
         /// <summary> A delegate describing a function that attempts to parse the given <paramref name="input"/> into the <paramref name="output"/> with the given <typeparamref name="T"/> type. </summary>
@@ -52,9 +51,9 @@ namespace GuiCookie.Core.Attributes
             this.rawAttributesByName = new Dictionary<string, string>(rawAttributesByName ?? throw new ArgumentNullException(nameof(rawAttributesByName)));
         }
 
-        internal AttributeCollection(XmlNode elementNode)
+        public AttributeCollection(IEnumerable<(string key, string value)> rawAttributesByName)
         {
-            foreach (XmlAttribute attribute in elementNode.Attributes) Add(attribute.Name, attribute.InnerText);
+            this.rawAttributesByName = rawAttributesByName.ToDictionary(x => x.key, x => x.value);
         }
         #endregion
 
@@ -95,13 +94,13 @@ namespace GuiCookie.Core.Attributes
             return HasAttribute(attributeName) && tryParser(rawAttributesByName[attributeName], out T output) ? output : defaultTo;
         }
 
-        public string GetAttributeOrDefault(string attributeName, string defaultTo)
+        public string? GetAttributeOrDefault(string attributeName, string? defaultTo)
         {
             // Ensure validity.
             if (string.IsNullOrWhiteSpace(attributeName))
                 throw new ArgumentException($"'{nameof(attributeName)}' cannot be null or whitespace", nameof(attributeName));
 
-            return rawAttributesByName.TryGetValue(attributeName, out string value) ? value : defaultTo;
+            return rawAttributesByName.TryGetValue(attributeName, out string? value) ? value : defaultTo;
         }
 
         /// <summary>
@@ -121,7 +120,8 @@ namespace GuiCookie.Core.Attributes
                 throw new ArgumentException($"'{nameof(attributeName)}' cannot be null or whitespace", nameof(attributeName));
 
             // Get the string from the raw dictionary, if it does not exist, throw an exception.
-            if (!rawAttributesByName.TryGetValue(attributeName, out string attributeString)) throw new KeyNotFoundException($"No attribute with the key {attributeName} exists.");
+            if (!rawAttributesByName.TryGetValue(attributeName, out string? attributeString))
+                throw new KeyNotFoundException($"No attribute with the key {attributeName} exists.");
 
             // Parse and return the value.
             return parser(attributeString);
@@ -134,7 +134,8 @@ namespace GuiCookie.Core.Attributes
                 throw new ArgumentException($"'{nameof(attributeName)}' cannot be null or whitespace", nameof(attributeName));
 
             // Get the string from the raw dictionary, if it does not exist, throw an exception.
-            if (!rawAttributesByName.TryGetValue(attributeName, out string attributeString)) throw new KeyNotFoundException($"No attribute with the key {attributeName} exists.");
+            if (!rawAttributesByName.TryGetValue(attributeName, out string? attributeString)) 
+                throw new KeyNotFoundException($"No attribute with the key {attributeName} exists.");
 
             // Return the attribute string.
             return attributeString;
@@ -172,11 +173,20 @@ namespace GuiCookie.Core.Attributes
         #endregion
 
         #region Addition Functions
-        public void Add(string key, string value) { if (!rawAttributesByName.TryAdd(key, value)) throw new Exception($"Attribute with key {key} already exists."); }
+        public void Add(string key, string value) 
+        {
+            if (!rawAttributesByName.TryAdd(key, value)) 
+                throw new Exception($"Attribute with key {key} already exists."); 
+        }
 
-        public void Add(string key, object value) => Add(key, value.ToString());
+        public void Add(string key, object value) => Add(key, value.ToString()!);
 
-        public void Replace(string key, string value) { if (!rawAttributesByName.ContainsKey(key)) rawAttributesByName.Remove(key); rawAttributesByName.Add(key, value);  }
+        public void Replace(string key, string value) 
+        {
+            if (!rawAttributesByName.ContainsKey(key)) 
+                rawAttributesByName.Remove(key); 
+            rawAttributesByName.Add(key, value);  
+        }
         #endregion
 
         #region Removal Functions

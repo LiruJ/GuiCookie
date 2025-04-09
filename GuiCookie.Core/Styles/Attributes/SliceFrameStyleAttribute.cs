@@ -1,4 +1,4 @@
-﻿using GuiCookie.Core.Attributes;
+﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles.DataStructures;
 using System.Drawing;
@@ -47,7 +47,7 @@ namespace GuiCookie.Core.Styles.Attributes
         #endregion
 
         #region Constructors
-        public SliceFrameStyleAttribute(ResourceManager resourceManager, IReadOnlyAttributes attributes)
+        public SliceFrameStyleAttribute(ResourceManager resourceManager, IReadOnlyAttributeCollection attributes)
         {
             // Set the colour, slice, and cache texture.
             TintedColour = new TintedColour(resourceManager, attributes);

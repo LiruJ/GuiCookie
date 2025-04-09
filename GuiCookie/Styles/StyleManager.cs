@@ -11,11 +11,11 @@ namespace GuiCookie.Styles
     public class StyleManager
     {
         #region Constants
+        public const string defaultStyleAttributeName = "DefaultStyle";
+        
         private const string resourcesNodeName = "Resources";
 
         private const string stylesNodeName = "Styles";
-
-        private const string defaultStyleAttributeName = "DefaultStyle";
         #endregion
 
         #region Fields

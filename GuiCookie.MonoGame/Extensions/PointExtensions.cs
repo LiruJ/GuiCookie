@@ -1,5 +1,4 @@
-﻿using GuiCookie.Core.DataStructures;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
 namespace GuiCookie.MonoGame.Extensions
 {
@@ -8,5 +7,9 @@ namespace GuiCookie.MonoGame.Extensions
         public static Point ToMonoGamePoint(this System.Drawing.Point point) => new(point.X, point.Y);
 
         public static System.Drawing.Point ToDrawingPoint(this Point point) => new(point.X, point.Y);
+
+        public static Vector2 ToMonoGameVector(this System.Drawing.Point point) => new(point.X, point.Y);
+
+        public static System.Numerics.Vector2 ToNumericsVector(this Point point) => new(point.X, point.Y);
     }
 }

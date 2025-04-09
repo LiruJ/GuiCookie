@@ -2,14 +2,14 @@
 using System.Drawing;
 using System.Numerics;
 
-namespace GuiCookie.Core.Attributes
+namespace GuiCookie.Core.Data
 {
-    public interface IReadOnlyAttributes
+    public interface IReadOnlyAttributeCollection
     {
         int Count { get; }
 
         T GetAttributeOrDefault<T>(string attributeName, T defaultTo, AttributeCollection.TryParse<T> tryParser);
-        string GetAttributeOrDefault(string attributeName, string defaultTo);
+        string? GetAttributeOrDefault(string attributeName, string? defaultTo);
         T GetAttribute<T>(string attributeName, Func<string, T> parser);
         string GetAttribute(string attributeName);
         bool HasAttribute(string attributeName);
@@ -26,5 +26,6 @@ namespace GuiCookie.Core.Attributes
         T? GetAttributeOrDefault<T>(string attributeName, T? defaultTo, AttributeCollection.TryParse<T> tryParser) where T : struct;
         int? GetAttributeOrDefault(string attributeName, int? defaultTo);
         float? GetAttributeOrDefault(string attributeName, float? defaultTo);
+        AttributeCollection CreateCopy();
     }
 }

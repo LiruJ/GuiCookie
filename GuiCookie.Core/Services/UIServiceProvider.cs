@@ -16,6 +16,23 @@
         public void AddService<T>(T service) where T : class => services.Add(typeof(T), service);
         #endregion
 
+        #region Helper Functions
+        public UIServiceProvider AddSelf()
+        {
+            services.Add(typeof(IUIServiceProvider), this);
+            services.Add(typeof(UIServiceProvider), this);
+            services.Add(typeof(IServiceProvider), this);
+            return this;
+        }
+
+        public void RemoveSelf()
+        {
+            services.Remove(typeof(IUIServiceProvider));
+            services.Remove(typeof(UIServiceProvider));
+            services.Remove(typeof(IServiceProvider));
+        }
+        #endregion
+
         #region Get Functions
         public T? GetService<T>() where T : class => (T?)GetService(typeof(T));
 

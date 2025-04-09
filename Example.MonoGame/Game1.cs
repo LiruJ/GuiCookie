@@ -1,8 +1,11 @@
-﻿using GuiCookie.Core;
+﻿using GuiCookie.Core.Roots;
+using GuiCookie.Core.Services;
 using GuiCookie.MonoGame.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.IO;
+using System.Reflection;
 
 namespace Example.MonoGame
 {
@@ -29,12 +32,18 @@ namespace Example.MonoGame
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            UIServiceProvider serviceProvider = new UIServiceProvider()
+                .AddMonoGameInput(Window)
+                .AddMonoGameWindow(Window)
+                .AddMonoGameResources(Content)
+                .AddSelf();
 
-            UIManager uiManager = new UIManagerBuilder()
-                .WithMonoGameWindow(Window)
-                .WithMonoGameInput(Window)
-                //.WithDragAndDropManager()
-                //.WithDefaultElements()
+            Root root = RootBuilder<Root>.Create(serviceProvider)
+                .WithXmlLayoutSheet(Path.Combine(Content.RootDirectory, "Gui", "Layouts", "TestLayout"))
+                .WithXmlStyleSheet(Path.Combine(Content.RootDirectory, "Gui", "Styles", "TestStyle"))
+                .WithDefaultElementNamespace()
+                .WithElementNamespace(Assembly.GetExecutingAssembly(), "Example.MonoGame.Elements")
+                .WithDefaultTemplateSheet()
                 .Build();
 
             // TODO: use this.Content to load your game content here

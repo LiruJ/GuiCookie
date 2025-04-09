@@ -1,7 +1,6 @@
-﻿using GuiCookie.Core.Attributes;
+﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.Styles.Attributes;
 using LiruGameHelper.Reflection;
-using System.Xml;
 
 namespace GuiCookie.Core.Styles
 {
@@ -27,7 +26,7 @@ namespace GuiCookie.Core.Styles
         public string Name { get; }
 
         /// <summary> The name of the <see cref="Style"/> that this style inherits from. </summary>
-        public string BaseStyleName { get; }
+        public string? BaseStyleName { get; }
 
         /// <summary> The base <see cref="StyleVariant"/> with no changes applied. </summary>
         public StyleVariant BaseVariant { get; }
@@ -37,47 +36,12 @@ namespace GuiCookie.Core.Styles
         #endregion
 
         #region Constructors
-        /// <summary> Creates a style from the given <paramref name="styleNode"/>. </summary>
-        /// <param name="styleNode"> The <see cref="XmlNode"/> that contains the element style. </param>
-        public Style(ResourceManager resourceManager, ConstructorCache<IStyleAttribute> attributeCache, XmlNode styleNode)
+        public Style(string name, string? baseStyleName, StyleVariant baseVariant)
         {
-            // Set the name of this style based on the name of the node.
-            Name = styleNode.Name;
-
-            // Create attributes from this style node.
-            AttributeCollection attributes = new(styleNode);
-
-            // Set the name of the base style if one was given.
-            BaseStyleName = attributes.GetAttributeOrDefault(BaseVariantName, string.Empty);
-
-            // Hold collections of the loaded variants and attributes.
-            List<StyleVariant> variants = [];
-            List<IStyleAttribute> styleAttributes = [];
-
-            // Read each child node.
-            foreach (XmlNode childNode in styleNode)
-            {
-                // If the child node has children, load it as a variant.
-                if (childNode.HasChildNodes)
-                    variants.Add(new StyleVariant(childNode, resourceManager, attributeCache));
-                // Otherwise; dynamically create the style attribute and add it to the list.
-                else
-                    styleAttributes.Add(attributeCache.CreateInstance(childNode.Name, resourceManager, new AttributeCollection(childNode)));
-            }
-
-            // Create the base variant using the loaded attributes.
-            BaseVariant = new StyleVariant(BaseVariantName, styleAttributes);
-            AddVariant(BaseVariant);
-
-            // Create the derived variants using the base variant.
-            foreach (StyleVariant variant in variants)
-            {
-                // Combine the variant with the base.
-                variant.CombineOverBase(BaseVariant);
-
-                // Add the variant to the dictionary using its name.
-                AddVariant(variant);
-            }
+            Name = !string.IsNullOrWhiteSpace(name) ? name : throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
+            BaseStyleName = baseStyleName;
+            BaseVariant = baseVariant;
+            AddVariant(baseVariant);
         }
 
         private Style(Style original)
@@ -104,7 +68,7 @@ namespace GuiCookie.Core.Styles
         public void AddVariant(StyleVariant variant)
         {
             // Add the variant to the dictionary using its name.
-            if (!styleVariantsByName.TryAdd(variant.Name, variant)) 
+            if (!styleVariantsByName.TryAdd(variant.Name, variant))
                 throw new Exception($"Style variant with name {variant.Name} has already been defined for style {Name}.");
         }
         #endregion
@@ -135,6 +99,46 @@ namespace GuiCookie.Core.Styles
                     AddVariant(baseVariantCopy);
                 }
             }
+        }
+        #endregion
+
+        #region Load Functions
+        public static Style Load(ResourceManager resourceManager, ConstructorCache<IStyleAttribute> attributeCache, IReadOnlySheetDataNode styleNode)
+        {
+            // Hold collections of the loaded variants and attributes.
+            List<StyleVariant> variants = [];
+            List<IStyleAttribute> styleAttributes = [];
+
+            // Read each child node.
+            foreach (IReadOnlySheetDataNode childNode in styleNode.ChildNodes)
+            {
+                // TODO: Be smarter with attribute names. ConstructorCache needs a way to find if a type with a given name exists. Try with just the node name, then append "StyleAttribute" if it doesn't exist".
+                // If the child node has children, load it as a variant.
+                if (childNode.ChildNodes.Count != 0)
+                    variants.Add(StyleVariant.Load(childNode, resourceManager, attributeCache));
+                // Otherwise; dynamically create the style attribute and add it to the list.
+                else
+                    styleAttributes.Add(attributeCache.CreateInstance(childNode.Name + "StyleAttribute", resourceManager, childNode.Attributes.CreateCopy()));
+            }
+            
+            // Set the name of the base style if one was given.
+            string? baseStyleName = styleNode.Attributes.GetAttributeOrDefault(BaseVariantName, (string?)null);
+
+            // Create the base variant using the loaded attributes.
+            StyleVariant baseVariant = new(BaseVariantName, styleAttributes);
+            Style style = new(styleNode.Name, baseStyleName, baseVariant);
+
+            // Create the derived variants using the base variant.
+            foreach (StyleVariant variant in variants)
+            {
+                // Combine the variant with the base.
+                variant.CombineOverBase(baseVariant);
+
+                // Add the variant to the dictionary using its name.
+                style.AddVariant(variant);
+            }
+
+            return style;
         }
         #endregion
 

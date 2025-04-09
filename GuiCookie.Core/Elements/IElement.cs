@@ -1,4 +1,4 @@
-﻿using GuiCookie.Core.Attributes;
+﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Roots;
 using GuiCookie.Core.Styles;
@@ -20,8 +20,8 @@ namespace GuiCookie.Core.Elements
         string Tag { get; }
         bool HasTag { get; }
         Root Root { get; }
-        IReadOnlyAttributes Attributes { get; }
-        Element Parent { get; set; }
+        IReadOnlyAttributeCollection Attributes { get; }
+        Element? Parent { get; set; }
         bool BlocksMouse { get; set; }
         bool EnabledAndVisible { get; set; }
         bool Enabled { get; set; }

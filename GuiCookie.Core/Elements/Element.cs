@@ -1,5 +1,5 @@
-﻿using GuiCookie.Core.Attributes;
-using GuiCookie.Core.Components;
+﻿using GuiCookie.Core.Components;
+using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Roots;
@@ -65,7 +65,8 @@ namespace GuiCookie.Core.Elements
             set
             {
                 // If the given value is the same as the existing one, do nothing.
-                if (name == value) return;
+                if (name == value)
+                    return;
 
                 // Save the old name.
                 string? oldName = name;
@@ -94,10 +95,10 @@ namespace GuiCookie.Core.Elements
         public Bounds Bounds { get; private set; }
 
         /// <summary> The attributes used to create this element from the layout sheet. </summary>
-        public IReadOnlyAttributes Attributes => Template.Attributes;
+        public IReadOnlyAttributeCollection Attributes => Template.Attributes;
 
         /// <summary> The element whose child is this element, or null if this is a root-level element. </summary>
-        public Element Parent
+        public Element? Parent
         {
             get => ElementContainer.Parent?.Element;
             set => ElementContainer.Parent = value?.ElementContainer;

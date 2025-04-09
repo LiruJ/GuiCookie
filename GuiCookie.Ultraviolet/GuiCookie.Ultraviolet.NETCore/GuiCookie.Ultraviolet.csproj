@@ -29,4 +29,8 @@
     <ProjectReference Include="..\..\GuiCookie.Core\GuiCookie.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
 </Project>

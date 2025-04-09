@@ -1,4 +1,4 @@
-﻿using GuiCookie.Core.Attributes;
+﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.Styles.DataStructures;
 using System.Drawing;
 
@@ -38,7 +38,7 @@ namespace GuiCookie.Core.Styles.Attributes
         #endregion
 
         #region Constructors
-        public ContentStyleAttribute(ResourceManager resourceManager, IReadOnlyAttributes attributes)
+        public ContentStyleAttribute(ResourceManager resourceManager, IReadOnlyAttributeCollection attributes)
         {
             // Parse the colour.
             TintedColour = new TintedColour(resourceManager, attributes);

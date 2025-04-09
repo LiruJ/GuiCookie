@@ -1,17 +1,18 @@
-﻿using GuiCookie.Core.Styles.Attributes;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Styles.Attributes;
 using LiruGameHelper.Reflection;
-using System.Xml;
+using System.Buffers;
 
 namespace GuiCookie.Core.Styles
 {
     public class StyleManager(ResourceManager resourceManager)
     {
         #region Constants
-        private const string resourcesNodeName = "Resources";
+        public const string ResourcesNodeName = "Resources";
 
+        public const string DefaultStyleAttributeName = "DefaultStyle";
+        
         private const string stylesNodeName = "Styles";
-
-        private const string defaultStyleAttributeName = "DefaultStyle";
         #endregion
 
         #region Backing Fields
@@ -21,64 +22,52 @@ namespace GuiCookie.Core.Styles
         #region Properties
         public IReadOnlyDictionary<string, Style> StylesByName => stylesByName;
 
-        public Style DefaultStyle { get; set; }
+        public Style? DefaultStyle { get; set; }
 
         public ResourceManager ResourceManager => resourceManager;
 
         public ConstructorCache<IStyleAttribute> AttributeConstructorCache { get; } = new ConstructorCache<IStyleAttribute>();
         #endregion
 
-        #region Constructors
-
+        #region Attribute Functions
+        public void RegisterDefaultAttributes()
+        {
+            // Register the default attributes.
+            AttributeConstructorCache.RegisterType(typeof(FontStyleAttribute));
+            AttributeConstructorCache.RegisterType(typeof(SliceFrameStyleAttribute));
+            AttributeConstructorCache.RegisterType(typeof(ContentStyleAttribute));
+        }
         #endregion
 
         #region Load Functions
-        public void LoadFromSheet(string sheetPath)
+        public void LoadFromSheet(IReadOnlySheetDataSource styleSheet, bool includeResources = false)
         {
-            if (string.IsNullOrEmpty(sheetPath))
-                throw new ArgumentNullException(nameof(sheetPath), "Missing stylesheet path!");
-
-            if (!File.Exists(sheetPath))
-                throw new FileNotFoundException($"No stylesheet exists at the given path! {sheetPath}");
-
-            using FileStream stream = File.OpenRead(sheetPath);
-            LoadFromSheet(stream);
-        }
-
-        public void LoadFromSheet(Stream stream)
-        {
-            XmlDocument styleSheet = new();
-            styleSheet.Load(stream);
-            LoadFromSheet(styleSheet);
-        }
-
-        public void LoadFromSheet(XmlDocument styleSheet)
-        {
-            // Get the main node.
-            XmlNode? mainNode = styleSheet.SelectSingleNode($"/Main/{stylesNodeName}") ?? throw new ArgumentException($"The main node was missing a {stylesNodeName} node.");
-            if (mainNode.NodeType != XmlNodeType.Element)
-                throw new ArgumentException("Styles node was not an element!");
-
-            loadStyles(mainNode);
-        }
-
-        private void loadStyles(XmlNode stylesNode)
-        {
-            // Go over each style in the styles node and add it.
-            List<Style> addedStyles = new(stylesNode.ChildNodes.Count);
-            foreach (XmlNode styleNode in stylesNode.ChildNodes)
+            if (includeResources)
             {
-                if (styleNode.NodeType != XmlNodeType.Element)
-                    continue;
+                IReadOnlySheetDataNode resourceNode = styleSheet.GetChildWithName(ResourcesNodeName) ?? throw new ArgumentException("Given style sheet is missing resource node!");
+                ResourceManager.LoadFromNode(resourceNode);
+            }
 
-                Style style = new(ResourceManager, AttributeConstructorCache, styleNode);
+            IReadOnlySheetDataNode mainStyleNode = styleSheet.GetChildWithName(stylesNodeName) ?? throw new ArgumentException("Given style sheet is missing style node!");
+
+            // Go over each style in the styles node and add it.
+            Style[] addedStyles = ArrayPool<Style>.Shared.Rent(mainStyleNode.ChildNodes.Count);
+            int addedStyleIndex = 0;
+            foreach (IReadOnlySheetDataNode styleNode in mainStyleNode.ChildNodes)
+            {
+                Style style = Style.Load(ResourceManager, AttributeConstructorCache, styleNode);
                 Add(style);
-                addedStyles.Add(style);
+                addedStyles[addedStyleIndex] = style;
             }
 
             // Combine the added styles with their base styles.
-            foreach (Style style in addedStyles)
+            for (int i = 0; i < addedStyleIndex; i++)
+            {
+                Style style = addedStyles[i];
                 combineStyleWithBase(style);
+            }
+
+            ArrayPool<Style>.Shared.Return(addedStyles, true);
         }
         #endregion
 
@@ -109,7 +98,7 @@ namespace GuiCookie.Core.Styles
 
         #region Get Functions
         public Style GetStyleFromName(string styleName)
-            => stylesByName.TryGetValue(styleName, out Style? style) ? style : throw new ArgumentException("Style with name \"{styleName}\" does not exist!");
+            => stylesByName.TryGetValue(styleName, out Style? style) ? style : throw new ArgumentException($"Style with name \"{styleName}\" does not exist!");
         #endregion
     }
 }

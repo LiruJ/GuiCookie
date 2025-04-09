@@ -1,4 +1,4 @@
-﻿using GuiCookie.Core.Attributes;
+﻿using GuiCookie.Core.Data;
 using System.Drawing;
 
 namespace GuiCookie.Core.Styles.DataStructures
@@ -51,7 +51,7 @@ namespace GuiCookie.Core.Styles.DataStructures
         /// <summary> Creates a new tinted colour loaded from the given <paramref name="attributes"/> and <paramref name="resourceManager"/>. </summary>
         /// <param name="resourceManager"> The resources used to link colour references. </param>
         /// <param name="attributes"> The attributes from which to take the colour data. </param>
-        public TintedColour(ResourceManager resourceManager, IReadOnlyAttributes attributes)
+        public TintedColour(ResourceManager resourceManager, IReadOnlyAttributeCollection attributes)
         {
             // Ensure validity.
             ArgumentNullException.ThrowIfNull(attributes);

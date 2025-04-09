@@ -1,5 +1,5 @@
-﻿using GuiCookie.Core.Attributes;
-using GuiCookie.Core.Components;
+﻿using GuiCookie.Core.Components;
+using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Roots;
@@ -8,12 +8,13 @@ using GuiCookie.Core.Styles;
 using GuiCookie.Core.Templates;
 using LiruGameHelper.Reflection;
 using System.Collections;
-using System.Xml;
 
 namespace GuiCookie.Core.Elements
 {
-    /// <summary> Allows for elements to be created from templates. </summary>
-    public class ElementManager : IEnumerable<Element>, IUpdateableUIService
+    /// <summary>
+    /// Allows for elements to be created from templates.
+    /// </summary>
+    public class ElementManager(ComponentManager componentManager, TemplateManager templateManager, StyleManager styleManager, ConstructorCache<Element> elementCache, IServiceProvider serviceProvider) : IEnumerable<Element>, IUpdateableUIService
     {
         #region Constants
         private const string styleAttributeName = "Style";
@@ -21,13 +22,14 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Dependencies
-        private readonly IServiceProvider serviceProvider;
+        private readonly IServiceProvider serviceProvider = serviceProvider;
 
-        private readonly Root root;
-        private readonly ComponentManager componentManager;
-        private readonly TemplateManager templateManager;
-        private readonly StyleManager styleManager;
-        private readonly ConstructorCache<Element> elementCache;
+        private readonly ComponentManager componentManager = componentManager;
+        private readonly TemplateManager templateManager = templateManager;
+        private readonly StyleManager styleManager = styleManager;
+        private readonly ConstructorCache<Element> elementCache = elementCache;
+
+        private Root? root = null;
         #endregion
 
         #region Fields
@@ -35,65 +37,45 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Internal Properties
-        internal ElementContainer ElementContainer { get; private set; }
+        internal ElementContainer? RootElements { get; private set; }
         #endregion
 
         #region Properties
         public int Order => 10;
         #endregion
 
-        #region Constructors
-        public ElementManager(ComponentManager componentManager, TemplateManager templateManager, StyleManager styleManager, ConstructorCache<Element> elementCache, IServiceProvider serviceProvider)
-        {
-            // Set dependencies.
-            //this.root = root ?? throw new ArgumentNullException(nameof(root));
-            this.componentManager = componentManager ?? throw new ArgumentNullException(nameof(componentManager));
-            this.templateManager = templateManager ?? throw new ArgumentNullException(nameof(templateManager));
-            this.styleManager = styleManager ?? throw new ArgumentNullException(nameof(styleManager));
-            this.elementCache = elementCache ?? throw new ArgumentNullException(nameof(elementCache));
-            this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            
-            // Initialise the elements list.
-            ElementContainer = new ElementContainer(root);
-
-            // Bind to signals.
-            //ElementContainer.OnChildAdded.Connect(addTaggedElement);
-            ElementContainer.OnChildRemoved.Connect(removeTaggedElement);
-        }
-        #endregion
-
         #region Root Functions
         internal void onRootCreated(Root root)
         {
+            this.root = root;
 
+            RootElements = new ElementContainer(root);
+
+            // Bind to signals.
+            //ElementContainer.OnChildAdded.Connect(addTaggedElement);
+            RootElements.OnChildRemoved.Connect(removeTaggedElement);
         }
         #endregion
 
         #region Load Functions
-        internal void LoadFromNode(XmlNode mainNode)
+        internal void LoadFromNode(SheetDataNode mainNode)
         {
             // Load each element node within the main node.
-            foreach (XmlNode elementNode in mainNode)
+            foreach (SheetDataNode elementNode in mainNode.ChildNodes)
                 loadElementFromNode(elementNode);
         }
 
-        private Element? loadElementFromNode(XmlNode elementNode, Template? parentTemplate = null, Element? parentElement = null)
+        private Element? loadElementFromNode(SheetDataNode elementNode, Template? parentTemplate = null, Element? parentElement = null)
         {
-            // If the node is a comment, do nothing.
-            if (elementNode.NodeType == XmlNodeType.Comment) 
-                return null;
-
-            // Create the element attributes from the node attributes.
-            AttributeCollection attributes = new(elementNode);
-
             // Get the template from the element node name.
             Template template = templateManager.GetTemplateFromName(elementNode.Name);
 
             // Create the element with no children, this allows any template-specific children to be overriden.
-            Element element = createElementFromTemplateNoChildren(template, parentTemplate, attributes, parentElement);
+            Element element = createElementFromTemplateNoChildren(template, parentTemplate, elementNode.Attributes, parentElement);
 
             // Recursively call this function for every child node within this element.
-            foreach (XmlNode childNode in elementNode.ChildNodes) loadElementFromNode(childNode, template, element);
+            foreach (SheetDataNode childNode in elementNode.ChildNodes)
+                loadElementFromNode(childNode, template, element);
 
             // Go over each child template within the template, add any that are unnamed or that are named but with no matching child element. 
             foreach (Template childTemplate in template.Children)
@@ -112,13 +94,13 @@ namespace GuiCookie.Core.Elements
         /// <param name="parent"> The <see cref="Element"/> to parent the new <see cref="Element"/> to. </param>
         /// <param name="inputs"> Any items to be passed through to the constructor of the <see cref="Element"/>. </param>
         /// <returns> The created <see cref="Element"/>. </returns>
-        public Element CreateElementFromTemplateName(string templateName, AttributeCollection attributes = null, Element parent = null, params object[] inputs)
+        public Element CreateElementFromTemplateName(string templateName, AttributeCollection? attributes = null, Element? parent = null, params object[] inputs)
             => createElementFromTemplate(templateManager.GetTemplateFromName(templateName), null, attributes, parent, false, inputs);
 
-        public Element CreateElementFromTemplate(Template template, AttributeCollection attributes = null, Element parent = null, params object[] inputs)
+        public Element CreateElementFromTemplate(Template template, AttributeCollection? attributes = null, Element? parent = null, params object[] inputs)
             => createElementFromTemplate(template, null, attributes, parent, false, inputs);
 
-        private Element createElementFromTemplate(Template template, Template parentTemplate = null, AttributeCollection attributes = null, Element parent = null, bool isChild = false, params object[] inputs)
+        private Element createElementFromTemplate(Template template, Template? parentTemplate = null, AttributeCollection? attributes = null, Element? parent = null, bool isChild = false, params object[] inputs)
         {
             // Create the element from the template with no children.
             Element element = createElementFromTemplateNoChildren(template, parentTemplate, attributes, parent, inputs);
@@ -139,17 +121,21 @@ namespace GuiCookie.Core.Elements
             return element;
         }
 
-        private Element createElementFromTemplateNoChildren(Template template, Template parentTemplate, AttributeCollection attributes, Element parent, params object[] inputs)
+        private Element createElementFromTemplateNoChildren(Template template, Template? parentTemplate, AttributeCollection? attributes, Element? parent, params object[] inputs)
         {
+            if (root == null)
+                throw new InvalidOperationException("Root should not be null if elements are to be created!");
+
             // If the parent template exists and defines a template with the same name as the new element, use that template instead of the given one.
-            string identifierName = attributes?.GetAttributeOrDefault(nameAttributeName, (string)null);
-            if (parentTemplate == null || identifierName == null || !parentTemplate.ChildrenByIdentifierName.TryGetValue(identifierName, out Template baseTemplate)) baseTemplate = template;
+            string? identifierName = attributes?.GetAttributeOrDefault(nameAttributeName, (string?)null);
+            if (parentTemplate == null || identifierName == null || !parentTemplate.ChildrenByIdentifierName.TryGetValue(identifierName, out Template? baseTemplate)) 
+                baseTemplate = template;
 
             // If attributes were given, combine them with the base template to make a unique template for this element.
             Template elementTemplate = attributes == null || attributes.Count == 0 ? baseTemplate.CreateCopy() : baseTemplate.CombineOver(attributes);
 
             // Get the style name from the element template attributes, if the style is missing, use the default.
-            string styleName = elementTemplate.Attributes.GetAttributeOrDefault(styleAttributeName, string.Empty);
+            string? styleName = elementTemplate.Attributes.GetAttributeOrDefault(styleAttributeName, string.Empty);
             Style style = string.IsNullOrWhiteSpace(styleName) ? styleManager.DefaultStyle.CreateCopy() : styleManager.GetStyleFromName(styleName);
 
             // Create the element.
@@ -159,7 +145,7 @@ namespace GuiCookie.Core.Elements
             Dictionary<Type, Component> components = componentManager.CreateComponents(elementTemplate.ComponentNames, element, inputs);
 
             // Initialise the element internally.
-            element.internalOnCreated(root, this, styleManager, elementTemplate, parent == null ? ElementContainer : parent.ElementContainer, style, components);
+            element.internalOnCreated(root, this, styleManager, elementTemplate, parent == null ? RootElements : parent.ElementContainer, style, components);
 
             // Handle adding the element as tagged.
             addTaggedElement(element);
@@ -177,7 +163,7 @@ namespace GuiCookie.Core.Elements
             ArgumentNullException.ThrowIfNull(element);
 
             // Try to add the element.
-            return ElementContainer.AddChild(element.ElementContainer);
+            return RootElements!.AddChild(element.ElementContainer);
         }
 
         private void addTaggedElement(Element element)
@@ -205,7 +191,7 @@ namespace GuiCookie.Core.Elements
             ArgumentNullException.ThrowIfNull(element);
 
             // Try to remove the element.
-            if (!ElementContainer.RemoveChild(element.ElementContainer)) throw new Exception("Cannot remove element from root.");
+            if (!RootElements!.RemoveChild(element.ElementContainer)) throw new Exception("Cannot remove element from root.");
         }
 
         public void Destroy(Element element)
@@ -219,9 +205,9 @@ namespace GuiCookie.Core.Elements
 
         public T GetElementFromTag<T>(string tag) where T : Element => elementsByTag.TryGetValue(tag, out Element element) && element is T typedElement ? typedElement : null;
 
-        public IEnumerator<Element> GetEnumerator() => ElementContainer.GetEnumerator();
+        public IEnumerator<Element> GetEnumerator() => RootElements.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => ElementContainer.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => RootElements.GetEnumerator();
         #endregion
 
         #region Update Functions
@@ -233,18 +219,20 @@ namespace GuiCookie.Core.Elements
         public void Update(TimeSpan elapsedTime, TimeSpan totalTime)
         {
             // Update root-level elements, they will then recursively update their children.
-            foreach (Element element in ElementContainer) element.InternalUpdate(elapsedTime, totalTime);
+            foreach (Element element in RootElements!)
+                element.InternalUpdate(elapsedTime, totalTime);
 
             // Flush the removal/addition queues of the root container.
-            ElementContainer.flushQueues();
+            RootElements.flushQueues();
 
             // Late update all root-level elements.
-            foreach (Element element in ElementContainer) element.InternalLateUpdate(elapsedTime, totalTime);
+            foreach (Element element in RootElements) 
+                element.InternalLateUpdate(elapsedTime, totalTime);
         }
 
         public void PostUpdate(TimeSpan elapsedTime, TimeSpan totalTime)
         {
-            throw new NotImplementedException();
+            
         }
         #endregion
 
@@ -252,7 +240,7 @@ namespace GuiCookie.Core.Elements
         internal void Draw(IGuiCamera guiCamera)
         {
             // Draw root-level elements, they will then recursively draw their children.
-            foreach (Element element in ElementContainer) 
+            foreach (Element element in RootElements!) 
                 element.InternalDraw(guiCamera);
         }
         #endregion

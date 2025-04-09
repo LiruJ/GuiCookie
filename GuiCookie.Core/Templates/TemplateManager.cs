@@ -1,5 +1,6 @@
-﻿using System.Reflection;
-using System.Xml;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Data.Xml;
+using System.Reflection;
 
 namespace GuiCookie.Core.Templates
 {
@@ -7,7 +8,7 @@ namespace GuiCookie.Core.Templates
     public class TemplateManager : IReadOnlyTemplateManager
     {
         #region Constants
-        private const string defaultTemplateSheetPath = "GuiCookie.Templates.Templates.xml";
+        private const string defaultTemplateSheetPath = "GuiCookie.Core.Templates.Templates.xml";
         #endregion
 
         #region Fields
@@ -19,9 +20,11 @@ namespace GuiCookie.Core.Templates
         /// <param name="templateName"> The name of the template to get. </param>
         /// <returns> The template with the given <paramref name="templateName"/>. </returns>
         public Template GetTemplateFromName(string templateName)
-            => string.IsNullOrWhiteSpace(templateName) ? throw new ArgumentException("Template name cannot be null") : templatesByName.TryGetValue(templateName, out Template template)
-            ? template
-            : throw new Exception($"Template with name {templateName} was not defined or included.");
+            => string.IsNullOrWhiteSpace(templateName) 
+            ? throw new ArgumentException("Template name cannot be null") 
+            : templatesByName.TryGetValue(templateName, out Template? template)
+                ? template
+                : throw new Exception($"Template with name {templateName} was not defined or included.");
         #endregion
 
         #region Load Functions
@@ -29,70 +32,32 @@ namespace GuiCookie.Core.Templates
         public void LoadDefault()
         {
             // Load the embedded xml file for the pre-defined templates, then load their contents.
-            using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(defaultTemplateSheetPath);
-
-            // Load the file from the stream.
-            XmlDocument templateSheet = new();
-            templateSheet.Load(stream);
+            using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(defaultTemplateSheetPath)
+                ?? throw new InvalidDataException("Missing default template sheet!");
 
             // Load the contents of the file.
-            loadFromSheet(templateSheet);
+            XmlSheetDataSource dataSource = XmlSheetDataSource.Load(stream, defaultTemplateSheetPath);
+            LoadFromSheet(dataSource);
         }
 
-        /// <summary> Loads the template file at the given <paramref name="sheetPath"/> relative to the given <paramref name="rootDirectory"/> path. </summary>
-        /// <param name="sheetPath"> The path of the template file, relative to the <paramref name="rootDirectory"/> path. </param>
-        /// <param name="rootDirectory"> The root path, usually the content root path. </param>
-        public void LoadFromSheet(string sheetPath, string rootDirectory)
+        public void LoadFromSheet(IReadOnlySheetDataSource templateSheet)
         {
-            // Ensure the path is not null.
-            if (string.IsNullOrWhiteSpace(sheetPath))
-                throw new ArgumentException($"'{nameof(sheetPath)}' cannot be null or whitespace.", nameof(sheetPath));
-
-            // Add an extension to the path if it is missing.
-            if (!Path.HasExtension(sheetPath))
-                sheetPath = Path.ChangeExtension(sheetPath, ".xml");
-
-            // Convert the path to be relative to the content.
-            sheetPath = Path.Combine(rootDirectory, sheetPath);
-
-            // If the file does not exist, throw an exception.
-            if (!File.Exists(sheetPath))
-                throw new FileNotFoundException("The given template sheet file path does not exist.", sheetPath);
-
-            // Load the xml file.
-            XmlDocument templateSheet = new();
-            templateSheet.Load(sheetPath);
-
-            // Load the contents of the sheet.
-            loadFromSheet(templateSheet);
-        }
-
-        private void loadFromSheet(XmlDocument templateSheet)
-        {
-            // Get the main node from the sheet.
-            XmlNode mainNode = templateSheet.LastChild;
-
             // Go over each template within the main node.
-            foreach (XmlNode templateNode in mainNode)
-            {
-                // If the node is a comment, skip it.
-                if (templateNode.NodeType == XmlNodeType.Comment) continue;
-
-                // Get the template from the node, this automatically adds it.
-                getRootTemplate(mainNode, templateNode.Name);
-            }
+            foreach (IReadOnlySheetDataNode templateNode in templateSheet.RootNode.ChildNodes)
+                getRootTemplate(templateSheet.RootNode, templateNode.Name);
         }
 
-        internal Template getRootTemplate(XmlNode mainNode, string name)
+        internal Template getRootTemplate(IReadOnlySheetDataNode mainNode, string name)
         {
             // If the root template is already loaded, return it.
-            if (templatesByName.TryGetValue(name, out Template? template)) return template;
+            if (templatesByName.TryGetValue(name, out Template? template))
+                return template;
 
             // Otherwise; find it within the main node.
-            XmlNode templateNode = mainNode.SelectSingleNode(name) ?? throw new Exception($"Could not find template node with name: {name}");
+            IReadOnlySheetDataNode templateNode = mainNode.GetChildWithName(name) ?? throw new Exception($"Could not find template node with name: {name}");
 
             // Load the template.
-            template = Template.LoadFromXML(this, mainNode, templateNode);
+            template = Template.Load(this, mainNode, templateNode);
 
             // Add the template to the dictionary keyed by its name.
             templatesByName.Add(template.Name, template);

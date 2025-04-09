@@ -1,4 +1,4 @@
-﻿using GuiCookie.Core.Attributes;
+﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.Helpers;
 using System.Drawing;
 using System.Numerics;
@@ -221,7 +221,7 @@ namespace GuiCookie.Core.DataStructures
         #region Constructors
         /// <summary> Create a new <see cref="Bounds"/> with the given <see cref="Attributes"/>. </summary>
         /// <param name="elementAttributes"> The attributes of the containing <see cref="Elements"/>, which is used to determine spacing data. </param>
-        public Bounds(ElementContainer elementContainer, IReadOnlyAttributes elementAttributes)
+        public Bounds(ElementContainer elementContainer, IReadOnlyAttributeCollection elementAttributes)
         {
             ElementContainer = elementContainer ?? throw new ArgumentNullException(nameof(elementContainer));
 
@@ -252,7 +252,7 @@ namespace GuiCookie.Core.DataStructures
             recalculatePosition();
         }
 
-        internal Bounds(ElementContainer elementContainer, Point windowSize, IReadOnlyAttributes rootAttributes)
+        internal Bounds(ElementContainer elementContainer, Point windowSize, IReadOnlyAttributeCollection rootAttributes)
         {
             ElementContainer = elementContainer ?? throw new ArgumentNullException(nameof(elementContainer));
 

@@ -1,7 +1,6 @@
-﻿using GuiCookie.Core.Attributes;
+﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.Styles.Attributes;
 using LiruGameHelper.Reflection;
-using System.Xml;
 
 namespace GuiCookie.Core.Styles
 {
@@ -31,21 +30,6 @@ namespace GuiCookie.Core.Styles
             // Add each style attribute.
             foreach (IStyleAttribute styleAttribute in styleAttributes)
                 AddAttribute(styleAttribute);
-        }
-
-        public StyleVariant(XmlNode variantNode, ResourceManager resourceManager, ConstructorCache<IStyleAttribute> attributeCache)
-        {
-            // Set the name.
-            Name = variantNode.Name;
-
-            foreach (XmlNode childNode in variantNode)
-            {
-                // Create the attribute.
-                IStyleAttribute styleAttribute = attributeCache.CreateInstance(childNode.Name, resourceManager, new AttributeCollection(childNode));
-
-                // Try to add the attributes to the collection.
-                AddAttribute(styleAttribute);
-            }
         }
 
         private StyleVariant(StyleVariant original)
@@ -121,6 +105,23 @@ namespace GuiCookie.Core.Styles
                 // Otherwise; combine the derived attribute over the base attribute.
                 else derivedAttribute.OverrideBaseAttribute(baseAttribute);
             }
+        }
+        #endregion
+
+        #region Load Functions
+        public static StyleVariant Load(IReadOnlySheetDataNode variantNode, ResourceManager resourceManager, ConstructorCache<IStyleAttribute> attributeCache)
+        {
+            List<IStyleAttribute> attributes = [];
+            foreach (IReadOnlySheetDataNode childNode in variantNode.ChildNodes)
+            {
+                // Create the attribute.
+                IStyleAttribute styleAttribute = attributeCache.CreateInstance(childNode.Name + "StyleAttribute", resourceManager, childNode.Attributes.CreateCopy());
+
+                // Try to add the attributes to the collection.
+                attributes.Add(styleAttribute);
+            }
+
+            return new StyleVariant(variantNode.Name, attributes);
         }
         #endregion
 

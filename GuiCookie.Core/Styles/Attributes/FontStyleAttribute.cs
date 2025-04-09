@@ -1,4 +1,4 @@
-﻿using GuiCookie.Core.Attributes;
+﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles.DataStructures;
@@ -59,7 +59,7 @@ namespace GuiCookie.Core.Styles.Attributes
         #endregion
 
         #region Constructors
-        public FontStyleAttribute(ResourceManager resourceManager, IReadOnlyAttributes attributes)
+        public FontStyleAttribute(ResourceManager resourceManager, IReadOnlyAttributeCollection attributes)
         {
             // Try get the font name from the attributes, default to null.
             string fontName = attributes.GetAttributeOrDefault(FontAttributeName, string.Empty);

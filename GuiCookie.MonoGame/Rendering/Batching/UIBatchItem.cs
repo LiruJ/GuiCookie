@@ -122,7 +122,7 @@ namespace GuiCookie.MonoGame.Rendering.Batching
         #endregion
 
         #region IComparable Functions
-        public int CompareTo(UIBatchItem other)
+        public int CompareTo(UIBatchItem? other)
             => SortKey.CompareTo(other?.SortKey ?? 0);
         #endregion
 

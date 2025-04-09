@@ -1,4 +1,4 @@
-﻿using GuiCookie.Core.Attributes;
+﻿using GuiCookie.Core.Data;
 using LiruGameHelper.Parsers;
 using System.Drawing;
 using System.Numerics;
@@ -45,7 +45,7 @@ namespace GuiCookie.Core.Styles.DataStructures
         /// <summary> Creates a new drop shadow loaded from the given <paramref name="attributes"/> and <paramref name="resourceManager"/>. </summary>
         /// <param name="resourceManager"> The resources used to link colour references. </param>
         /// <param name="attributes"> The attributes from which to take the shadow data. </param>
-        public DropShadow(ResourceManager resourceManager, IReadOnlyAttributes attributes)
+        public DropShadow(ResourceManager resourceManager, IReadOnlyAttributeCollection attributes)
         {
             // Ensure validity.
             ArgumentNullException.ThrowIfNull(resourceManager);

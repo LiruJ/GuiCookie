@@ -1,9 +1,8 @@
-﻿using GuiCookie.Core.Attributes;
+﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.Rendering;
 using LiruGameHelper.Parsers;
 using LiruGameHelper.XML;
 using System.Drawing;
-using System.Xml;
 
 namespace GuiCookie.Core.Styles
 {
@@ -59,6 +58,55 @@ namespace GuiCookie.Core.Styles
         public IReadOnlyDictionary<string, Color> ColoursByName => coloursByName;
         #endregion
 
+        #region Get Functions
+        /// <summary>
+        /// Gets a <see cref="Color"/> from the given <paramref name="attributes"/> with the given <paramref name="attributeName"/>.
+        /// If the colour cannot be parsed or does not exist, returns <paramref name="defaultTo"/>.
+        /// This will use <see cref="ColoursByName"/> if the value starts with the '$' symbol.
+        /// </summary>
+        /// <param name="attributes"> The attributes to check for the value with the given <paramref name="attributeName"/> key. </param>
+        /// <param name="attributeName"> The name of the attribute to try to parse. </param>
+        /// <param name="defaultTo"> The default <see cref="Color"/> to use if the parsing fails. </param>
+        /// <returns> The parsed <see cref="Color"/> if the attribute exists and was parsed successfully into a colour; otherwise <paramref name="defaultTo"/>. </returns>
+        public Color? GetColourOrDefault(IReadOnlyAttributeCollection attributes, string attributeName, Color? defaultTo = null)
+            => GetColourOrDefault(attributes.GetAttributeOrDefault(attributeName, (string?)null), defaultTo);
+
+        /// <summary>
+        /// Tries to parse the given <paramref name="colourString"/> as a <see cref="Color"/>, returning <paramref name="defaultTo"/> if it fails.
+        /// This will use <see cref="ColoursByName"/> if the value starts with the '$' symbol.
+        /// </summary>
+        /// <param name="colourString"> The raw colour as a string. </param>
+        /// <param name="defaultTo"> The default <see cref="Color"/> to use if the parsing fails. </param>
+        /// <returns> The parsed <see cref="Color"/> if the <paramref name="colourString"/> was parsed successfully into a colour; otherwise <paramref name="defaultTo"/>. </returns>
+        /// <seealso cref="Colour.TryParse(string, out Color)"/>
+        public Color? GetColourOrDefault(string? colourString, Color? defaultTo = null)
+        {
+            // If the given string is empty, return the default colour.
+            if (string.IsNullOrWhiteSpace(colourString))
+                return defaultTo;
+
+            // If the string begins with a '$', get the colour from the dictionary.
+            if (colourString.StartsWith('$'))
+            {
+                // If the colour string is literally just '$', return the default colour.
+                if (colourString.Length == 1)
+                    return defaultTo;
+                // Otherwise; try to get the colour from the dictionary.
+                else if (coloursByName.TryGetValue(colourString[1..], out Color resourceColour))
+                    return resourceColour;
+                // In this case, it's clear that the user wanted a colour from the dictionary. Instead of returning the default colour, throw an exception. This makes it a little less confusing.
+                else
+                    throw new Exception($"Colour with name {colourString[1..]} was not defined as a resource.");
+            }
+            // Otherwise; parse and return the colour.
+            else if (Colour.TryParse(colourString, out Color parsedColour))
+                return parsedColour;
+            // Finally, if all else fails, return the default colour.
+            else
+                return defaultTo;
+        }
+        #endregion
+
         #region Add Functions
         /// <summary> Adds the given <paramref name="colour"/> to the <see cref="ColoursByName"/> keyed by the given <paramref name="name"/> </summary>
         /// <param name="name"> The key. </param>
@@ -109,104 +157,63 @@ namespace GuiCookie.Core.Styles
         #endregion
 
         #region Load Functions
-        /// <summary> Loads the given <paramref name="resourceNode"/> into this resource manager. </summary>
-        /// <param name="resourceNode"> The XML node containing the resources. </param>
-        public virtual void Load(XmlNode resourceNode)
-        {
-            // Ensure the node exists.
-            ArgumentNullException.ThrowIfNull(resourceNode);
 
+        public virtual void LoadFromSheet(IReadOnlySheetDataSource styleSheet)
+        {
+            IReadOnlySheetDataNode resourceNode = styleSheet.GetChildWithName(StyleManager.ResourcesNodeName) ?? throw new ArgumentException("Given style sheet is missing resource node!");
+            LoadFromNode(resourceNode);
+        }
+
+        /// <summary> Loads the given <paramref name="resourceNode"/> into this resource manager. </summary>
+        /// <param name="resourceNode"> The node containing the resources. </param>
+        public virtual void LoadFromNode(IReadOnlySheetDataNode resourceNode)
+        {
             // Get the root path for the resources.
-            resourceNode.GetAttributeValue(rootFolderAttributeName, out string rootFolder);
+            string? rootFolder = resourceNode.Attributes.GetAttributeOrDefault(rootFolderAttributeName, (string?)null);
 
             // Load the colours, fonts, and images.
-            loadColours(resourceNode.SelectSingleNode(coloursNodeName));
-            loadFonts(resourceNode.SelectSingleNode(fontsNodeName), rootFolder);
-            loadImages(resourceNode.SelectSingleNode(imagesNodeName), rootFolder);
+            loadColours(resourceNode.GetChildWithName(coloursNodeName));
+            loadFonts(resourceNode.GetChildWithName(fontsNodeName), rootFolder);
+            loadImages(resourceNode.GetChildWithName(imagesNodeName), rootFolder);
         }
 
-        private void loadColours(XmlNode coloursNode)
+        private void loadColours(IReadOnlySheetDataNode? coloursNode)
         {
             // Do nothing if the given node does not exist.
-            if (coloursNode == null) return;
+            if (coloursNode == null)
+                return;
 
             // Load the colours.
-            foreach (XmlNode colourNode in coloursNode)
+            foreach (IReadOnlySheetDataNode colourNode in coloursNode.ChildNodes)
                 // Add the parsed colour to the dictionary with the node's name.
-                AddColour(colourNode.Name, colourNode.ParseAttributeValue(colourAttributeName, Colour.Parse));
+                AddColour(colourNode.Name, colourNode.Attributes.GetAttribute(colourAttributeName, Colour.Parse));
         }
 
-        private void loadFonts(XmlNode fontsNode, string rootFolder)
+        private void loadFonts(IReadOnlySheetDataNode? fontsNode, string? rootFolder)
         {
             // Do nothing if the given node does not exist.
-            if (fontsNode == null) return;
+            if (fontsNode == null)
+                return;
 
             // Load the fonts.
-            foreach (XmlNode fontNode in fontsNode)
+            foreach (IReadOnlySheetDataNode fontNode in fontsNode.ChildNodes)
                 loadFontFromNode(fontNode, rootFolder);
         }
 
-        protected abstract void loadFontFromNode(XmlNode fontNode, string rootFolder);
+        protected abstract void loadFontFromNode(IReadOnlySheetDataNode? fontNode, string? rootFolder);
 
-        private void loadImages(XmlNode imagesNode, string rootFolder)
+        private void loadImages(IReadOnlySheetDataNode? imagesNode, string? rootFolder)
         {
             // Do nothing if the given node does not exist.
-            if (imagesNode == null) return;
+            if (imagesNode == null)
+                return;
 
             // Load the images.
-            foreach (XmlNode imageNode in imagesNode)
+            foreach (IReadOnlySheetDataNode imageNode in imagesNode.ChildNodes)
                 loadImageFromNode(imageNode, rootFolder);
         }
 
-        protected abstract void loadImageFromNode(XmlNode imageNode, string rootFolder);
-        #endregion
-
-        #region Get Functions
-        /// <summary>
-        /// Gets a <see cref="Color"/> from the given <paramref name="attributes"/> with the given <paramref name="attributeName"/>.
-        /// If the colour cannot be parsed or does not exist, returns <paramref name="defaultTo"/>.
-        /// This will use <see cref="ColoursByName"/> if the value starts with the '$' symbol.
-        /// </summary>
-        /// <param name="attributes"> The attributes to check for the value with the given <paramref name="attributeName"/> key. </param>
-        /// <param name="attributeName"> The name of the attribute to try to parse. </param>
-        /// <param name="defaultTo"> The default <see cref="Color"/> to use if the parsing fails. </param>
-        /// <returns> The parsed <see cref="Color"/> if the attribute exists and was parsed successfully into a colour; otherwise <paramref name="defaultTo"/>. </returns>
-        public Color? GetColourOrDefault(IReadOnlyAttributes attributes, string attributeName, Color? defaultTo = null) 
-            => GetColourOrDefault(attributes.GetAttributeOrDefault(attributeName, string.Empty), defaultTo);
-
-        /// <summary>
-        /// Tries to parse the given <paramref name="colourString"/> as a <see cref="Color"/>, returning <paramref name="defaultTo"/> if it fails.
-        /// This will use <see cref="ColoursByName"/> if the value starts with the '$' symbol.
-        /// </summary>
-        /// <param name="colourString"> The raw colour as a string. </param>
-        /// <param name="defaultTo"> The default <see cref="Color"/> to use if the parsing fails. </param>
-        /// <returns> The parsed <see cref="Color"/> if the <paramref name="colourString"/> was parsed successfully into a colour; otherwise <paramref name="defaultTo"/>. </returns>
-        /// <seealso cref="Colour.TryParse(string, out Color)"/>
-        public Color? GetColourOrDefault(string colourString, Color? defaultTo = null)
-        {
-            // If the given string is empty, return the default colour.
-            if (string.IsNullOrWhiteSpace(colourString)) return defaultTo;
-
-            // If the string begins with a '$', get the colour from the dictionary.
-            if (colourString.StartsWith('$'))
-            {
-                // If the colour string is literally just '$', return the default colour.
-                if (colourString.Length == 1) 
-                    return defaultTo;
-                // Otherwise; try to get the colour from the dictionary.
-                else if (coloursByName.TryGetValue(colourString[1..], out Color resourceColour))
-                    return resourceColour;
-                // In this case, it's clear that the user wanted a colour from the dictionary. Instead of returning the default colour, throw an exception. This makes it a little less confusing.
-                else 
-                    throw new Exception($"Colour with name {colourString[1..]} was not defined as a resource.");
-            }
-            // Otherwise; parse and return the colour.
-            else if (Colour.TryParse(colourString, out Color parsedColour))
-                return parsedColour;
-            // Finally, if all else fails, return the default colour.
-            else 
-                return defaultTo;
-        }
+        protected abstract void loadImageFromNode(IReadOnlySheetDataNode? imageNode, string? rootFolder);
         #endregion
     }
 }
