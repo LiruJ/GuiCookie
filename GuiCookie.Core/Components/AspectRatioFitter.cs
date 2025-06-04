@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.Styles.DataStructures;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Styles.DataStructures;
 using LiruGameHelper.Helpers;
 using System.Drawing;
 
@@ -31,21 +32,21 @@ namespace GuiCookie.Core.Components
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
             // Get the aspect ratio properties.
-            Mode = Element.Attributes.GetEnumAttributeOrDefault(modeAttributeName, AspectRatioMode.None);
-            ratio = Element.Attributes.GetAttributeOrDefault(valueAttributeName, (float?)null);
+            Mode = attributes.GetEnumAttributeOrDefault(modeAttributeName, AspectRatioMode.None);
+            ratio = attributes.GetAttributeOrDefault(valueAttributeName, (float?)null);
         }
 
-        public override void OnSetup()
+        public override void OnSetup(IReadOnlyAttributeCollection attributes)
         {
             // Set the ratio to the supplied attribute, or if none exists, it's calculated from the bound size.
             if (!ratio.HasValue) 
-                ratio = Element.Attributes.GetAttributeOrDefault(valueAttributeName, (float)Bounds.TotalSize.X / Bounds.TotalSize.Y);
+                ratio = attributes.GetAttributeOrDefault(valueAttributeName, (float)Bounds.TotalSize.X / Bounds.TotalSize.Y);
         }
 
-        public override void OnPostSetup()
+        public override void OnPostSetup(IReadOnlyAttributeCollection attributes)
         {
             if (ratio.HasValue) 
                 ValidateSizeChanged();

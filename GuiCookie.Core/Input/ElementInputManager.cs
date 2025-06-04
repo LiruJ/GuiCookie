@@ -167,9 +167,6 @@ namespace GuiCookie.Core.Input
             return null;
         }
 
-        public T? FindInBoundsWithInterfacedComponent<T>(ElementManager container, Rectangle bounds, Element? ignoreElement = null) where T : class
-            => FindInBoundsWithInterfacedComponent<T>(container.RootElements, bounds, ignoreElement);
-
         public T? FindInBoundsWithInterfacedComponent<T>(Element container, Rectangle bounds, Element? ignoreElement = null) where T : class
             => FindInBoundsWithInterfacedComponent<T>(container.ElementContainer, bounds, ignoreElement);
 

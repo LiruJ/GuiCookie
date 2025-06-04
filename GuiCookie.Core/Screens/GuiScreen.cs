@@ -6,13 +6,11 @@ using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Services;
 using LiruGameHelper.Signals;
 using System.Drawing;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace GuiCookie.Core.Roots
+namespace GuiCookie.Core.Screens
 {
-    /// <summary>
-    /// The base class for a UI controller, inherit from this and create a new inherited class via the <see cref="UIManager"/> to create a custom UI controller.
-    /// </summary>
-    public class Root : IDisposable
+    public class GuiScreen : IDisposable
     {
         #region Dependencies
         public ElementManager ElementManager { get; }
@@ -32,9 +30,7 @@ namespace GuiCookie.Core.Roots
         /// <summary>
         /// The bounds of the game window.
         /// </summary>
-        public Bounds Bounds { get; private set; }
-
-        public ElementContainer Elements => Bounds.ElementContainer;
+        public Bounds Bounds => ElementManager.RootElement.Bounds;
 
         /// <summary>
         /// Gets a value that is <c>true</c> when the mouse is over an element; otherwise, <c>false</c>.
@@ -43,38 +39,28 @@ namespace GuiCookie.Core.Roots
         #endregion
 
         #region Constructors
-        public Root(ElementManager elementManager, IUIServiceProvider serviceProvider)
+        public GuiScreen(ElementManager elementManager, IServiceProvider serviceProvider)
         {
             ElementManager = elementManager;
             ElementInputManager = serviceProvider.GetService<ElementInputManager>();
 
-            elementManager.onRootCreated(this);
+            //elementManager.onRootCreated(this);
 
-            if (serviceProvider.TryGetService(out Window? window))
+            Window? window = serviceProvider.GetService<Window>();
+            if (window != null)
             {
                 SignalConnection connection = window!.OnSizeChanged.Connect(onWindowResized);
                 connections.Add(connection);
-                Bounds = new(elementManager.RootElements!, window.Size);
-            }
-            else
-                Bounds = new Bounds(elementManager.RootElements!, new Point(0, 0));
 
-            foreach ((Type type, object service) in serviceProvider.GetServicesEnumerable())
+                elementManager.RootElement.Bounds.TotalSize = window.Size;
+            }
+
+            foreach (object? service in serviceProvider.GetServices(typeof(IUpdateableUIService)))
             {
                 if (service is IUpdateableUIService serviceUpdateableService)
                     updateableServices.Add(serviceUpdateableService);
             }
             updateableServices.Sort((left, right) => left.Order.CompareTo(right.Order));
-        }
-        #endregion
-
-        #region Load Functions
-        public void LoadLayout(SheetDataSource layoutSheetData)
-        {
-            if (Elements.Count != 0)
-                throw new InvalidOperationException("Cannot load layout if the root has already been loaded! Reload instead.");
-
-            ElementManager.LoadFromNode(layoutSheetData.RootNode);
         }
         #endregion
 
@@ -112,7 +98,7 @@ namespace GuiCookie.Core.Roots
         #endregion
 
         #region Disposable Functions
-        ~Root()
+        ~GuiScreen()
         {
             Dispose(false);
         }

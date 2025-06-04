@@ -1,11 +1,12 @@
 ﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Elements;
 using GuiCookie.Core.Helpers;
 using System.Drawing;
 using System.Numerics;
 
 namespace GuiCookie.Core.DataStructures
 {
-    public class Bounds
+    public class Bounds(Element element)
     {
         #region Constants
         private const string pivotAttributeName = "Pivot";
@@ -46,12 +47,10 @@ namespace GuiCookie.Core.DataStructures
         #endregion
 
         #region Properties
-        public ElementContainer ElementContainer { get; }
+        /// <summary> The parent bounds, or null if there is no parent. </summary>
+        public Bounds? Parent => element.Parent?.Bounds;
 
-        /// <summary> The parent bounds, or null if these bounds are for the root. </summary>
-        public Bounds Parent => ElementContainer.Parent?.Element != null ? ElementContainer.Parent.Element.Bounds : ElementContainer.Parent != null ? ElementContainer.Root.Bounds : null;
-
-        private Rectangle parentAbsoluteContentArea => Parent == null ? baseRectangle : Parent.AbsoluteContentArea;
+        private Rectangle parentAbsoluteContentArea => Parent?.AbsoluteContentArea ?? baseRectangle;
         #endregion
 
         #region Size Properties
@@ -218,55 +217,17 @@ namespace GuiCookie.Core.DataStructures
         }
         #endregion
 
-        #region Constructors
-        /// <summary> Create a new <see cref="Bounds"/> with the given <see cref="Attributes"/>. </summary>
-        /// <param name="elementAttributes"> The attributes of the containing <see cref="Elements"/>, which is used to determine spacing data. </param>
-        public Bounds(ElementContainer elementContainer, IReadOnlyAttributeCollection elementAttributes)
+        #region Load Functions
+        public void LoadFromAttributes(IReadOnlyAttributeCollection attributes)
         {
-            ElementContainer = elementContainer ?? throw new ArgumentNullException(nameof(elementContainer));
-
             // Get all associated attributes from the element attributes.
-            scaledPosition = elementAttributes.GetAttributeOrDefault(positionAttributeName, new Space(0, Axes.None));
-            scaledSize = elementAttributes.GetAttributeOrDefault(sizeAttributeName, new Space(0, Axes.None));
-            padding = elementAttributes.GetAttributeOrDefault(paddingAttributeName, new Sides(0, SideMask.None));
-            anchor = elementAttributes.GetAttributeOrDefault(anchorAttributeName, new Space(0, Axes.Both));
-            pivot = elementAttributes.GetAttributeOrDefault(pivotAttributeName, new Space(0, Axes.Both));
-            minimumSize = elementAttributes.GetAttributeOrDefault(minimumSizeAttributeName, new Space(0, Axes.None));
-            maximumSize = elementAttributes.GetAttributeOrDefault(maximumSizeAttributeName, new Space(0, Axes.None));
-        }
-
-        internal Bounds(ElementContainer elementContainer, Point windowSize)
-        {
-            ElementContainer = elementContainer ?? throw new ArgumentNullException(nameof(elementContainer));
-
-            baseRectangle = new Rectangle(0, 0, windowSize.X, windowSize.Y);
-
-            // The root fills the entire window unless otherwise stated.
-            scaledSize = new Space(windowSize.X, windowSize.Y, Axes.None);
-
-            // The root has no padding unless otherwise specified.
-            padding = new Sides(0, SideMask.None);
-
-            // Calculate the bounds from the parsed properties.
-            recalculateSize();
-            recalculatePosition();
-        }
-
-        internal Bounds(ElementContainer elementContainer, Point windowSize, IReadOnlyAttributeCollection rootAttributes)
-        {
-            ElementContainer = elementContainer ?? throw new ArgumentNullException(nameof(elementContainer));
-
-            baseRectangle = new Rectangle(new Point(), (Size)windowSize);
-
-            // The root fills the entire window unless otherwise stated.
-            scaledSize = rootAttributes.GetAttributeOrDefault(sizeAttributeName, new Space(windowSize.X, windowSize.Y, Axes.None));
-
-            // The root has no padding unless otherwise specified.
-            padding = rootAttributes.GetAttributeOrDefault(paddingAttributeName, new Sides(0, SideMask.None));
-
-            // Calculate the bounds from the parsed properties.
-            recalculateSize();
-            recalculatePosition();
+            scaledPosition = attributes.GetAttributeOrDefault(positionAttributeName, new Space(0, Axes.None));
+            scaledSize = attributes.GetAttributeOrDefault(sizeAttributeName, new Space(0, Axes.None));
+            padding = attributes.GetAttributeOrDefault(paddingAttributeName, new Sides(0, SideMask.None));
+            anchor = attributes.GetAttributeOrDefault(anchorAttributeName, new Space(0, Axes.Both));
+            pivot = attributes.GetAttributeOrDefault(pivotAttributeName, new Space(0, Axes.Both));
+            minimumSize = attributes.GetAttributeOrDefault(minimumSizeAttributeName, new Space(0, Axes.None));
+            maximumSize = attributes.GetAttributeOrDefault(maximumSizeAttributeName, new Space(0, Axes.None));
         }
         #endregion
 
@@ -282,7 +243,7 @@ namespace GuiCookie.Core.DataStructures
             relativePosition = (scaledPosition.GetScaledSpace((Point)parentAbsoluteContentArea.Size) + (Size)anchor.GetScaledSpace((Point)parentAbsoluteContentArea.Size)) - (Size)pivot.GetScaledSpace(TotalSize);
             absolutePosition = relativePosition + (Size)parentAbsoluteContentArea.Location;
 
-            ElementContainer.Element?.onPositionChanged();
+            element?.onPositionChanged();
         }
 
         internal void recalculateSize()
@@ -290,9 +251,9 @@ namespace GuiCookie.Core.DataStructures
             totalSize = scaledSize.GetScaledSpace((Point)parentAbsoluteContentArea.Size);
             contentSize = (Point)padding.ScaleRectangle(RelativeTotalArea).Size;
 
-            if (ElementContainer.Element != null && !ElementContainer.Element.validateSizeChanged()) return;
+            if (element != null && !element.validateSizeChanged()) return;
 
-            ElementContainer.Element?.onSizeChanged();
+            element?.onSizeChanged();
             recalculatePosition();
         }
         #endregion

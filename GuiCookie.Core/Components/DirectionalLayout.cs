@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.DataStructures;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Rendering;
 using System.Drawing;
@@ -81,13 +82,11 @@ namespace GuiCookie.Core.Components
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
-            // Parse the direction.
-            LayoutDirection = Element.Attributes.GetEnumAttributeOrDefault(layoutAttributeName, Direction.Vertical);
-
-            // Parse the spacing.
-            Spacing = Element.Attributes.GetAttributeOrDefault(spacingAttributeName, 0);
+            // Parse the attributes.
+            LayoutDirection = attributes.GetEnumAttributeOrDefault(layoutAttributeName, Direction.Vertical);
+            Spacing = attributes.GetAttributeOrDefault(spacingAttributeName, 0);
 
             Element.OnChildAdded.Connect((c) => MakeDirty());
             Element.OnChildRemoved.Connect((c) => MakeDirty());

@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Components;
+using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Rendering;
 using System.Drawing;
@@ -15,7 +16,6 @@ namespace GuiCookie.Core.Elements
         /// <summary> The <see cref="ClippingMode"/> of the current image. </summary>
         public ClippingMode ClippingMode { get => ImageBlock.ClippingMode; set => ImageBlock.ClippingMode = value; }
 
-
         /// <summary> The colour of the current image. </summary>
         public Color? Colour { get => ImageBlock.Colour; set => ImageBlock.Colour = value; }
 
@@ -24,10 +24,10 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
             // Initialise the base button first.
-            base.OnCreated();
+            base.OnCreated(attributes);
 
             // Set components.
             ImageBlock = GetComponent<ImageBlock>();

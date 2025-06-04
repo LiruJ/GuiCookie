@@ -1,9 +1,9 @@
 ﻿namespace GuiCookie.Core.Data
 {
-    public abstract class SheetDataSource(string filePath, SheetDataNode rootNode) : IReadOnlySheetDataSource
+    public abstract class SheetDataSource(string? filePath, SheetDataNode rootNode) : IReadOnlySheetDataSource
     {
         #region Properties
-        public string FilePath { get; } = filePath;
+        public string? FilePath { get; } = filePath;
 
         public SheetDataNode RootNode { get; } = rootNode;
 

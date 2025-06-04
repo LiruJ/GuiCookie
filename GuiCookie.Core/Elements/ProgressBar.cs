@@ -1,10 +1,12 @@
-﻿using GuiCookie.Core.Data;
+﻿using GuiCookie.Core.Components;
+using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles;
 using GuiCookie.Core.Styles.Attributes;
 using GuiCookie.Core.Styles.DataStructures;
 using LiruGameHelper.Parsers;
+using LiruGameHelper.Signals;
 using System.Drawing;
 
 namespace GuiCookie.Core.Elements
@@ -30,10 +32,14 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Fields
-        protected readonly StyleAttributeCache<SliceFrameStyleAttribute> fillCache = new StyleAttributeCache<SliceFrameStyleAttribute>(fillName);
+        protected readonly StyleAttributeCache<SliceFrameStyleAttribute> fillCache = new(fillName);
+
+        private SignalConnection? styleChangedConnection = null;
         #endregion
 
         #region Backing Fields
+        private StyleStateMachine? styleStateMachine;
+
         private int decimalDigits;
 
         private Direction layoutDirection = Direction.Horizontal;
@@ -46,6 +52,20 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Properties
+        public StyleStateMachine? StyleStateMachine
+        {
+            get => styleStateMachine;
+            set
+            {
+                if (styleStateMachine == value)
+                    return;
+
+                styleStateMachine = value;
+                styleChangedConnection?.Disconnect();
+                styleChangedConnection = styleStateMachine?.OnStyleChanged?.Connect(fillCache.Refresh);
+            }
+        }
+
         /// <summary> The number of decimal digits used when rounding the value. </summary>
         public int DecimalDigits
         {
@@ -53,7 +73,7 @@ namespace GuiCookie.Core.Elements
             set
             {
                 // If the value is negative, do nothing.
-                if (value < 0) 
+                if (value < 0)
                     return;
 
                 // Set the decimal digits.
@@ -71,7 +91,7 @@ namespace GuiCookie.Core.Elements
             set
             {
                 // Ensure validity.
-                if (value == Direction.None) 
+                if (value == Direction.None)
                     throw new ArgumentException("Cannot set direction of progress bar to none!");
 
                 // Set the layout direction.
@@ -87,7 +107,7 @@ namespace GuiCookie.Core.Elements
             set
             {
                 // If there is no change, do nothing.
-                if (minimumValue == value) 
+                if (minimumValue == value)
                     return;
 
                 // If the given value is greater than the maximum then do nothing.
@@ -110,11 +130,11 @@ namespace GuiCookie.Core.Elements
             set
             {
                 // If there is no change, do nothing.
-                if (maximumValue == value) 
+                if (maximumValue == value)
                     return;
 
                 // If the given value is less than the minimum then do nothing.
-                if (value < MinimumValue) 
+                if (value < MinimumValue)
                     return;
 
                 // Set the maximum value.
@@ -142,15 +162,15 @@ namespace GuiCookie.Core.Elements
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name for the fill. </summary>
         public Color? FillColour
         {
-            get => fillCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Colour : null;
+            get => fillCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Colour : null;
             set
             {
                 // Try to create the fill attributes if they do not exist already.
                 tryCreateFillAttributes();
 
                 // Set the value for all variants.
-                foreach (StyleVariant variant in Style.StyleVariantsByName.Values)
-                    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame) 
+                foreach (StyleVariant variant in StyleStateMachine?.Style?.StyleVariantsByName.Values)
+                    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame)
                         fillFrame.Colour = value;
             }
         }
@@ -158,15 +178,15 @@ namespace GuiCookie.Core.Elements
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name for the fill. </summary>
         public Color? FillTint
         {
-            get => fillCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Tint : null;
-            set 
+            get => fillCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Tint : null;
+            set
             {
                 // Try to create the fill attributes if they do not exist already.
                 tryCreateFillAttributes();
 
                 // Set the value for all variants.
-                foreach (StyleVariant variant in Style.StyleVariantsByName.Values)
-                    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame) 
+                foreach (StyleVariant variant in StyleStateMachine?.Style?.StyleVariantsByName.Values)
+                    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame)
                         fillFrame.Tint = value;
             }
         }
@@ -179,29 +199,29 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
             // Set the amount of digits to round to.
-            decimalDigits = Attributes.GetAttributeOrDefault(decimalDigitsAttributeName, 10);
-            layoutDirection = Attributes.GetEnumAttributeOrDefault(directionAttributeName, Direction.Horizontal);
+            decimalDigits = attributes.GetAttributeOrDefault(decimalDigitsAttributeName, 10);
+            layoutDirection = attributes.GetEnumAttributeOrDefault(directionAttributeName, Direction.Horizontal);
 
             // Set the graphical data.
-            if (Attributes.HasAttribute(fillName + ResourceManager.ColourAttributeName)) 
-                FillColour = Attributes.GetAttributeOrDefault(fillName + ResourceManager.ColourAttributeName, (Color?)null, Colour.TryParse);
-            if (Attributes.HasAttribute(fillName + TintedColour.TintAttributeName))
-                FillTint = Attributes.GetAttributeOrDefault(fillName + TintedColour.TintAttributeName, (Color?)null, Colour.TryParse);
+            if (attributes.HasAttribute(fillName + ResourceManager.ColourAttributeName))
+                FillColour = attributes.GetAttributeOrDefault(fillName + ResourceManager.ColourAttributeName, (Color?)null, Colour.TryParse);
+            if (attributes.HasAttribute(fillName + TintedColour.TintAttributeName))
+                FillTint = attributes.GetAttributeOrDefault(fillName + TintedColour.TintAttributeName, (Color?)null, Colour.TryParse);
 
-            FillPadding = Attributes.GetAttributeOrDefault(fillPaddingAttributeName, new Sides(0, SideMask.None));
-            DrawFillBehind = Attributes.GetAttributeOrDefault(drawBehindAttributeName, false);
+            FillPadding = attributes.GetAttributeOrDefault(fillPaddingAttributeName, new Sides(0, SideMask.None));
+            DrawFillBehind = attributes.GetAttributeOrDefault(drawBehindAttributeName, false);
 
             // Set the minimum and maximum values, throw an error if they're invalid.
-            SetMinimumAndMaximum(Attributes.GetAttributeOrDefault(minimumValueAttributeName, 0.0f), Attributes.GetAttributeOrDefault(maximumValueAttributeName, 1.0f));
+            SetMinimumAndMaximum(attributes.GetAttributeOrDefault(minimumValueAttributeName, 0.0f), attributes.GetAttributeOrDefault(maximumValueAttributeName, 1.0f));
         }
 
-        public override void OnFullSetup()
+        public override void OnFullSetup(IReadOnlyAttributeCollection attributes)
         {
             // Set the value.
-            Value = Attributes.GetAttributeOrDefault(valueAttributeName, 0f);
+            Value = attributes.GetAttributeOrDefault(valueAttributeName, 0f);
         }
         #endregion
 
@@ -239,24 +259,24 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Style Functions
-        public override void OnStyleChanged() => fillCache.Refresh(Style);
+        //public override void OnStyleChanged(Style? style) => fillCache.Refresh(style);
 
         private SliceFrameStyleAttribute tryCreateFillAttributes()
         {
             // If the fill frame does not exist, create it.
-            if (!fillCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? fillFrame) && fillFrame != null)
+            if (!fillCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out SliceFrameStyleAttribute? fillFrame) && fillFrame != null)
             {
                 // Create an empty slice frame.
                 fillFrame = new SliceFrameStyleAttribute(resourceManager, new AttributeCollection() { { "Name", fillName } });
 
                 // Add the fill frame to the base variant of the style. Do the same for the hovered, clicked, and disabled.
-                Style.BaseVariant.AddAttribute(fillFrame);
-                Style.GetStyleVariantFromName(Style.HoveredVariantName).AddAttribute(fillFrame.CreateCopy());
-                Style.GetStyleVariantFromName(Style.ClickedVariantName).AddAttribute(fillFrame.CreateCopy());
-                Style.GetStyleVariantFromName(Style.DisabledVariantName).AddAttribute(fillFrame.CreateCopy());
+                StyleStateMachine?.Style?.BaseVariant.AddAttribute(fillFrame);
+                StyleStateMachine?.Style?.GetStyleVariantFromName(Style.HoveredVariantName).AddAttribute(fillFrame.CreateCopy());
+                StyleStateMachine?.Style?.GetStyleVariantFromName(Style.ClickedVariantName).AddAttribute(fillFrame.CreateCopy());
+                StyleStateMachine?.Style?.GetStyleVariantFromName(Style.DisabledVariantName).AddAttribute(fillFrame.CreateCopy());
 
                 // Refresh the cache.
-                fillCache.Refresh(Style);
+                fillCache.Refresh(StyleStateMachine?.Style);
             }
 
             // Return the created/found fill frame.
@@ -282,7 +302,7 @@ namespace GuiCookie.Core.Elements
         protected virtual void drawFill(IGuiCamera guiCamera)
         {
             // Do nothing if there is no fill.
-            if (!fillCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrameStyleAttribute? fill))
+            if (!fillCache.TryGetVariantAttribute(StyleStateMachine?.CurrentStyleVariant, out SliceFrameStyleAttribute? fill))
                 return;
 
             // Calculate the absolute area for the fill to be drawn.

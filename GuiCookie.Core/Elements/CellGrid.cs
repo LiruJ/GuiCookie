@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Components;
+using GuiCookie.Core.Data;
 using GuiCookie.Core.Helpers;
 using LiruGameHelper.Signals;
 using System.Drawing;
@@ -25,7 +26,7 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
             cellLayout = GetComponent<GridLayout>();
             mouseHandler = GetComponent<MouseHandler>();

@@ -1,4 +1,5 @@
-﻿using LiruGameHelper.Signals;
+﻿using GuiCookie.Core.Data;
+using LiruGameHelper.Signals;
 
 namespace GuiCookie.Core.Elements
 {
@@ -49,7 +50,7 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Initialisation Functions
-        public override void OnFullSetup()
+        public override void OnFullSetup(IReadOnlyAttributeCollection attributes)
         {
             // Get the elements.
             Label = GetInterfacedChildByName<ITextable>("Label");

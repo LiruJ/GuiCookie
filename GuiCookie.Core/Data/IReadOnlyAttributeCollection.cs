@@ -4,9 +4,20 @@ using System.Numerics;
 
 namespace GuiCookie.Core.Data
 {
-    public interface IReadOnlyAttributeCollection
+    public interface IReadOnlyAttributeCollection : IEnumerable<string>
     {
+        #region Properties
         int Count { get; }
+        #endregion
+
+        #region Copy Functions
+        AttributeCollection CreateCopy();
+        #endregion
+
+        #region Get Functions
+        bool TryGetAttribute(string attributeName, out string? value);
+        bool TryGetAttribute<T>(string attributeName, out T? value, AttributeCollection.TryParse<T> tryParser);
+        bool TryGetAttribute<T>(string attributeName, out T? value, Func<string, T> parser);
 
         T GetAttributeOrDefault<T>(string attributeName, T defaultTo, AttributeCollection.TryParse<T> tryParser);
         string? GetAttributeOrDefault(string attributeName, string? defaultTo);
@@ -26,6 +37,6 @@ namespace GuiCookie.Core.Data
         T? GetAttributeOrDefault<T>(string attributeName, T? defaultTo, AttributeCollection.TryParse<T> tryParser) where T : struct;
         int? GetAttributeOrDefault(string attributeName, int? defaultTo);
         float? GetAttributeOrDefault(string attributeName, float? defaultTo);
-        AttributeCollection CreateCopy();
+        #endregion
     }
 }

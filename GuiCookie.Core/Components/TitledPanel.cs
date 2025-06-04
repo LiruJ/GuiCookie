@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.DataStructures;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Rendering;
 using System.Drawing;
@@ -20,7 +21,7 @@ namespace GuiCookie.Core.Components
         #endregion
 
         #region Initialisation Functions
-        public override void OnPostSetup()
+        public override void OnPostSetup(IReadOnlyAttributeCollection attributes)
         {
             // Get the elements.
             TitleBar = Element.GetInterfacedChildByName<ITextable>("TitleBar");

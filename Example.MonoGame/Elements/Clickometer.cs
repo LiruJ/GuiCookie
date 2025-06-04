@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.Elements;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Elements;
 using System;
 
 namespace Example.MonoGame.Elements
@@ -12,7 +13,7 @@ namespace Example.MonoGame.Elements
         #endregion
 
         #region Initialisation Functions
-        public override void OnFullSetup()
+        public override void OnFullSetup(IReadOnlyAttributeCollection attributes)
         {
             // Set the elements.
             button = GetChildByName<Button>("Button");

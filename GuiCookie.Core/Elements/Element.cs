@@ -2,9 +2,7 @@
 using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Rendering;
-using GuiCookie.Core.Roots;
-using GuiCookie.Core.Styles;
-using GuiCookie.Core.Templates;
+using GuiCookie.Core.Screens;
 using LiruGameHelper.Signals;
 using System.Collections;
 
@@ -13,21 +11,15 @@ namespace GuiCookie.Core.Elements
     public class Element : IEnumerable<Element>, IElement
     {
         #region Constants
-        private const string tagAttributeName = "Tag";
+        public const string TagAttributeName = "Tag";
         private const string nameAttributeName = "Name";
         private const string visibleAttributeName = "Visible";
         private const string enabledAttributeName = "Enabled";
         private const string blocksMouseAttributeName = "BlocksMouse";
         #endregion
 
-        #region Dependencies
-        protected ElementManager elementManager;
-
-        protected StyleManager styleManager;
-        #endregion
-
         #region Fields
-        private Dictionary<Type, Component> components;
+        private Dictionary<Type, Component> components = [];
         #endregion
 
         #region Backing Fields
@@ -39,24 +31,12 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Internal Properties
-        internal ElementContainer ElementContainer { get; private set; }
+        internal ElementContainer ElementContainer { get;}
         #endregion
 
         #region Public Properties
-        /// <summary> The <see cref="StyleStateMachine"/> used to determine the current style based on the state of this element. </summary>
-        public StyleStateMachine StyleState { get; set; }
-
-        /// <summary> The current <see cref="Style"/> that the <see cref="StyleState"/> is using. </summary>
-        public Style Style { get => StyleState.Style; set => StyleState.Style = value; }
-
-        /// <summary> The <see cref="StyleState"/>'s current <see cref="StyleVariant"/>. </summary>
-        public StyleVariant CurrentStyleVariant => StyleState.CurrentStyleVariant;
-
         /// <summary> The initialisation state of this element, showing which initialisation functions have been called. </summary>
         public InitialisationState InitialisationState { get; private set; } = InitialisationState.None;
-
-        /// <summary> The template used to create this element. A copy of this template can be used to create a copy of this element via the <see cref="ElementManager.CreateElementFromTemplateName(string, AttributeCollection, Element)(Template, Template, AttributeCollection, Element)"/> function. </summary>
-        public Template Template { get; private set; }
 
         /// <summary> The name of this element, used along with the <see cref="GetChildByName{T}(string, bool)"/> function. </summary>
         public string? Name
@@ -82,20 +62,14 @@ namespace GuiCookie.Core.Elements
         /// <summary> Is true if this element's <see cref="Name"/> is not null or whitespace, otherwise; false. </summary>
         public bool HasName => !string.IsNullOrWhiteSpace(Name);
 
-        /// <summary> The root-level unique tag of this element, used with <see cref="Root.GetElementFromTag{T}(string)"/>. </summary>
-        public string Tag { get; private set; }
+        /// <summary> The root-level unique tag of this element, used with <see cref="GuiScreen.GetElementFromTag{T}(string)"/>. </summary>
+        public string? Tag { get; private set; } = null;
 
         /// <summary> Is true if this element's <see cref="Tag"/> is not null or whitespace, otherwise; false. </summary>
         public bool HasTag => !string.IsNullOrWhiteSpace(Tag);
 
-        /// <summary> The root containing this element. </summary>
-        public Root? Root { get; private set; }
-
         /// <summary> The positional data of this element, with its size and position. </summary>
-        public Bounds Bounds { get; private set; }
-
-        /// <summary> The attributes used to create this element from the layout sheet. </summary>
-        public IReadOnlyAttributeCollection Attributes => Template.Attributes;
+        public Bounds Bounds { get; }
 
         /// <summary> The element whose child is this element, or null if this is a root-level element. </summary>
         public Element? Parent
@@ -186,43 +160,40 @@ namespace GuiCookie.Core.Elements
         private readonly Signal onDisabled = new();
         #endregion
 
+        #region Constructors
+        public Element()
+        {
+            ElementContainer = new ElementContainer(this);
+            Bounds = new Bounds(this);
+        }
+        #endregion
+
         #region Initialisation Functions
-        internal void internalOnCreated(Root root, ElementManager elementManager, StyleManager styleManager, Template template, ElementContainer parent, Style style, Dictionary<Type, Component> components)
+        internal void internalOnCreated(IReadOnlyAttributeCollection attributes, Element? parent, Dictionary<Type, Component> components)
         {
             // Ensure this function has not been called before.
-            if ((InitialisationState & InitialisationState.Created) == InitialisationState.Created) return;
-
-            // Initialise dependencies.
-            Root = root;
-            this.elementManager = elementManager;
-            this.styleManager = styleManager;
+            if ((InitialisationState & InitialisationState.Created) == InitialisationState.Created)
+                return;
 
             // Initialise properties.
-            Template = template;
             this.components = components;
-            Tag = Attributes.GetAttributeOrDefault(tagAttributeName, string.Empty);
-            name = Attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
-            BlocksMouse = Attributes.GetAttributeOrDefault(blocksMouseAttributeName, true);
+            Tag = attributes.GetAttributeOrDefault(TagAttributeName, string.Empty);
+            name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
+            BlocksMouse = attributes.GetAttributeOrDefault(blocksMouseAttributeName, true);
 
             // Initialise visibility and enabled.
-            visible = Attributes.GetAttributeOrDefault(visibleAttributeName, true);
-            enabled = Attributes.GetAttributeOrDefault(enabledAttributeName, true);
-
-            // Initialise the element container.
-            ElementContainer = new ElementContainer(this);
+            visible = attributes.GetAttributeOrDefault(visibleAttributeName, true);
+            enabled = attributes.GetAttributeOrDefault(enabledAttributeName, true);
 
             // Initialise bounds from the given attributes.
-            Bounds = new Bounds(ElementContainer, Attributes);
-
-            // Initialise the style state machine.
-            StyleState = new StyleStateMachine(this);
-            Style = style;
+            Bounds.LoadFromAttributes(attributes);
 
             // Initialise the components publicly.
-            foreach (Component component in components.Values) component.OnCreated();
+            foreach (Component component in components.Values) 
+                component.OnCreated(attributes);
 
             // If the parent is not null, add this element to it.
-            parent.AddChild(ElementContainer);
+            parent?.AddChild(this);
 
             // Calculate the bounds once they are all set up.
             Bounds.recalculateSize();
@@ -232,52 +203,56 @@ namespace GuiCookie.Core.Elements
             InitialisationState |= InitialisationState.Created;
         }
 
-        /// <summary> Called after the element has been fully set up. Use this to set references to components, although other elements may not exist yet. </summary>
-        public virtual void OnCreated() { }
+        /// <summary>
+        /// Called upon the initial creation of the element.
+        /// Components will exist at this point, although only <see cref="Component.OnCreated"/> would have been called on them.
+        /// Override this function to set references to components.
+        /// </summary>
+        /// <remarks>
+        /// As this call is depth-first, any previous siblings may exist.
+        /// However, it is not recommended to set references to siblings in this function, as changing the order in the layout sheet will cause the sibling to not be found.
+        /// </remarks>
+        public virtual void OnCreated(IReadOnlyAttributeCollection attributes) { }
 
-        internal void internalOnFullSetup()
+        internal void internalOnFullSetup(IReadOnlyAttributeCollection attributes)
         {
             // Ensure this function has not been called before.
-            if ((InitialisationState & InitialisationState.Setup) == InitialisationState.Setup) return;
+            if ((InitialisationState & InitialisationState.Setup) == InitialisationState.Setup) 
+                return;
 
             // Call the overrideable function.
-            OnFullSetup();
+            OnFullSetup(attributes);
 
             // Set initialisation state.
             InitialisationState |= InitialisationState.Setup;
 
-            // Setup each child.
-            foreach (Element child in ElementContainer)
-                child.internalOnFullSetup();
-
             // Setup each component.
-            foreach (Component component in components.Values) component.OnSetup();
+            foreach (Component component in components.Values)
+                component.OnSetup(attributes);
         }
 
         /// <summary> Called after every element has been fully created. Use this to set references to other elements. </summary>
-        public virtual void OnFullSetup() { }
+        public virtual void OnFullSetup(IReadOnlyAttributeCollection attributes) { }
 
-        internal void internalOnPostFullSetup()
+        internal void internalOnPostFullSetup(IReadOnlyAttributeCollection attributes)
         {
             // Ensure this function has not been called before.
-            if ((InitialisationState & InitialisationState.PostSetup) == InitialisationState.PostSetup) return;
+            if ((InitialisationState & InitialisationState.PostSetup) == InitialisationState.PostSetup)
+                return;
 
             // Call the overrideable function.
-            OnPostFullSetup();
+            OnPostFullSetup(attributes);
 
             // Set initialisation state.
             InitialisationState |= InitialisationState.PostSetup;
 
-            // Post setup each child.
-            foreach (Element child in ElementContainer)
-                child.internalOnPostFullSetup();
-
             // Post setup each component.
-            foreach (Component component in components.Values) component.OnPostSetup();
+            foreach (Component component in components.Values)
+                component.OnPostSetup(attributes);
         }
 
         /// <summary> Called after every element's <see cref="OnFullSetup"/> function has been called. Use this to initialise elements who required element references from <see cref="OnFullSetup"/>. </summary>
-        public virtual void OnPostFullSetup() { }
+        public virtual void OnPostFullSetup(IReadOnlyAttributeCollection attributes) { }
         #endregion
 
         #region Event Functions
@@ -322,19 +297,6 @@ namespace GuiCookie.Core.Elements
 
         protected virtual void OnSizeChanged() { }
 
-        internal void onStyleChanged()
-        {
-            // Call the function on every component.
-            foreach (Component component in components.Values)
-                component.OnStyleChanged();
-
-            // Call the virtual function.
-            OnStyleChanged();
-        }
-
-        /// <summary> Called when this element's <see cref="Style"/> or <see cref="StyleState"/> is changed. Fired after <see cref="Component.OnStyleChanged"/>. </summary>
-        public virtual void OnStyleChanged() { }
-
         internal void internalOnDestroyed()
         {
             // Tell this element about the destruction.
@@ -357,17 +319,17 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Child Functions
-        public bool ContainsChild(Element child) => ElementContainer.Contains(child?.ElementContainer);
+        public bool ContainsChild(Element child) => ElementContainer.Contains(child.ElementContainer);
 
         /// <summary> Returns the first child of this element that is of the given type <typeparamref name="T"/>, or <c>null</c> if no such child exists. </summary>
         /// <typeparam name="T"> The type of the desired element. </typeparam>
         /// <returns> The first element of the given <typeparamref name="T"/>, or <c>null</c> if no such child exists. </returns>
-        public T GetChild<T>() where T : Element => ElementContainer.GetChild<T>();
+        public T? GetChild<T>() where T : Element => ElementContainer.GetChild<T>();
 
-        public T GetInterfacedChild<T>() where T : class
-            => TryGetInterfacedChild(out T interfacedChild) ? interfacedChild : null;
+        public T? GetInterfacedChild<T>() where T : class
+            => TryGetInterfacedChild(out T? interfacedChild) ? interfacedChild : null;
 
-        public bool TryGetInterfacedChild<T>(out T interfacedChild) where T : class
+        public bool TryGetInterfacedChild<T>(out T? interfacedChild) where T : class
         {
             interfacedChild = null;
             if (!typeof(T).IsInterface) return false;
@@ -382,19 +344,19 @@ namespace GuiCookie.Core.Elements
             return false;
         }
 
-        public Element GetChildByName(string name, bool recursive = false) => ElementContainer.GetChildByName(name, recursive);
+        public Element? GetChildByName(string name, bool recursive = false) => ElementContainer.GetChildByName(name, recursive);
 
-        public T GetChildByName<T>(string name, bool recursive = false) where T : Element => ElementContainer.GetChildByName<T>(name, recursive);
+        public T? GetChildByName<T>(string name, bool recursive = false) where T : Element => ElementContainer.GetChildByName<T>(name, recursive);
 
-        public T GetInterfacedChildByName<T>(string name, bool recursive = false) where T : class
-            => TryGetInterfacedChildByName(name, out T interfacedChild, recursive) ? interfacedChild : null;
+        public T? GetInterfacedChildByName<T>(string name, bool recursive = false) where T : class
+            => TryGetInterfacedChildByName(name, out T? interfacedChild, recursive) ? interfacedChild : null;
 
-        public bool TryGetInterfacedChildByName<T>(string name, out T interfacedChild, bool recursive = false) where T : class
+        public bool TryGetInterfacedChildByName<T>(string name, out T? interfacedChild, bool recursive = false) where T : class
         {
             interfacedChild = null;
             if (!typeof(T).IsInterface) return false;
 
-            Element child = GetChildByName(name, recursive);
+            Element? child = GetChildByName(name, recursive);
 
             if (child is T interfacedElement)
             {
@@ -404,21 +366,21 @@ namespace GuiCookie.Core.Elements
             return false;
         }
 
-        public Element GetChildByIndex(int index) => ElementContainer.GetChildByIndex(index);
+        public Element? GetChildByIndex(int index) => ElementContainer.GetChildByIndex(index);
 
-        public T GetChildByIndex<T>(int index) where T : Element => ElementContainer.GetChildByIndex<T>(index);
+        public T? GetChildByIndex<T>(int index) where T : Element => ElementContainer.GetChildByIndex<T>(index);
 
-        public bool AddChild(Element child) => ElementContainer.AddChild(child?.ElementContainer);
+        public bool AddChild(Element child) => ElementContainer.AddChild(child.ElementContainer);
 
-        public bool RemoveChild(Element child) => ElementContainer.RemoveChild(child?.ElementContainer);
+        public bool RemoveChild(Element child) => ElementContainer.RemoveChild(child.ElementContainer);
 
-        public void Destroy()
+        internal void Destroy()
         {
             // Allow this element to clean itself up before it is destroyed.
             internalOnDestroyed();
 
-            // Destroy the element.
-            elementManager.Destroy(this);
+            // Unset the parent.
+            Parent = null;
 
             // TODO: Set some stuff to null just to clean up references and make it easier on the GC.
             // Tell the element container about the destruction.
@@ -480,9 +442,6 @@ namespace GuiCookie.Core.Elements
         {
             // Update all components.
             UpdateComponents(elapsedTime, totalTime);
-
-            // Update the style state machine.
-            StyleState.UpdateCurrentStyle();
 
             // Call the public update function.
             Update(elapsedTime, totalTime);

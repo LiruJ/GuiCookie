@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.Elements;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Elements;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
 using LiruGameHelper.Parsers;
@@ -16,8 +17,6 @@ namespace GuiCookie.Core.Components
 
         private const string spacingAttributeName = "Spacing";
 
-        #endregion
-        #region Dependencies
         #endregion
 
         #region Fields
@@ -151,21 +150,21 @@ namespace GuiCookie.Core.Components
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
             // Load the grid and cell size.
-            gridSize = Element.Attributes.GetAttributeOrDefault(gridSizeAttributeName, (Point?)null, ToPoint.TryParse);
-            cellSize = Element.Attributes.GetAttributeOrDefault(cellSizeAttributeName, (Point?)null, ToPoint.TryParse);
+            gridSize = attributes.GetAttributeOrDefault(gridSizeAttributeName, (Point?)null, ToPoint.TryParse);
+            cellSize = attributes.GetAttributeOrDefault(cellSizeAttributeName, (Point?)null, ToPoint.TryParse);
 
             // A grid layout cannot function without at least one defined dimensional property, so throw an exception if that is the case.
             if (gridSize == null && cellSize == null)
                 throw new Exception($"{nameof(GridLayout)} of {(string.IsNullOrWhiteSpace(Element.Name) ? Element.ToString() : Element.Name)} does not have a {gridSizeAttributeName} or {cellSizeAttributeName} defined. Must have at least one.");
 
             // Load the spacing.
-            spacing = Element.Attributes.GetAttributeOrDefault(spacingAttributeName, new Point(0, 0), ToPoint.TryParse);
+            spacing = attributes.GetAttributeOrDefault(spacingAttributeName, new Point(0, 0), ToPoint.TryParse);
         }
 
-        public override void OnSetup()
+        public override void OnSetup(IReadOnlyAttributeCollection attributes)
         {
             // Bind the child added/removed signals to recalculate the layout.
             Element.OnChildAdded.Connect((_) => MakeDirty());

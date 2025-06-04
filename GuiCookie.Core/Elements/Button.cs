@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Components;
+using GuiCookie.Core.Data;
 using LiruGameHelper.Signals;
 
 namespace GuiCookie.Core.Elements
@@ -19,7 +20,7 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         { 
             // Set components.
             MouseHandler = GetComponent<MouseHandler>() ?? throw new Exception("Button's mouse handler is missing.");

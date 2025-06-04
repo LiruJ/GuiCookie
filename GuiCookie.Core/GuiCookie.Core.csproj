@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Lovebirb.LiruGameHelper" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.5" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Components;
+using GuiCookie.Core.Data;
 using System.Drawing;
 
 namespace GuiCookie.Core.Elements
@@ -19,10 +20,10 @@ namespace GuiCookie.Core.Elements
 
         #region Initialisation Functions
         /// <summary> Calls <see cref="Button.OnCreated"/> then sets the <see cref="TextBlock"/> property. </summary>
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
             // Initialise the base first.
-            base.OnCreated();
+            base.OnCreated(attributes);
 
             // Set components.
             TextBlock = GetComponent<TextBlock>();

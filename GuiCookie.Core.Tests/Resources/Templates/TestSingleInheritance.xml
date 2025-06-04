@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Templates>
+
+  <TestA TestValue="5" TestBaseValue="35"/>
+  <TestB Base="TestA" TestValue="10"/>
+</Templates>

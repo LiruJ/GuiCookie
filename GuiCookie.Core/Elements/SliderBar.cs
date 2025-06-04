@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Components;
+using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
@@ -11,16 +12,14 @@ namespace GuiCookie.Core.Elements
 {
     public class SliderBar(ResourceManager resourceManager) : ProgressBar(resourceManager), IClickable
     {
-        #region Components
+        #region Fields
         private MouseHandler mouseHandler;
         #endregion
 
-        #region Elements
+        #region Properties
         /// <summary> The handle for this slider bar. </summary>
         public Element Handle { get; private set; }
-        #endregion
 
-        #region Properties
         /// <summary> Gets or sets the value of the slider bar, not invoking <see cref="OnValueChanged"/>, but still updating the position of the slider handle. </summary>
         public float ValueNoSignal
         {
@@ -52,20 +51,25 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Initialisation Functions
-        public override void OnFullSetup()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
-            // Get the mouse handler.
             mouseHandler = GetComponent<MouseHandler>() ?? throw new Exception($"{nameof(SliderBar)} is missing {nameof(MouseHandler)} component.");
 
+            base.OnCreated(attributes);
+        }
+
+        public override void OnFullSetup(IReadOnlyAttributeCollection attributes)
+        {
             // Get the handle element.
             Handle = GetChildByName("Handle");
 
             // If there is a handle and it has no mouse handler, set its mouse handler.
-            if (Handle != null && Handle.StyleState.MouseHandler == null)
-                Handle.StyleState.MouseHandler = mouseHandler;
+            // TODO: Fix this
+            //if (Handle != null && Handle.StyleState.MouseHandler == null)
+            //    Handle.StyleState.MouseHandler = mouseHandler;
 
             // Set up the base progress bar.
-            base.OnFullSetup();
+            base.OnFullSetup(attributes);
         }
         #endregion
 
@@ -120,10 +124,6 @@ namespace GuiCookie.Core.Elements
         }
         #endregion
 
-        #region Style Functions
-        public override void OnStyleChanged() => fillCache.Refresh(Style);
-        #endregion
-
         #region Update Functions
         protected override void Update(TimeSpan elapsedTime, TimeSpan totalTime)
         {
@@ -147,8 +147,10 @@ namespace GuiCookie.Core.Elements
         #region Draw Functions
         protected override void drawFill(IGuiCamera guiCamera)
         {
+            // TODO: Should this really be in an element, or can it go into a component a lot better?
+
             // Do nothing if there is no fill.
-            if (!fillCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrameStyleAttribute? fill)) 
+            if (!fillCache.TryGetVariantAttribute(StyleStateMachine?.CurrentStyleVariant, out SliceFrameStyleAttribute? fill)) 
                 return;
 
             // If there is no handle, fall back on the progress bar's way of drawing the fill.

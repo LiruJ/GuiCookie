@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.Elements;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Elements;
 using System;
 
 namespace Example.MonoGame.Elements
@@ -14,10 +15,10 @@ namespace Example.MonoGame.Elements
         #endregion
 
         #region Initialisation Functions
-        public override void OnFullSetup()
+        public override void OnFullSetup(IReadOnlyAttributeCollection attributes)
         {
             // Initialise the labelled slider.
-            base.OnFullSetup();
+            base.OnFullSetup(attributes);
 
             // Set the counters.
             MinimumCounter = GetChildByName<NumberCounter>("MinimumCounter");
@@ -32,7 +33,7 @@ namespace Example.MonoGame.Elements
             MaximumCounter.OnValueChanged.Connect(() => { Slider.MaximumValue = MaximumCounter.Value; MaximumCounter.Value = (int)MathF.Floor(Slider.MaximumValue); Slider.ResizeHandleRange(1); });
         }
 
-        public override void OnPostFullSetup() => Slider.ResizeHandleRange(1);
+        public override void OnPostFullSetup(IReadOnlyAttributeCollection attributes) => Slider.ResizeHandleRange(1);
         #endregion
     }
 }

@@ -1,16 +1,13 @@
 ﻿using Example.MonoGame.DataStructures;
 using GuiCookie.Core.Components;
+using GuiCookie.Core.Data;
 using GuiCookie.Core.Elements;
 using System;
 
 namespace Example.MonoGame.Elements
 {
-    public class ListPane : Element
+    public class ListPane(Random random, ElementManager elementManager) : Element
     {
-        #region Dependencies
-        private readonly Random random;
-        #endregion
-
         #region Elements
         private DirectionalLayout list = null;
 
@@ -23,22 +20,15 @@ namespace Example.MonoGame.Elements
         private int totalItems = 0;
         #endregion
 
-        #region Constructors
-        public ListPane(Random random)
-        {
-            this.random = random ?? throw new ArgumentNullException(nameof(random));
-        }
-        #endregion
-
         #region Initialisation Functions
-        public override void OnFullSetup()
+        public override void OnFullSetup(IReadOnlyAttributeCollection attributes)
         {
             list = GetChildByName("List").GetComponent<DirectionalLayout>();
             spaceSlider = GetChildByName<LabelledSlider>("SpaceSlider");
             addItemButton = GetChildByName<Button>("AddItemButton");
         }
 
-        public override void OnPostFullSetup()
+        public override void OnPostFullSetup(IReadOnlyAttributeCollection attributes)
         {
             // Add a bunch of random items to the list.
             for (int i = 0; i < 10; i++)

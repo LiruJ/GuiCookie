@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.Rendering;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles;
 using GuiCookie.Core.Styles.Attributes;
 using GuiCookie.Core.Styles.DataStructures;
@@ -7,7 +8,7 @@ using System.Numerics;
 
 namespace GuiCookie.Core.Components
 {
-    public class Frame(ResourceManager resourceManager, StyleManager styleManager) : Component
+    public class Frame(ResourceManager resourceManager, StyleManager styleManager) : StyledComponent
     {
         #region Constants
         private const string frameImageAttributeName = "FrameImage";
@@ -27,55 +28,54 @@ namespace GuiCookie.Core.Components
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Image? FrameImage
         {
-            get => sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Image : null;
-            set { if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame)) sliceFrame!.Image = value; }
+            get => sliceCache.TryGetVariantAttribute(Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Image : null;
+            set { if (sliceCache.TryGetVariantAttribute(Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame)) sliceFrame!.Image = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public DropShadow DropShadow
         {
-            get => sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.DropShadow : new DropShadow((Vector2?)null, null);
-            set { if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame)) sliceFrame!.DropShadow = value; }
+            get => sliceCache.TryGetVariantAttribute(Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.DropShadow : new DropShadow((Vector2?)null, null);
+            set { if (sliceCache.TryGetVariantAttribute(Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame)) sliceFrame!.DropShadow = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Color? Colour
         {
-            get => sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Colour : null;
-            set { if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame)) sliceFrame!.Colour = value; }
+            get => sliceCache.TryGetVariantAttribute(Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Colour : null;
+            set { if (sliceCache.TryGetVariantAttribute(Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame)) sliceFrame!.Colour = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Color? Tint
         {
-            get => sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Tint : null;
-            set { if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame)) sliceFrame!.Tint = value; }
+            get => sliceCache.TryGetVariantAttribute(Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Tint : null;
+            set { if (sliceCache.TryGetVariantAttribute(Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame)) sliceFrame!.Tint = value; }
         }
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
+            // Initialise the styled component first, so the style state machine can be set up.
+            base.OnCreated(attributes);
+
             // Set the frame image.
-            if (Element.Attributes.HasAttribute(frameImageAttributeName))
-                FrameImage = resourceManager.ImagesByName.TryGetValue(Element.Attributes.GetAttribute(frameImageAttributeName), out Image image) ?
-                    image : throw new Exception($"Image with name {Element.Attributes.GetAttribute(frameImageAttributeName)} has not been loaded.");
+            if (attributes.TryGetAttribute(frameImageAttributeName, out string? frameImageName))
+                FrameImage = resourceManager.ImagesByName.TryGetValue(frameImageName!, out Image? image) ?
+                    image : throw new Exception($"Image with name {frameImageName} has not been loaded.");
 
             // Set the drop shadow.
-            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, Element.Attributes));
+            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, attributes));
 
             // Set the colour and tint.
-            if (sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame))
-                sliceFrame!.TintedColour = TintedColour.CreateCombination(sliceFrame.TintedColour, new TintedColour(resourceManager, Element.Attributes));
+            if (sliceCache.TryGetVariantAttribute(StyleStateMachine?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame))
+                sliceFrame!.TintedColour = TintedColour.CreateCombination(sliceFrame.TintedColour, new TintedColour(resourceManager, attributes));
         }
         #endregion
 
         #region Texture Functions
-        public override void OnStyleChanged()
-        {
-            // Refresh the cache.
-            sliceCache.Refresh(Style);
-        }
+        public override void OnStyleChanged(Style? style) => sliceCache.Refresh(style);
 
         private Image? getCurrentTexture()
         {
@@ -91,7 +91,7 @@ namespace GuiCookie.Core.Components
             if (!texturesByStyleVariant.TryGetValue(CurrentStyleVariant, out Image? texture))
             {
                 // Try to get the current SliceFrame. If none was found then return null.
-                if (!sliceCache.TryGetVariantAttribute(Style.BaseVariant, out SliceFrameStyleAttribute? sliceFrame)) 
+                if (!sliceCache.TryGetVariantAttribute(Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame)) 
                     return null;
 
                 // Before going through the effort of creating an entirely new texture, first check to see if there's any identical textures that could be reused.

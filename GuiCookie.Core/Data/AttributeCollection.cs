@@ -19,52 +19,70 @@ namespace GuiCookie.Core.Data
         #endregion
 
         #region Indexers
-        public string this[string name]
+        public virtual string? this[string name]
         {
-            get => rawAttributesByName.TryGetValue(name, out string value) ? value : null;
-            set => rawAttributesByName.Add(name, value);
+            get => rawAttributesByName.TryGetValue(name, out string? value) ? value : null;
+            set => rawAttributesByName.Add(name, value!);
         }
         #endregion
 
         #region Fields
         /// <summary> The raw string values keyed by attribute. </summary>
-        private readonly Dictionary<string, string> rawAttributesByName = [];
+        protected readonly Dictionary<string, string> rawAttributesByName = [];
         #endregion
 
         #region Properties
         public ICollection<string> Keys => rawAttributesByName.Keys;
 
-        public int Count => rawAttributesByName.Count;
+        public virtual int Count => rawAttributesByName.Count;
         #endregion
 
         #region Constructors
         public AttributeCollection() { }
 
-        public AttributeCollection(int capacity)
-        {
-            // Initialise the raw attributes.
-            rawAttributesByName = new Dictionary<string, string>(capacity);
-        }
+        public AttributeCollection(int capacity) 
+            => rawAttributesByName = new Dictionary<string, string>(capacity);
 
-        public AttributeCollection(Dictionary<string, string> rawAttributesByName)
-        {
-            this.rawAttributesByName = new Dictionary<string, string>(rawAttributesByName ?? throw new ArgumentNullException(nameof(rawAttributesByName)));
-        }
+        public AttributeCollection(Dictionary<string, string> rawAttributesByName) 
+            => this.rawAttributesByName = new Dictionary<string, string>(rawAttributesByName ?? throw new ArgumentNullException(nameof(rawAttributesByName)));
 
-        public AttributeCollection(IEnumerable<(string key, string value)> rawAttributesByName)
-        {
-            this.rawAttributesByName = rawAttributesByName.ToDictionary(x => x.key, x => x.value);
-        }
+        public AttributeCollection(IEnumerable<(string key, string value)> rawAttributesByName) 
+            => this.rawAttributesByName = rawAttributesByName.ToDictionary(x => x.key, x => x.value);
         #endregion
 
         #region Copy Functions
-        public AttributeCollection CreateCopy() => new(new Dictionary<string, string>(rawAttributesByName));
+        public virtual AttributeCollection CreateCopy() => new(new Dictionary<string, string>(rawAttributesByName));
         #endregion
 
         #region Get Functions
-        public IEnumerator<string> GetEnumerator() => Keys.GetEnumerator();
+        public virtual IEnumerator<string> GetEnumerator() => Keys.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Keys).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public virtual bool TryGetAttribute(string attributeName, out string? value)
+        {
+            if (string.IsNullOrWhiteSpace(attributeName))
+                throw new ArgumentException($"'{nameof(attributeName)}' cannot be null or whitespace", nameof(attributeName));
+            return rawAttributesByName.TryGetValue(attributeName, out value);
+        }
+
+        public virtual bool TryGetAttribute<T>(string attributeName, out T? value, TryParse<T> tryParser)
+        {
+            value = default;
+            ArgumentNullException.ThrowIfNull(tryParser);
+            return TryGetAttribute(attributeName, out string? attributeValue) && tryParser(attributeValue!, out value);
+        }
+
+        public virtual bool TryGetAttribute<T>(string attributeName, out T? value, Func<string, T> parser)
+        {
+            value = default;
+            ArgumentNullException.ThrowIfNull(parser);
+            if (!TryGetAttribute(attributeName, out string? attributeValue))
+                return false;
+            
+            value = parser(attributeValue!);
+            return true;
+        }
 
         /// <summary> Attempts to parse the attribute with the given <paramref name="attributeName"/> using the given <paramref name="tryParser"/> function, returns <paramref name="defaultTo"/> if the key was not found or the function returned false. </summary>
         /// <typeparam name="T"> The type of object to parse. </typeparam>
@@ -74,27 +92,27 @@ namespace GuiCookie.Core.Data
         /// <returns> The parsed attribute, or <paramref name="defaultTo"/> if the attribute was not found or could not parse. </returns>
         /// <exception cref="ArgumentNullException"> The <paramref name="tryParser"/> was null. </exception>
         /// <exception cref="ArgumentException"> The <paramref name="attributeName"/> was null or whitespace. </exception>
-        public T GetAttributeOrDefault<T>(string attributeName, T defaultTo, TryParse<T> tryParser)
+        public virtual T GetAttributeOrDefault<T>(string attributeName, T defaultTo, TryParse<T> tryParser)
         {
             // Ensure validity.
             ArgumentNullException.ThrowIfNull(tryParser);
             if (string.IsNullOrWhiteSpace(attributeName))
                 throw new ArgumentException($"'{nameof(attributeName)}' cannot be null or whitespace", nameof(attributeName));
 
-            return HasAttribute(attributeName) && tryParser(rawAttributesByName[attributeName], out T output) ? output : defaultTo;
+            return rawAttributesByName.TryGetValue(attributeName, out string? attributeString) && tryParser(attributeString, out T output) ? output : defaultTo;
         }
 
-        public T? GetAttributeOrDefault<T>(string attributeName, T? defaultTo, TryParse<T> tryParser) where T : struct
+        public virtual T? GetAttributeOrDefault<T>(string attributeName, T? defaultTo, TryParse<T> tryParser) where T : struct
         {
             // Ensure validity.
             ArgumentNullException.ThrowIfNull(tryParser);
             if (string.IsNullOrWhiteSpace(attributeName))
                 throw new ArgumentException($"'{nameof(attributeName)}' cannot be null or whitespace", nameof(attributeName));
 
-            return HasAttribute(attributeName) && tryParser(rawAttributesByName[attributeName], out T output) ? output : defaultTo;
+            return rawAttributesByName.TryGetValue(attributeName, out string? attributeString) && tryParser(attributeString, out T output) ? output : defaultTo;
         }
 
-        public string? GetAttributeOrDefault(string attributeName, string? defaultTo)
+        public virtual string? GetAttributeOrDefault(string attributeName, string? defaultTo)
         {
             // Ensure validity.
             if (string.IsNullOrWhiteSpace(attributeName))
@@ -112,7 +130,7 @@ namespace GuiCookie.Core.Data
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"> The <paramref name="parser"/> was null. </exception>
         /// <exception cref="ArgumentException"> The <paramref name="attributeName"/> was null or whitespace. </exception>
-        public T GetAttribute<T>(string attributeName, Func<string, T> parser)
+        public virtual T GetAttribute<T>(string attributeName, Func<string, T> parser)
         {
             // Ensure validity.
             ArgumentNullException.ThrowIfNull(parser);
@@ -127,7 +145,7 @@ namespace GuiCookie.Core.Data
             return parser(attributeString);
         }
 
-        public string GetAttribute(string attributeName)
+        public virtual string GetAttribute(string attributeName)
         {
             // Ensure validity.
             if (string.IsNullOrWhiteSpace(attributeName))
@@ -141,47 +159,47 @@ namespace GuiCookie.Core.Data
             return attributeString;
         }
 
-        public bool HasAttribute(string attributeName) => rawAttributesByName.ContainsKey(attributeName);
+        public virtual bool HasAttribute(string attributeName) => rawAttributesByName.ContainsKey(attributeName);
         #endregion
 
         #region Shortcut Functions
-        public T GetEnumAttributeOrDefault<T>(string attributeName, T defaultTo) where T : struct => GetAttributeOrDefault(attributeName, defaultTo, Enum.TryParse);
+        public virtual T GetEnumAttributeOrDefault<T>(string attributeName, T defaultTo) where T : struct => GetAttributeOrDefault(attributeName, defaultTo, Enum.TryParse);
 
-        public int GetAttributeOrDefault(string attributeName, int defaultTo) 
+        public virtual int GetAttributeOrDefault(string attributeName, int defaultTo) 
             => GetAttributeOrDefault(attributeName, defaultTo, (string input, out int output) => int.TryParse(input, NumberStyles.Integer, ParserSettings.FormatProvider, out output));
 
-        public int? GetAttributeOrDefault(string attributeName, int? defaultTo) 
+        public virtual int? GetAttributeOrDefault(string attributeName, int? defaultTo) 
             => GetAttributeOrDefault(attributeName, defaultTo, (string input, out int output) => int.TryParse(input, NumberStyles.Integer, ParserSettings.FormatProvider, out output));
-        
-        public float GetAttributeOrDefault(string attributeName, float defaultTo) 
+
+        public virtual float GetAttributeOrDefault(string attributeName, float defaultTo) 
             => GetAttributeOrDefault(attributeName, defaultTo, (string input, out float output) => float.TryParse(input, NumberStyles.Float, ParserSettings.FormatProvider, out output));
 
-        public float? GetAttributeOrDefault(string attributeName, float? defaultTo)
+        public virtual float? GetAttributeOrDefault(string attributeName, float? defaultTo)
             => GetAttributeOrDefault(attributeName, defaultTo, (string input, out float output) => float.TryParse(input, NumberStyles.Float, ParserSettings.FormatProvider, out output));
 
-        public bool GetAttributeOrDefault(string attributeName, bool defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, bool.TryParse);
+        public virtual bool GetAttributeOrDefault(string attributeName, bool defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, bool.TryParse);
 
-        public Space GetAttributeOrDefault(string attributeName, Space defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, Space.TryParse);
+        public virtual Space GetAttributeOrDefault(string attributeName, Space defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, Space.TryParse);
 
-        public Sides GetAttributeOrDefault(string attributeName, Sides defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, Sides.TryParse);
+        public virtual Sides GetAttributeOrDefault(string attributeName, Sides defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, Sides.TryParse);
 
-        public Vector2 GetAttributeOrDefault(string attributeName, Vector2 defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, ToVector.TryParse);
+        public virtual Vector2 GetAttributeOrDefault(string attributeName, Vector2 defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, ToVector.TryParse);
 
-        public Vector3 GetAttributeOrDefault(string attributeName, Vector3 defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, ToVector.TryParse);
+        public virtual Vector3 GetAttributeOrDefault(string attributeName, Vector3 defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, ToVector.TryParse);
 
-        public Color GetAttributeOrDefault(string attributeName, Color defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, Colour.TryParse);
+        public virtual Color GetAttributeOrDefault(string attributeName, Color defaultTo) => GetAttributeOrDefault(attributeName, defaultTo, Colour.TryParse);
         #endregion
 
         #region Addition Functions
-        public void Add(string key, string value) 
+        public virtual void Add(string key, string value) 
         {
             if (!rawAttributesByName.TryAdd(key, value)) 
                 throw new Exception($"Attribute with key {key} already exists."); 
         }
 
-        public void Add(string key, object value) => Add(key, value.ToString()!);
+        public virtual void Add(string key, object value) => Add(key, value.ToString()!);
 
-        public void Replace(string key, string value) 
+        public virtual void Replace(string key, string value) 
         {
             if (!rawAttributesByName.ContainsKey(key)) 
                 rawAttributesByName.Remove(key); 
@@ -190,7 +208,7 @@ namespace GuiCookie.Core.Data
         #endregion
 
         #region Removal Functions
-        public bool Remove(string key) => rawAttributesByName.Remove(key);
+        public virtual bool Remove(string key) => rawAttributesByName.Remove(key);
         #endregion
 
         #region String Functions

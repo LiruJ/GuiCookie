@@ -2,7 +2,7 @@
 
 namespace GuiCookie.Core.Data.Xml
 {
-    public class XmlSheetDataSource(string filePath, SheetDataNode rootNode) : SheetDataSource(filePath, rootNode)
+    public class XmlSheetDataSource(string? filePath, SheetDataNode rootNode) : SheetDataSource(filePath, rootNode)
     {
         #region Load Functions
         public static XmlSheetDataSource Load(string filePath)
@@ -13,7 +13,7 @@ namespace GuiCookie.Core.Data.Xml
             return Load(stream, filePath);
         }
 
-        public static XmlSheetDataSource Load(Stream stream, string filePath)
+        public static XmlSheetDataSource Load(Stream stream, string? filePath = null)
         {
             XmlDocument sheetDocument = new();
             sheetDocument.Load(stream);

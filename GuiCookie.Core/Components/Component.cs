@@ -1,8 +1,7 @@
-﻿using GuiCookie.Core.DataStructures;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Rendering;
-using GuiCookie.Core.Roots;
-using GuiCookie.Core.Styles;
 
 namespace GuiCookie.Core.Components
 {
@@ -16,22 +15,6 @@ namespace GuiCookie.Core.Components
         #region Accessors
         /// <summary> The current <see cref="Bounds"/> of the <see cref="Element"/>. </summary>
         public Bounds Bounds => Element.Bounds;
-
-        /// <summary> The current <see cref="Root"/> of the <see cref="Element"/>. </summary>
-        public Root Root => Element.Root;
-
-        /// <summary> The current <see cref="Style"/> of the <see cref="Element"/>. </summary>
-        public Style Style => Element.Style;
-
-        /// <summary> The current <see cref="StyleStateMachine"/> of the <see cref="Element"/>. </summary>
-        public StyleStateMachine StyleState => Element.StyleState;
-
-        /// <summary> The current <see cref="StyleVariant"/> of the <see cref="Element"/>. </summary>
-        public StyleVariant CurrentStyleVariant => Element.CurrentStyleVariant;
-        #endregion
-
-        #region Constructors
-        protected Component() { }
         #endregion
 
         #region Initialisation Functions
@@ -41,14 +24,17 @@ namespace GuiCookie.Core.Components
             Element = element ?? throw new ArgumentNullException(nameof(element));
         }
 
-        /// <summary> Called after the component has been added to an element. The element itself will not be done setting up, use <see cref="OnSetup"/> if this is needed. </summary>
-        public virtual void OnCreated() { }
+        /// <summary> 
+        /// Called after the component has been added to an element. Other components will exist on the element.
+        /// The element itself will not be done setting up, use <see cref="OnSetup"/> if this is needed.
+        /// </summary>
+        public virtual void OnCreated(IReadOnlyAttributeCollection attributes) { }
 
         /// <summary> Called after the component's element has been fully set up. Use this to set references to other components, although other elements may not exist yet. </summary>
-        public virtual void OnSetup() { }
+        public virtual void OnSetup(IReadOnlyAttributeCollection attributes) { }
 
         /// <summary> Called after every element has been fully set up. Use this to set references to other elements. </summary>
-        public virtual void OnPostSetup() { }
+        public virtual void OnPostSetup(IReadOnlyAttributeCollection attributes) { }
         #endregion
 
         #region Calculation Functions
@@ -57,8 +43,6 @@ namespace GuiCookie.Core.Components
         /// <summary> Is fired when the size changes, returning a value that represents if the new size is valid. It is expected that this function will also change the size to something valid. </summary>
         /// <returns></returns>
         public virtual bool ValidateSizeChanged() => true;
-
-        public virtual void OnStyleChanged() { }
 
         public virtual void OnDestroyed() { }
         #endregion

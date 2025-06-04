@@ -18,9 +18,15 @@
         #endregion
 
         #region Cache Functions
-        public bool TryGetVariantAttribute(StyleVariant styleVariant, out T? output) => attributesByVariant.TryGetValue(styleVariant, out output) && output != null;
+        public bool TryGetVariantAttribute(StyleVariant? styleVariant, out T? output)
+        {
+            output = null;
+            if (styleVariant == null) 
+                return false;
+            return attributesByVariant.TryGetValue(styleVariant, out output) && output != null;
+        }
 
-        public void Refresh(Style style)
+        public void Refresh(Style? style)
         {
             // Clear the old cache.
             attributesByVariant.Clear();

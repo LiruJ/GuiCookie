@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.DataStructures;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Input;
 using LiruGameHelper.Signals;
@@ -75,10 +76,10 @@ namespace GuiCookie.Core.Components
 
         #region Initialisation Functions
         /// <summary> Sets the relevant data for this <see cref="Component"/>. </summary>
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
             // Set the click type.
-            ClickType = Element.Attributes.GetEnumAttributeOrDefault(clickTypeAttributeName, ClickType.OnMouseUp);
+            ClickType = attributes.GetEnumAttributeOrDefault(clickTypeAttributeName, ClickType.OnMouseUp);
         }
         #endregion
 

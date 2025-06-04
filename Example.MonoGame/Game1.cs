@@ -1,6 +1,8 @@
-﻿using GuiCookie.Core.Roots;
+﻿using GuiCookie.Core.Data.Xml;
+using GuiCookie.Core.Screens;
 using GuiCookie.Core.Services;
 using GuiCookie.MonoGame.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,6 +15,8 @@ namespace Example.MonoGame
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+
+        private GuiScreen root;
 
         public Game1()
         {
@@ -32,15 +36,16 @@ namespace Example.MonoGame
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            UIServiceProvider serviceProvider = new UIServiceProvider()
+            ServiceCollection serviceProvider = new ServiceCollection()
                 .AddMonoGameInput(Window)
                 .AddMonoGameWindow(Window)
-                .AddMonoGameResources(Content)
-                .AddSelf();
+                .AddMonoGameResources(Content);
 
-            Root root = RootBuilder<Root>.Create(serviceProvider)
+            root = GuiScreenBuilder<GuiScreen>.Create(serviceProvider)
+                .WithRandom()
                 .WithXmlLayoutSheet(Path.Combine(Content.RootDirectory, "Gui", "Layouts", "TestLayout"))
                 .WithXmlStyleSheet(Path.Combine(Content.RootDirectory, "Gui", "Styles", "TestStyle"))
+                .WithXmlTemplateSheet(Path.Combine(Content.RootDirectory, "Gui", "Templates", "TestTemplates"))
                 .WithDefaultElementNamespace()
                 .WithElementNamespace(Assembly.GetExecutingAssembly(), "Example.MonoGame.Elements")
                 .WithDefaultTemplateSheet()
@@ -53,6 +58,8 @@ namespace Example.MonoGame
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            root.Update(gameTime.ElapsedGameTime, gameTime.TotalGameTime);
 
             // TODO: Add your update logic here
 

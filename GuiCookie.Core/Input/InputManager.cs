@@ -29,7 +29,7 @@ namespace GuiCookie.Core.Input
         /// <summary>
         /// The <see cref="IKeyboardState"/> of the current frame.
         /// </summary>
-        public virtual IKeyboardState CurrentKeyboardState { get; } = currentKeyboardState;
+        public IKeyboardState CurrentKeyboardState { get; } = currentKeyboardState;
 
         /// <summary>
         /// The <see cref="IKeyboardState"/> of the previous frame.

@@ -5,7 +5,7 @@ namespace GuiCookie.Core.Templates
     public class Template
     {
         #region Constants
-        private const string controllerAttributeName = "Controller";
+        public const string ControllerAttributeName = "Controller";
 
         private const string componentListAttributeName = "Components";
 
@@ -16,21 +16,33 @@ namespace GuiCookie.Core.Templates
         private const string defaultControllerName = "Element";
         #endregion
 
+        #region Fields
+        private readonly string? baseTemplateName = null;
+
+        private bool needsCombiningOverBase = true;
+        #endregion
+
         #region Backing Fields
-        private string? controllerName;
-        private readonly List<string> componentNames;
-        private readonly List<Template> children;
-        private readonly Dictionary<string, Template> childrenByIdentifierName;
-        private readonly AttributeCollection attributes;
+        private string? controllerName = null;
+
+        private readonly List<string> componentNames = [];
+
+        private readonly List<Template> children = [];
+
+        private readonly Dictionary<string, Template> childrenByIdentifierName = [];
+
+        private readonly AttributeCollection attributes = [];
         #endregion
 
         #region Properties
         public string Name { get; }
 
+        public Template? BaseTemplate { get; private set; } = null;
+
         /// <summary>
         /// The name used to identify this template as a child. This is the name attribute in the xml.
         /// </summary>
-        public string? IdentifierName { get; }
+        public string? ChildIdentifierName { get; }
 
         public string ControllerName => controllerName ?? defaultControllerName;
 
@@ -44,18 +56,40 @@ namespace GuiCookie.Core.Templates
         #endregion
 
         #region Constructors
+        public Template(string name, IReadOnlyAttributeCollection attributes)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
+
+            Name = name;
+
+            prepareFromAttributes(attributes, out var componentNames, out var controllerName, out var identifierName, out var baseName);
+            this.componentNames = componentNames;
+            this.controllerName = controllerName;
+            ChildIdentifierName = identifierName;
+
+            baseTemplateName = baseName;
+            needsCombiningOverBase = !string.IsNullOrWhiteSpace(baseTemplateName);
+
+            // Create a copy of the node attributes, and remove any redundant attributes.
+            this.attributes = attributes.CreateCopy();
+            this.attributes.Remove(baseAttributeName);
+            this.attributes.Remove(ControllerAttributeName);
+            this.attributes.Remove(componentListAttributeName);
+        }
+
         public Template(string name, string? identifierName, string? controllerName, List<Template> childTemplates, List<string> componentNames, AttributeCollection attributes)
         {
             Name = !string.IsNullOrWhiteSpace(name) ? name : throw new ArgumentException("Name cannot be null or empty.", nameof(controllerName));
             this.controllerName = !string.IsNullOrWhiteSpace(controllerName) ? controllerName : null;
-            IdentifierName = !string.IsNullOrWhiteSpace(identifierName) ? identifierName : null;
+            ChildIdentifierName = !string.IsNullOrWhiteSpace(identifierName) ? identifierName : null;
             this.attributes = attributes;
 
             // Set the children.
             children = childTemplates ?? throw new ArgumentNullException(nameof(childTemplates));
             childrenByIdentifierName = [];
             foreach (Template child in children)
-                if (child.IdentifierName != null) childrenByIdentifierName.Add(child.IdentifierName, child);
+                if (child.ChildIdentifierName != null) childrenByIdentifierName.Add(child.ChildIdentifierName, child);
 
             // Set and neaten the component names.
             this.componentNames = componentNames ?? throw new ArgumentNullException(nameof(componentNames));
@@ -73,11 +107,55 @@ namespace GuiCookie.Core.Templates
             foreach (Template child in children)
                 newChildren.Add(child.CreateCopy());
 
-            return new Template(Name, IdentifierName, controllerName, newChildren, [.. componentNames], attributes.CreateCopy());
+            return new Template(Name, ChildIdentifierName, controllerName, newChildren, [.. componentNames], attributes.CreateCopy());
         }
         #endregion
 
         #region Merge Functions
+        internal void ResolveBase(TemplateManager templateManager)
+        {
+            if (string.IsNullOrEmpty(baseTemplateName))
+                return;
+
+            if (!templateManager.TryGetTemplateFromName(baseTemplateName, out var baseTemplate))
+                throw new InvalidOperationException($"Template \"{Name}\" has a base template \"{baseTemplateName}\" which does not exist");
+
+            BaseTemplate = baseTemplate;
+        }
+
+        internal void ResolveChildren(TemplateManager templateManager, IEnumerable<IReadOnlySheetDataNode> childNodes)
+        {
+            foreach (var childNode in childNodes)
+            {
+                if (!templateManager.TryGetTemplateFromName(childNode.Name, out var childTemplate))
+                    throw new InvalidDataException($"Template \"{Name}\" defines a child \"{childNode.Name}\" which does not exist as a template");
+
+                DerivedAttributeCollection derivedAttributes = new(childTemplate!.Attributes, childNode.Attributes);
+
+                Template derivedTemplate = new(childNode.Name, derivedAttributes);
+                children.Add(derivedTemplate);
+
+                if (!string.IsNullOrWhiteSpace(derivedTemplate.ChildIdentifierName))
+                    childrenByIdentifierName.Add(derivedTemplate.ChildIdentifierName, derivedTemplate);
+            }
+        }
+
+        internal void CombineOverBase()
+        {
+            if (!needsCombiningOverBase)
+                return;
+
+            if (BaseTemplate == null)
+                throw new InvalidDataException($"Template \"{Name}\" needs combining over a base template, yet its base template is null");
+
+            if (BaseTemplate.needsCombiningOverBase)
+                BaseTemplate.CombineOverBase();
+
+            CombineOver(BaseTemplate);
+
+            needsCombiningOverBase = false;
+        }
+
         public void CombineOver(Template root)
         {
             // If the controller of this template is null, take the root's one.
@@ -92,16 +170,16 @@ namespace GuiCookie.Core.Templates
             foreach (Template childTemplate in root.Children)
             {
                 // If the child template has an identifier.
-                if (childTemplate.IdentifierName != null)
+                if (childTemplate.ChildIdentifierName != null)
                 {
                     // If this template defines a child with the same identifier, combine them.
-                    if (ChildrenByIdentifierName.ContainsKey(childTemplate.IdentifierName))
-                        childrenByIdentifierName[childTemplate.IdentifierName].CombineOver(childTemplate);
+                    if (ChildrenByIdentifierName.ContainsKey(childTemplate.ChildIdentifierName))
+                        childrenByIdentifierName[childTemplate.ChildIdentifierName].CombineOver(childTemplate);
                     // Otherwise; add a copy.
                     else
                     {
                         Template newChild = childTemplate.CreateCopy();
-                        childrenByIdentifierName.Add(newChild.IdentifierName!, newChild);
+                        childrenByIdentifierName.Add(newChild.ChildIdentifierName!, newChild);
                         children.Add(newChild);
                     }
                 }
@@ -117,7 +195,7 @@ namespace GuiCookie.Core.Templates
         public Template CombineOver(AttributeCollection derivedAttributes)
         {
             // Prepare the attributes.
-            prepareFromAttributes(ref derivedAttributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? _);
+            prepareFromAttributes(derivedAttributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? _);
 
             // Create a template with the derived attributes and combine it over this template.
             Template derivedTemplate = new(Name, identifierName, controllerName, [], componentNames, derivedAttributes);
@@ -130,69 +208,74 @@ namespace GuiCookie.Core.Templates
         #endregion
 
         #region Load Functions
-        public static Template Load(TemplateManager templateManager, IReadOnlySheetDataNode mainNode, IReadOnlySheetDataNode templateNode)
+        public static Template Load(IReadOnlySheetDataNode templateNode) => new(templateNode.Name, templateNode.Attributes);
+
+        //public static Template Load(TemplateManager templateManager, IReadOnlySheetDataNode mainNode, IReadOnlySheetDataNode templateNode)
+        //{
+        //    // Copy the attributes.
+        //    AttributeCollection attributes = templateNode.Attributes.CreateCopy();
+
+        //    // Prepare the attributes.
+        //    prepareFromAttributes(ref attributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? baseName);
+
+        //    // Recursively load the templates and save them to a list.
+        //    List<Template> childTemplates = new(templateNode.ChildNodes.Count);
+        //    foreach (IReadOnlySheetDataNode childNode in templateNode.ChildNodes)
+        //    {
+        //        // Get the root template from the node's name.
+        //        Template rootTemplate = templateManager.getRootTemplate(mainNode, childNode.Name);
+
+        //        // Load the child node itself as a template.
+        //        Template childTemplate = Load(templateManager, mainNode, childNode);
+
+        //        // Merge the child over the root template.
+        //        childTemplate.CombineOver(rootTemplate);
+
+        //        // Add the child template to the list.
+        //        childTemplates.Add(childTemplate);
+        //    }
+
+        //    // Create a new template with the loaded values.
+        //    Template loadedTemplate = new(templateNode.Name, identifierName, controllerName, childTemplates, componentNames, attributes);
+
+        //    // If a base name was given, get it from the template manager.
+        //    if (baseName != null)
+        //    {
+        //        Template baseTemplate = templateManager.getRootTemplate(mainNode, baseName);
+        //        loadedTemplate.CombineOver(baseTemplate);
+        //    }
+
+        //    // Create and return a template with the loaded values.
+        //    return loadedTemplate;
+        //}
+
+        private static void prepareFromAttributes(IReadOnlyAttributeCollection attributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? baseName)
         {
-            // Copy the attributes.
-            AttributeCollection attributes = templateNode.Attributes.CreateCopy();
+            componentNames = GetComponentNames(attributes);
 
-            // Prepare the attributes.
-            prepareFromAttributes(ref attributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? baseName);
-
-            // Recursively load the templates and save them to a list.
-            List<Template> childTemplates = new(templateNode.ChildNodes.Count);
-            foreach (SheetDataNode childNode in templateNode.ChildNodes)
-            {
-                // Get the root template from the node's name.
-                Template rootTemplate = templateManager.getRootTemplate(mainNode, childNode.Name);
-
-                // Load the child node itself as a template.
-                Template childTemplate = Load(templateManager, mainNode, childNode);
-
-                // Merge the child over the root template.
-                childTemplate.CombineOver(rootTemplate);
-
-                // Add the child template to the list.
-                childTemplates.Add(childTemplate);
-            }
-
-            // Create a new template with the loaded values.
-            Template loadedTemplate = new(templateNode.Name, identifierName, controllerName, childTemplates, componentNames, attributes);
-
-            // If a base name was given, get it from the template manager.
-            if (baseName != null)
-            {
-                Template baseTemplate = templateManager.getRootTemplate(mainNode, baseName);
-                loadedTemplate.CombineOver(baseTemplate);
-            }
-
-            // Create and return a template with the loaded values.
-            return loadedTemplate;
+            // If an explicit controller name was given, use that as the controller name; otherwise, default to null. Do the same with the identifier name and base name.
+            controllerName = attributes.GetAttributeOrDefault(ControllerAttributeName, (string?)null)?.Trim();
+            identifierName = attributes.GetAttributeOrDefault(nameAttributeName, (string?)null)?.Trim();
+            baseName = attributes.GetAttributeOrDefault(baseAttributeName, (string?)null)?.Trim();
         }
 
-        private static void prepareFromAttributes(ref AttributeCollection attributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? baseName)
+        public static List<string> GetComponentNames(IReadOnlyAttributeCollection attributes)
         {
             // Get the component names from the comma-separated component name list attribute.
             string? componentListString = attributes.GetAttributeOrDefault(componentListAttributeName, (string?)null);
 
-            // Remove the component names string from the collection as it's not needed for the element itself.
-            attributes.Remove(componentListAttributeName);
-
+            // TODO: Work out a nice way to use ReadOnlySpan<char> and slices, to avoid having to allocate lists every time an element is made.
+            // This requires some changes in LiruGameHelper to take a ReadOnlySpan<char> instead of a string for a type name.
             // Split the component name list by commas and save the results.
-            componentNames = componentListString == null ? [] : [.. componentListString.Split(',')];
-
-            // If an explicit controller name was given, use that as the controller name; otherwise, default to null. Do the same with the identifier name and base name.
-            controllerName = attributes.GetAttributeOrDefault(controllerAttributeName, (string?)null);
-            identifierName = attributes.GetAttributeOrDefault(nameAttributeName, (string?)null);
-            baseName = attributes.GetAttributeOrDefault(baseAttributeName, (string?)null);
-
-            // Remove the controller name as it's not needed for the element itself.
-            attributes.Remove(controllerAttributeName);
-            attributes.Remove(baseAttributeName);
+            List<string> componentNames = !string.IsNullOrWhiteSpace(componentListString)
+                ? [.. componentListString.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)] 
+                : [];
+            return componentNames;
         }
         #endregion
 
         #region String Functions
-        public override string ToString() => $"{Name} template with {ComponentNames?.Count} components and {Children?.Count} children, and controlled by {ControllerName}.";
+        public override string ToString() => $"{Name} template with {ComponentNames?.Count ?? 0} components, {Children?.Count ?? 0} children, and controlled by {ControllerName}.";
         #endregion
     }
 }

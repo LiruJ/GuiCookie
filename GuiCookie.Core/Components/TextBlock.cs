@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.DataStructures;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles;
@@ -11,7 +12,7 @@ using System.Text;
 
 namespace GuiCookie.Core.Components
 {
-    public class TextBlock(ResourceManager resourceManager) : Component
+    public class TextBlock(ResourceManager resourceManager) : StyledComponent
     {
         #region Constants
         private const string textAttributeName = "Text";
@@ -35,10 +36,7 @@ namespace GuiCookie.Core.Components
             get => text;
             set
             {
-                // Set the text.
                 text = value;
-
-                // Recalculate the text properties.
                 recalculateTextSizeProperties();
             }
         }
@@ -49,50 +47,50 @@ namespace GuiCookie.Core.Components
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Space? TextAnchor
         {
-            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font) ? font!.TextAnchor : null;
-            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font)) font!.TextAnchor = value; }
+            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.TextAnchor : null;
+            set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.TextAnchor = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Space? TextPivot
         {
-            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font) ? font!.TextPivot : null;
-            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font)) font!.TextPivot = value; }
+            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.TextPivot : null;
+            set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.TextPivot = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public DropShadow DropShadow
         {
-            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font) ? font!.DropShadow : new DropShadow((Vector2?)null, null);
-            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font)) font!.DropShadow = value; }
+            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.DropShadow : new DropShadow((Vector2?)null, null);
+            set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.DropShadow = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Color? Colour
         {
-            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font) ? font!.Colour : null;
-            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font)) font!.Colour = value; }
+            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.Colour : null;
+            set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.Colour = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Color? Tint
         {
-            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font) ? font!.Tint : null;
-            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font)) font!.Tint = value; }
+            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.Tint : null;
+            set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.Tint = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Vector2? Offset
         {
-            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font) ? font!.Offset : null;
-            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font)) font!.Offset = value; }
+            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.Offset : null;
+            set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.Offset = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Font? Font
         {
-            get => fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? fontStyle) ? fontStyle!.Font : null;
-            set { if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? fontStyle)) fontStyle!.Font = value; }
+            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? fontStyle) ? fontStyle!.Font : null;
+            set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? fontStyle)) fontStyle!.Font = value; }
         }
 
         /// <summary> The direction in which this text's element resizes. </summary>
@@ -109,49 +107,36 @@ namespace GuiCookie.Core.Components
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
-            // Set the text.
-            text = Element.Attributes.GetAttributeOrDefault(textAttributeName, string.Empty);
+            // Set the attributes.
+            text = attributes.GetAttributeOrDefault(textAttributeName, string.Empty)!;
+            ResizeDirection = attributes.GetEnumAttributeOrDefault(resizeAttributeName, DirectionMask.None);
+            if (attributes.TryGetAttribute(FontStyleAttribute.AnchorAttributeName, out Space anchor, Space.TryParse))
+                TextAnchor = anchor;
+            if (attributes.TryGetAttribute(FontStyleAttribute.PivotAttributeName, out Space pivot, Space.TryParse))
+                TextPivot = pivot;
+            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, attributes));
+            if (attributes.TryGetAttribute(FontStyleAttribute.OffsetAttributeName, out Vector2 offset, ToVector.TryParse))
+                Offset = offset;
+            if (fontCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out FontStyleAttribute? font))
+                font!.TintedColour = TintedColour.CreateCombination(font.TintedColour, new TintedColour(resourceManager, attributes));
 
-            // Set the resize direction.
-            ResizeDirection = Element.Attributes.GetEnumAttributeOrDefault(resizeAttributeName, DirectionMask.None);
-
-            // Set the text anchor and pivot.
-            if (Element.Attributes.HasAttribute(FontStyleAttribute.AnchorAttributeName)) TextAnchor = Element.Attributes.GetAttribute(FontStyleAttribute.AnchorAttributeName, Space.Parse);
-            if (Element.Attributes.HasAttribute(FontStyleAttribute.PivotAttributeName)) TextPivot = Element.Attributes.GetAttribute(FontStyleAttribute.PivotAttributeName, Space.Parse);
-
-            // Set the drop shadow.
-            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, Element.Attributes));
-
-            // Set the offet.
-            if (Element.Attributes.HasAttribute(FontStyleAttribute.OffsetAttributeName)) Offset = Element.Attributes.GetAttribute(FontStyleAttribute.OffsetAttributeName, ToVector.Parse2);
-
-            // Set the colour and tint.
-            if (fontCache.TryGetVariantAttribute(Style.BaseVariant, out FontStyleAttribute? font))
-                font!.TintedColour = TintedColour.CreateCombination(font.TintedColour, new TintedColour(resourceManager, Element.Attributes));
-
-            if (Element.Attributes.HasAttribute(FontStyleAttribute.FontAttributeName))
-            {
-                string fontName = Element.Attributes.GetAttributeOrDefault(FontStyleAttribute.FontAttributeName, string.Empty);
+            // Try load the font, if one was defined.
+            if (attributes.TryGetAttribute(FontStyleAttribute.FontAttributeName, out string? fontName))
                 Font = !string.IsNullOrWhiteSpace(fontName) ?
                     resourceManager.FontsByName.TryGetValue(fontName, out Font? spriteFont) ? spriteFont : throw new Exception($"Font resource named \"{fontName}\" does not exist.")
                     : null;
-            }
         }
 
-        public override void OnSetup()
+        public override void OnSetup(IReadOnlyAttributeCollection attributes)
         {
             recalculateTextSizeProperties();
         }
         #endregion
 
         #region Style Functions
-        public override void OnStyleChanged()
-        {
-            // Refresh the font cache.
-            fontCache.Refresh(Style);
-        }
+        public override void OnStyleChanged(Style? style) => fontCache.Refresh(style);
 
         private void recalculateTextSizeProperties()
         {
@@ -214,7 +199,8 @@ namespace GuiCookie.Core.Components
         public void DrawText(IGuiCamera guiCamera, StringBuilder text)
         {
             // Ensure there is text and a font to draw.
-            if (text.Length == 0 || !fontCache.TryGetVariantAttribute(CurrentStyleVariant, out FontStyleAttribute? fontVariant)) return;
+            if (text.Length == 0 || !fontCache.TryGetVariantAttribute(CurrentStyleVariant, out FontStyleAttribute? fontVariant))
+                return;
 
             // Calculate the position of the text.
             Vector2 position = CalculateTextPosition(fontVariant!, fontVariant!.Font.MeasureString(text));

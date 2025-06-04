@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Components;
+using GuiCookie.Core.Data;
 using System.Drawing;
 
 namespace GuiCookie.Core.Elements
@@ -18,7 +19,7 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
             // Set components.
             TextBlock = GetComponent<TextBlock>();

@@ -75,7 +75,7 @@ namespace GuiCookie.Core.Input.DragAndDrop
             if (CurrentDraggable != null)
             {
                 // Get the DropTarget under the mouse, ignoring the currently dragged item.
-                IDropTarget dropTarget = elementInputManager.FindInBoundsWithInterfacedComponent<IDropTarget>(elementManager, CurrentDraggable.Bounds.AbsoluteContentArea, CurrentDraggable.Element);
+                IDropTarget? dropTarget = elementInputManager.FindInBoundsWithInterfacedComponent<IDropTarget>(elementManager.RootElement, CurrentDraggable.Bounds.AbsoluteContentArea, CurrentDraggable.Element);
 
                 // Calculate the offset relative to the drop target.
                 Point relativeMousePosition = dropTarget == null ? new(0, 0) : PointExtensions.Subtract(elementInputManager.InputManager.MousePosition, dropTarget.Bounds.AbsoluteTotalPosition);
@@ -97,7 +97,7 @@ namespace GuiCookie.Core.Input.DragAndDrop
             else if (elementInputManager.InputManager.IsLeftMouseDown && !elementInputManager.InputManager.WasLeftMouseDown)
             {
                 // Find the draggable object under the mouse
-                IDraggable draggable = elementInputManager.FindInBoundsWithInterfacedComponent<IDraggable>(elementManager, new Rectangle(elementInputManager.InputManager.MousePosition, new(0, 0)));
+                IDraggable? draggable = elementInputManager.FindInBoundsWithInterfacedComponent<IDraggable>(elementManager.RootElement, new Rectangle(elementInputManager.InputManager.MousePosition, new(0, 0)));
 
                 // If there is no draggable object, do nothing.
                 if (draggable == null) return;

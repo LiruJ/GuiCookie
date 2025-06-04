@@ -1,4 +1,6 @@
-﻿namespace GuiCookie.Core.Elements
+﻿using GuiCookie.Core.Data;
+
+namespace GuiCookie.Core.Elements
 {
     /// <summary> Represents a slider and a text label displaying the current value. </summary>
     public class LabelledSlider : Element
@@ -77,16 +79,16 @@
         #endregion
 
         #region Initialisation Functions
-        public override void OnFullSetup()
+        public override void OnFullSetup(IReadOnlyAttributeCollection attributes)
         {
             // Get the elements.
             Slider = GetChildByName<SliderBar>(sliderName);
             Label = GetInterfacedChildByName<ITextable>(labelName);
 
             // Set the attributes.
-            prefix = Attributes.GetAttributeOrDefault(prefixAttributeName, string.Empty);
-            suffix = Attributes.GetAttributeOrDefault(suffixAttributeName, string.Empty);
-            isPercentage = Attributes.GetAttributeOrDefault(isPercentageAttributeName, false);
+            prefix = attributes.GetAttributeOrDefault(prefixAttributeName, string.Empty)!;
+            suffix = attributes.GetAttributeOrDefault(suffixAttributeName, string.Empty)!;
+            isPercentage = attributes.GetAttributeOrDefault(isPercentageAttributeName, false);
 
             // Connect to the slider signal.
             Slider?.OnValueChanged.Connect(calculateLabel);

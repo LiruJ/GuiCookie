@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.DataStructures;
+﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles;
@@ -9,16 +10,12 @@ using System.Numerics;
 
 namespace GuiCookie.Core.Components
 {
-    public class ImageBlock(ResourceManager resourceManager) : Component
+    public class ImageBlock(ResourceManager resourceManager) : StyledComponent
     {
         #region Constants
         private const string imageAttributeName = "Image";
         private const string clippingModeAttributeName = "ClippingMode";
         private const string centredAttributeName = "Centred";
-        #endregion
-
-        #region Dependencies
-        private readonly ResourceManager resourceManager = resourceManager ?? throw new ArgumentNullException(nameof(resourceManager));
         #endregion
 
         #region Fields
@@ -62,25 +59,20 @@ namespace GuiCookie.Core.Components
         #endregion
 
         #region Initialisation Functions
-        public override void OnCreated()
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
-            // Set the image.
-            string imageName = Element.Attributes.GetAttributeOrDefault(imageAttributeName, string.Empty);
+            // Initialise the styled component first, so the style state machine can be set up.
+            base.OnCreated(attributes);
+
+            // Set the attributes.
+            string imageName = attributes.GetAttributeOrDefault(imageAttributeName, string.Empty)!;
             if (!string.IsNullOrEmpty(imageName))
                 SetImageFromName(imageName);
-
-            // Set the colour and tint.
-            if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content))
-                content!.TintedColour = TintedColour.CreateCombination(content.TintedColour, new TintedColour(resourceManager, Element.Attributes));
-
-            // Set the drop shadow.
-            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, Element.Attributes));
-
-            // Set clipping mode.
-            ClippingMode = Element.Attributes.GetEnumAttributeOrDefault(clippingModeAttributeName, ClippingMode.Squeeze);
-
-            // Set centred.
-            Centred = Element.Attributes.GetAttributeOrDefault(centredAttributeName, false);
+            if (contentCache.TryGetVariantAttribute(Style?.BaseVariant, out ContentStyleAttribute? content))
+                content!.TintedColour = TintedColour.CreateCombination(content.TintedColour, new TintedColour(resourceManager, attributes));
+            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, attributes));
+            ClippingMode = attributes.GetEnumAttributeOrDefault(clippingModeAttributeName, ClippingMode.Squeeze);
+            Centred = attributes.GetAttributeOrDefault(centredAttributeName, false);
         }
         #endregion
 
@@ -90,11 +82,7 @@ namespace GuiCookie.Core.Components
             ? image
             : throw new Exception($"Image with name {name} has not been loaded as an image resource.");
 
-        public override void OnStyleChanged()
-        {
-            // Refresh the cache.
-            contentCache.Refresh(Style);
-        }
+        public override void OnStyleChanged(Style? style) => contentCache.Refresh(Style);
         #endregion
 
         #region Draw Functions

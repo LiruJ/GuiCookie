@@ -1,5 +1,4 @@
 ﻿using GuiCookie.Core.Elements;
-using GuiCookie.Core.Roots;
 using LiruGameHelper.Signals;
 using System.Collections;
 
@@ -82,7 +81,7 @@ namespace GuiCookie.Core.DataStructures
         #endregion
     }
 
-    public class ElementContainer : IEnumerable<Element>
+    public class ElementContainer(Element element) : IEnumerable<Element>
     {
         #region Fields
         private readonly List<ElementContainer> children = [];
@@ -90,7 +89,7 @@ namespace GuiCookie.Core.DataStructures
         private readonly Dictionary<string, ElementContainer> childrenByName = [];
 
         /// <summary> 
-        /// The collection of elements to be removed from the <see cref="children"/> and/or <see cref="additionQueue"/> collection nex time <see cref="flushQueues"/> is called. 
+        /// The collection of elements to be removed from the <see cref="children"/> and/or <see cref="additionQueue"/> collection next time <see cref="flushQueues"/> is called. 
         /// Each item within this collection exists in the children and/or addition collection and there are no duplicates.
         /// </summary>
         private readonly HashSet<ElementContainer> removalQueue = [];
@@ -102,16 +101,12 @@ namespace GuiCookie.Core.DataStructures
         #endregion
 
         #region Backing Fields
-        private readonly Root? root;
-
         private ElementContainer? parent;
         #endregion
 
         #region Properties
         /// <summary> The Element that this container represents. </summary>
-        public Element? Element { get; private set; }
-
-        public Root? Root => root ?? Element?.Root;
+        public Element Element { get; } = element ?? throw new ArgumentNullException(nameof(element));
 
         public ElementContainer? Parent
         {
@@ -145,22 +140,6 @@ namespace GuiCookie.Core.DataStructures
         private readonly Signal<Element> onChildRemoved = new();
         #endregion
 
-        #region Constructors
-        /// <summary> Creates an element container for the root. </summary>
-        /// <param name="root"> The layout's root. </param>
-        internal ElementContainer(Root root)
-        {
-            this.root = root ?? throw new ArgumentNullException(nameof(root));
-            Element = null;
-        }
-
-        internal ElementContainer(Element element)
-        {
-            Element = element ?? throw new ArgumentNullException(nameof(element));
-            root = null;
-        }
-        #endregion
-
         #region Element Functions
         internal void onElementDestroyed()
         {
@@ -186,7 +165,7 @@ namespace GuiCookie.Core.DataStructures
             return count;
         }
 
-        public T GetChild<T>() where T : Element
+        public T? GetChild<T>() where T : Element
         {
             // Go over each child, if one is assignable from the given type, return it.
             foreach (Element child in this)
@@ -196,13 +175,15 @@ namespace GuiCookie.Core.DataStructures
             return null;
         }
 
-        public Element GetChildByName(string name, bool recursive = false)
+        public Element? GetChildByName(string name, bool recursive = false)
         {
             // Ensure the given name is correct.
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Cannot find a child by name with the given name as it is null or empty.", nameof(name));
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Cannot find a child by name with the given name as it is null or empty.", nameof(name));
 
             // Try to get the element with the name, if it is found then return it.
-            if (childrenByName.TryGetValue(name, out ElementContainer child)) return child.Element;
+            if (childrenByName.TryGetValue(name, out ElementContainer? child)) 
+                return child.Element;
             // Otherwise; if the element could not be found, handle it.
             else
             {
@@ -223,10 +204,10 @@ namespace GuiCookie.Core.DataStructures
             }
         }
 
-        public T GetChildByName<T>(string name, bool recursive = false) where T : Element
+        public T? GetChildByName<T>(string name, bool recursive = false) where T : Element
             => GetChildByName(name, recursive) as T;
 
-        public Element GetChildByIndex(int index)
+        public Element? GetChildByIndex(int index)
         {
             // Check for range.
             if (index < 0 || index >= Count) throw new IndexOutOfRangeException(nameof(index));
@@ -247,7 +228,7 @@ namespace GuiCookie.Core.DataStructures
             throw new IndexOutOfRangeException(nameof(index));
         }
 
-        public T GetChildByIndex<T>(int index) where T : Element => GetChildByIndex(index) as T;
+        public T? GetChildByIndex<T>(int index) where T : Element => GetChildByIndex(index) as T;
 
         public bool RemoveChild(ElementContainer child)
         {
@@ -352,19 +333,22 @@ namespace GuiCookie.Core.DataStructures
             }
         }
 
-        internal void renameChild(ElementContainer child, string oldName)
+        internal void renameChild(ElementContainer child, string? oldName)
         {
             // Ensure the child is not null.
             ArgumentNullException.ThrowIfNull(child);
 
             // Ensure the child is actually a child.
-            if (!Contains(child)) throw new Exception("Given container is not a child of this container.");
+            if (!Contains(child)) 
+                throw new Exception("Given container is not a child of this container.");
 
             // If the old name was empty, it does not need to be removed.
-            if (!string.IsNullOrWhiteSpace(oldName) && !childrenByName.Remove(oldName)) throw new Exception("Failed to remove child from named collection despite child being named.");
+            if (!string.IsNullOrWhiteSpace(oldName) && !childrenByName.Remove(oldName)) 
+                throw new Exception("Failed to remove child from named collection despite child being named.");
 
             // If the element now has a name, add it.
-            if (child.Element.HasName) childrenByName.Add(child.Element.Name, child);
+            if (child.Element.HasName) 
+                childrenByName.Add(child.Element.Name, child);
         }
 
         internal void flushQueues()

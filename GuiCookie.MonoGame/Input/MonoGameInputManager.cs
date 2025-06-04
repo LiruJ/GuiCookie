@@ -8,22 +8,36 @@ namespace GuiCookie.MonoGame.Input
 {
     public class MonoGameInputManager : InputManager
     {
+        #region Fields
+        private readonly MonoGameKeyboardState currentKeyboardState;
+
+        private readonly MonoGameKeyboardState previousKeyboardState;
+
+        private readonly MonoGameMouseState currentMouseState;
+
+        private readonly MonoGameMouseState previousMouseState;
+        #endregion
+
         #region Properties
-        public Point CurrentCursorPosition => CurrentMouseState.Position.ToMonoGamePoint();
-
-        public override MonoGameKeyboardState CurrentKeyboardState { get; }
-
-        public override MonoGameKeyboardState PreviousKeyboardState { get; }
-
-        public override MonoGameMouseState CurrentMouseState { get; }
-
-        public override MonoGameMouseState PreviousMouseState { get; }
+        public Point CurrentCursorPosition => currentMouseState.Position.ToMonoGamePoint();
         #endregion
 
         #region Constructors
-        public MonoGameInputManager(GameWindow gameWindow) : base(new MonoGameKeyboardState(), new MonoGameKeyboardState(), new MonoGameMouseState(), new MonoGameMouseState())
+        public MonoGameInputManager(GameWindow gameWindow) 
+            : this(gameWindow, new MonoGameKeyboardState(), new MonoGameKeyboardState(), new MonoGameMouseState(), new MonoGameMouseState())
+        {
+            
+        }
+
+        public MonoGameInputManager(GameWindow gameWindow, MonoGameKeyboardState currentKeyboardState, MonoGameKeyboardState previousKeyboardState, MonoGameMouseState currentMouseState, MonoGameMouseState previousMouseState)
+            : base(currentKeyboardState, previousKeyboardState, currentMouseState, previousMouseState)
         {
             gameWindow.TextInput += (object? sender, TextInputEventArgs e) => TextInput.Append(e.Character);
+
+            this.currentKeyboardState = currentKeyboardState;
+            this.previousKeyboardState = previousKeyboardState;
+            this.currentMouseState = currentMouseState;
+            this.previousMouseState = previousMouseState;
         }
         #endregion
 
@@ -32,11 +46,11 @@ namespace GuiCookie.MonoGame.Input
         {
             base.Update(elapsedTime, totalTime);
             
-            PreviousKeyboardState.KeyboardState = CurrentKeyboardState.KeyboardState;
-            CurrentKeyboardState.KeyboardState = Keyboard.GetState();
+            previousKeyboardState.KeyboardState = currentKeyboardState.KeyboardState;
+            currentKeyboardState.KeyboardState = Keyboard.GetState();
 
-            PreviousMouseState.MouseState = CurrentMouseState.MouseState;
-            CurrentMouseState.MouseState = Mouse.GetState();
+            previousMouseState.MouseState = currentMouseState.MouseState;
+            currentMouseState.MouseState = Mouse.GetState();
         }
         #endregion
     }
