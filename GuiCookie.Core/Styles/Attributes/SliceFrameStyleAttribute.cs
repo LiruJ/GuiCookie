@@ -17,13 +17,13 @@ namespace GuiCookie.Core.Styles.Attributes
         public string Name { get; }
 
         /// <summary> The image atlas that this <see cref="SliceFrameStyleAttribute"/> sources from. </summary>
-        public Image? Image { get; set; }
+        public Image? Image { get; private set; }
 
         /// <summary> The <see cref="DataStructures.NineSlice"/> used to slice the image into sections. </summary>
-        public NineSlice? NineSlice { get; set; }
+        public NineSlice? NineSlice { get; private set; }
 
         /// <summary> The colour and tint applied to the frame. </summary>
-        public TintedColour TintedColour { get; set; }
+        public TintedColour TintedColour { get; private set; }
 
         /// <summary> Accessor for <see cref="TintedColour.Colour"/>. </summary>
         public Color? Colour
@@ -43,7 +43,7 @@ namespace GuiCookie.Core.Styles.Attributes
         public Color MixedColour => TintedColour.Mixed;
 
         /// <summary> The drop shadow data used to drop a shadow behind the element. </summary>
-        public DropShadow DropShadow { get; set; }
+        public DropShadow DropShadow { get; private set; }
         #endregion
 
         #region Constructors
@@ -54,13 +54,13 @@ namespace GuiCookie.Core.Styles.Attributes
             NineSlice = attributes.GetAttributeOrDefault("NineSlice", (NineSlice?)null, DataStructures.NineSlice.TryParse);
 
             // Get the image.
-            string imageName = attributes.GetAttributeOrDefault(imageAttributeName, string.Empty);
+            string imageName = attributes.GetAttributeOrDefault(imageAttributeName, string.Empty)!;
             Image = !string.IsNullOrWhiteSpace(imageName) ?
                 resourceManager.ImagesByName.TryGetValue(imageName, out Image? image) ? image : throw new Exception($"Image resource named \"{imageName}\" does not exist.")
                 : null;
 
             // Set the name.
-            Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
+            Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty)!;
 
             // Set the drop shadow.
             DropShadow = new DropShadow(resourceManager, attributes);

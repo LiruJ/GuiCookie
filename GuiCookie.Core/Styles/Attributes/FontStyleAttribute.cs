@@ -24,45 +24,37 @@ namespace GuiCookie.Core.Styles.Attributes
         #region Properties
         public string Name { get; }
 
-        /// <summary> The <see cref="Microsoft.Xna.Framework.Graphics.SpriteFont"/>. </summary>
-        public Font? Font { get; set; }
+        /// <summary> The font. </summary>
+        public Font? Font { get; private set; }
 
         /// <summary> The colour and tint applied to the frame. </summary>
-        public TintedColour TintedColour { get; set; }
+        public TintedColour TintedColour { get; private set; }
 
         /// <summary> Accessor for <see cref="TintedColour.Colour"/>. </summary>
-        public Color? Colour
-        {
-            get => TintedColour.Colour;
-            set => TintedColour = new TintedColour(value, TintedColour.Tint);
-        }
+        public Color? Colour => TintedColour.Colour;
 
         /// <summary> Accessor for <see cref="TintedColour.Tint"/>. </summary>
-        public Color? Tint
-        {
-            get => TintedColour.Tint;
-            set => TintedColour = new TintedColour(TintedColour.Colour, value);
-        }
+        public Color? Tint => TintedColour.Tint;
 
         /// <summary> Accessor for <see cref="TintedColour.Mixed"/>. </summary>
         public Color MixedColour => TintedColour.Mixed;
 
-        public Space? TextAnchor { get; set; }
+        public Space? TextAnchor { get; private set; }
 
-        public Space? TextPivot { get; set; }
+        public Space? TextPivot { get; private set; }
 
         /// <summary> The drop shadow data used to draw a shadow behind the text. </summary>
-        public DropShadow DropShadow { get; set; }
+        public DropShadow DropShadow { get; private set; }
 
         /// <summary> The amount of pixels to offset the final position by. This is useful for things like buttons that appear to be pushed inwards. </summary>
-        public Vector2? Offset { get; set; }
+        public Vector2? Offset { get; private set; }
         #endregion
 
         #region Constructors
         public FontStyleAttribute(ResourceManager resourceManager, IReadOnlyAttributeCollection attributes)
         {
             // Try get the font name from the attributes, default to null.
-            string fontName = attributes.GetAttributeOrDefault(FontAttributeName, string.Empty);
+            string fontName = attributes.GetAttributeOrDefault(FontAttributeName, string.Empty)!;
             Font = !string.IsNullOrWhiteSpace(fontName) ?
                 resourceManager.FontsByName.TryGetValue(fontName, out Font? font) ? font : throw new Exception($"Font resource named \"{fontName}\" does not exist.")
                 : null;
@@ -71,7 +63,7 @@ namespace GuiCookie.Core.Styles.Attributes
             TintedColour = new TintedColour(resourceManager, attributes);
 
             // Set the name.
-            Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
+            Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty)!;
 
             // Set the text anchor and pivot.
             TextAnchor = attributes.GetAttributeOrDefault(AnchorAttributeName, (Space?)null, Space.TryParse);

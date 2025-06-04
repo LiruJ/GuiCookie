@@ -43,21 +43,6 @@ namespace GuiCookie.Core.Styles
             BaseVariant = baseVariant;
             AddVariant(baseVariant);
         }
-
-        private Style(Style original)
-        {
-            ArgumentNullException.ThrowIfNull(original);
-
-            Name = original.Name;
-            BaseStyleName = original.BaseStyleName;
-
-            // Copy each variant over.
-            foreach (StyleVariant variant in original.styleVariantsByName.Values)
-                AddVariant(variant.CreateCopy());
-
-            // Set the base variant to the base variant from the newly populated dictionary, ensuring it's the new copy and not the original.
-            BaseVariant = styleVariantsByName[BaseVariantName];
-        }
         #endregion
 
         #region Collection Functions
@@ -71,10 +56,6 @@ namespace GuiCookie.Core.Styles
             if (!styleVariantsByName.TryAdd(variant.Name, variant))
                 throw new Exception($"Style variant with name {variant.Name} has already been defined for style {Name}.");
         }
-        #endregion
-
-        #region Copy Functions
-        public Style CreateCopy() => new(this);
         #endregion
 
         #region Combination Functions

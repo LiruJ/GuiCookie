@@ -14,27 +14,19 @@ namespace GuiCookie.Core.Styles.Attributes
         public string Name { get; }
 
         /// <summary> The colour and tint applied to the frame. </summary>
-        public TintedColour TintedColour { get; set; }
+        public TintedColour TintedColour { get; private set; }
 
         /// <summary> Accessor for <see cref="TintedColour.Colour"/>. </summary>
-        public Color? Colour
-        {
-            get => TintedColour.Colour;
-            set => TintedColour = new TintedColour(value, TintedColour.Tint);
-        }
+        public Color? Colour => TintedColour.Colour;
 
         /// <summary> Accessor for <see cref="TintedColour.Tint"/>. </summary>
-        public Color? Tint
-        {
-            get => TintedColour.Tint;
-            set => TintedColour = new TintedColour(TintedColour.Colour, value);
-        }
+        public Color? Tint => TintedColour.Tint;
 
         /// <summary> Accessor for <see cref="TintedColour.Mixed"/>. </summary>
         public Color MixedColour => TintedColour.Mixed;
 
         /// <summary> The drop shadow data used to drop a shadow behind the content. </summary>
-        public DropShadow DropShadow { get; set; }
+        public DropShadow DropShadow { get; private set; }
         #endregion
 
         #region Constructors
@@ -44,7 +36,7 @@ namespace GuiCookie.Core.Styles.Attributes
             TintedColour = new TintedColour(resourceManager, attributes);
 
             // Set the name.
-            Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty);
+            Name = attributes.GetAttributeOrDefault(nameAttributeName, string.Empty)!;
 
             // Set the drop shadow.
             DropShadow = new DropShadow(resourceManager, attributes);
@@ -52,7 +44,7 @@ namespace GuiCookie.Core.Styles.Attributes
 
         private ContentStyleAttribute(ContentStyleAttribute original)
         {
-            if (original == null) throw new ArgumentNullException(nameof(original));
+            ArgumentNullException.ThrowIfNull(original);
 
             Name = original.Name;
 
@@ -71,7 +63,7 @@ namespace GuiCookie.Core.Styles.Attributes
         {
 #if DEBUG
             // Validity checks.
-            if (baseAttribute == null) throw new ArgumentNullException(nameof(baseAttribute));
+            ArgumentNullException.ThrowIfNull(baseAttribute);
             if (baseAttribute.Name != Name) throw new Exception($"Content name mismatch; {baseAttribute.Name}, {Name}");
 #endif
 
