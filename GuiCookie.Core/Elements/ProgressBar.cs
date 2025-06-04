@@ -169,9 +169,9 @@ namespace GuiCookie.Core.Elements
                 tryCreateFillAttributes();
 
                 // Set the value for all variants.
-                foreach (StyleVariant variant in StyleStateMachine?.Style?.StyleVariantsByName.Values)
-                    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame)
-                        fillFrame.Colour = value;
+                //foreach (StyleVariant variant in StyleStateMachine?.Style?.StyleVariantsByName.Values)
+                //    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame)
+                //        fillFrame.Colour = value;
             }
         }
 
@@ -185,9 +185,9 @@ namespace GuiCookie.Core.Elements
                 tryCreateFillAttributes();
 
                 // Set the value for all variants.
-                foreach (StyleVariant variant in StyleStateMachine?.Style?.StyleVariantsByName.Values)
-                    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame)
-                        fillFrame.Tint = value;
+                //foreach (StyleVariant variant in StyleStateMachine?.Style?.StyleVariantsByName.Values)
+                //    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame)
+                //        fillFrame.Tint = value;
             }
         }
 

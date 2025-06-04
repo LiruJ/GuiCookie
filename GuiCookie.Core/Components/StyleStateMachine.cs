@@ -78,6 +78,8 @@ namespace GuiCookie.Core.Components
 
         /// <summary> The mouse handler that determines what variant to use. This defaults to the element's mouse handler, but can be set to any element's mouse handler. </summary>
         public MouseHandler? MouseHandler { get; set; }
+
+        public bool IsCurrentVariantBase => CurrentStyleVariant != null && CurrentStyleVariant == BaseVariant;
         #endregion
 
         #region Signals

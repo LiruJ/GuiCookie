@@ -63,7 +63,7 @@ namespace Example.MonoGame.Elements
             //}
         }
 
-        public override void OnPostFullSetup(IReadOnlyAttributeCollection attributes)
+        public override void OnPostFullSetup()
         {
             grid.Spacing = new System.Drawing.Point((int)xSpaceSlider.Slider.Value, (int)ySpaceSlider.Slider.Value);
 

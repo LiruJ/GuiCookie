@@ -34,7 +34,7 @@ namespace GuiCookie.Core.Components
         public virtual void OnSetup(IReadOnlyAttributeCollection attributes) { }
 
         /// <summary> Called after every element has been fully set up. Use this to set references to other elements. </summary>
-        public virtual void OnPostSetup(IReadOnlyAttributeCollection attributes) { }
+        public virtual void OnPostSetup() { }
         #endregion
 
         #region Calculation Functions

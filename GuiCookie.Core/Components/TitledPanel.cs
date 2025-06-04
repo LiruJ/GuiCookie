@@ -21,7 +21,7 @@ namespace GuiCookie.Core.Components
         #endregion
 
         #region Initialisation Functions
-        public override void OnPostSetup(IReadOnlyAttributeCollection attributes)
+        public override void OnPostSetup()
         {
             // Get the elements.
             TitleBar = Element.GetInterfacedChildByName<ITextable>("TitleBar");

@@ -63,7 +63,6 @@ namespace GuiCookie.Core.Templates
             {
                 Template template = templatesByName[templateNode.Name];
                 template.ResolveBase(this);
-                template.ResolveChildren(this, templateNode.ChildNodes);
             }
 
             // Stage 3: Combine templates with their bases.
@@ -71,6 +70,12 @@ namespace GuiCookie.Core.Templates
             {
                 Template template = templatesByName[templateNode.Name];
                 template.CombineOverBase();
+            }
+
+            foreach (var templateNode in templateNodes)
+            {
+                Template template = templatesByName[templateNode.Name];
+                template.ResolveChildren(this, templateNode.ChildNodes);
             }
         }
 

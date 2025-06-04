@@ -28,7 +28,7 @@ namespace Example.MonoGame.Elements
             addItemButton = GetChildByName<Button>("AddItemButton");
         }
 
-        public override void OnPostFullSetup(IReadOnlyAttributeCollection attributes)
+        public override void OnPostFullSetup()
         {
             // Add a bunch of random items to the list.
             for (int i = 0; i < 10; i++)

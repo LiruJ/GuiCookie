@@ -12,8 +12,6 @@ namespace GuiCookie.Core.Templates
         private const string nameAttributeName = "Name";
 
         private const string baseAttributeName = "Base";
-
-        private const string defaultControllerName = "Element";
         #endregion
 
         #region Fields
@@ -44,7 +42,7 @@ namespace GuiCookie.Core.Templates
         /// </summary>
         public string? ChildIdentifierName { get; }
 
-        public string ControllerName => controllerName ?? defaultControllerName;
+        public string ControllerName => controllerName ?? nameof(Elements.Element);
 
         public IReadOnlyList<string> ComponentNames => componentNames;
 
@@ -74,8 +72,8 @@ namespace GuiCookie.Core.Templates
             // Create a copy of the node attributes, and remove any redundant attributes.
             this.attributes = attributes.CreateCopy();
             this.attributes.Remove(baseAttributeName);
-            this.attributes.Remove(ControllerAttributeName);
-            this.attributes.Remove(componentListAttributeName);
+            //this.attributes.Remove(ControllerAttributeName);
+            //this.attributes.Remove(componentListAttributeName);
         }
 
         public Template(string name, string? identifierName, string? controllerName, List<Template> childTemplates, List<string> componentNames, AttributeCollection attributes)
@@ -191,63 +189,10 @@ namespace GuiCookie.Core.Templates
             foreach (string rootAttribute in root.attributes.Keys)
                 if (!attributes.HasAttribute(rootAttribute)) attributes.Add(rootAttribute, root.Attributes.GetAttribute(rootAttribute));
         }
-
-        public Template CombineOver(AttributeCollection derivedAttributes)
-        {
-            // Prepare the attributes.
-            prepareFromAttributes(derivedAttributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? _);
-
-            // Create a template with the derived attributes and combine it over this template.
-            Template derivedTemplate = new(Name, identifierName, controllerName, [], componentNames, derivedAttributes);
-            //Template derivedTemplate = new Template(Name, identifierName, controllerName, children, componentNames, derivedAttributes);
-            derivedTemplate.CombineOver(CreateCopy());
-
-            // Return the created template.
-            return derivedTemplate;
-        }
         #endregion
 
         #region Load Functions
         public static Template Load(IReadOnlySheetDataNode templateNode) => new(templateNode.Name, templateNode.Attributes);
-
-        //public static Template Load(TemplateManager templateManager, IReadOnlySheetDataNode mainNode, IReadOnlySheetDataNode templateNode)
-        //{
-        //    // Copy the attributes.
-        //    AttributeCollection attributes = templateNode.Attributes.CreateCopy();
-
-        //    // Prepare the attributes.
-        //    prepareFromAttributes(ref attributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? baseName);
-
-        //    // Recursively load the templates and save them to a list.
-        //    List<Template> childTemplates = new(templateNode.ChildNodes.Count);
-        //    foreach (IReadOnlySheetDataNode childNode in templateNode.ChildNodes)
-        //    {
-        //        // Get the root template from the node's name.
-        //        Template rootTemplate = templateManager.getRootTemplate(mainNode, childNode.Name);
-
-        //        // Load the child node itself as a template.
-        //        Template childTemplate = Load(templateManager, mainNode, childNode);
-
-        //        // Merge the child over the root template.
-        //        childTemplate.CombineOver(rootTemplate);
-
-        //        // Add the child template to the list.
-        //        childTemplates.Add(childTemplate);
-        //    }
-
-        //    // Create a new template with the loaded values.
-        //    Template loadedTemplate = new(templateNode.Name, identifierName, controllerName, childTemplates, componentNames, attributes);
-
-        //    // If a base name was given, get it from the template manager.
-        //    if (baseName != null)
-        //    {
-        //        Template baseTemplate = templateManager.getRootTemplate(mainNode, baseName);
-        //        loadedTemplate.CombineOver(baseTemplate);
-        //    }
-
-        //    // Create and return a template with the loaded values.
-        //    return loadedTemplate;
-        //}
 
         private static void prepareFromAttributes(IReadOnlyAttributeCollection attributes, out List<string> componentNames, out string? controllerName, out string? identifierName, out string? baseName)
         {
@@ -272,6 +217,8 @@ namespace GuiCookie.Core.Templates
                 : [];
             return componentNames;
         }
+
+        public IEnumerable<string> CombineComponentNames(IReadOnlyAttributeCollection attributes) => GetComponentNames(attributes).Concat(componentNames).Distinct();
         #endregion
 
         #region String Functions

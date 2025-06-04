@@ -8,10 +8,10 @@ namespace GuiCookie.Core.Components
         #region Creation Functions
         public Component CreateComponent(string name, params object[] inputs) => componentCache.CreateInstance(name, serviceProvider, inputs);
 
-        public Dictionary<Type, Component> CreateComponents(IReadOnlyList<string> names, Element element, params object[] inputs)
+        public Dictionary<Type, Component> CreateComponents(IEnumerable<string> names, Element element, params object[] inputs)
         {
             // Create a new list to hold the components.
-            Dictionary<Type, Component> components = new(names.Count);
+            Dictionary<Type, Component> components = new(names.Count());
 
             // Create a component based on each type from the given list.
             foreach (string componentName in names)

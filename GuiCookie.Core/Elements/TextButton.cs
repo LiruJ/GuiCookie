@@ -15,7 +15,7 @@ namespace GuiCookie.Core.Elements
         public string Text { get => TextBlock.Text; set => TextBlock.Text = value; }
 
         /// <summary> The colour of the button's text. </summary>
-        public Color? Colour { get => TextBlock.Colour; set => TextBlock.Colour = value; }
+        public Color? Colour { get => TextBlock.Colour; }
         #endregion
 
         #region Initialisation Functions

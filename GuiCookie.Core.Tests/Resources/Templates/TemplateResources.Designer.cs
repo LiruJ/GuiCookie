@@ -63,6 +63,16 @@ namespace GuiCookie.Core.Tests.Resources.Templates {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] TestControllers_Templates {
+            get {
+                object obj = ResourceManager.GetObject("TestControllers_Templates", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] TestLoad_Templates {
             get {
                 object obj = ResourceManager.GetObject("TestLoad_Templates", resourceCulture);

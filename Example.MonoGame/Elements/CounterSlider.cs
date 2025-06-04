@@ -33,7 +33,7 @@ namespace Example.MonoGame.Elements
             MaximumCounter.OnValueChanged.Connect(() => { Slider.MaximumValue = MaximumCounter.Value; MaximumCounter.Value = (int)MathF.Floor(Slider.MaximumValue); Slider.ResizeHandleRange(1); });
         }
 
-        public override void OnPostFullSetup(IReadOnlyAttributeCollection attributes) => Slider.ResizeHandleRange(1);
+        public override void OnPostFullSetup() => Slider.ResizeHandleRange(1);
         #endregion
     }
 }

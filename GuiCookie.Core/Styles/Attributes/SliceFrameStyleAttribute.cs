@@ -29,14 +29,14 @@ namespace GuiCookie.Core.Styles.Attributes
         public Color? Colour
         {
             get => TintedColour.Colour;
-            set => TintedColour = new TintedColour(value, TintedColour.Tint);
+            private set => TintedColour = new TintedColour(value, TintedColour.Tint);
         }
 
         /// <summary> Accessor for <see cref="TintedColour.Tint"/>. </summary>
         public Color? Tint
         {
             get => TintedColour.Tint;
-            set => TintedColour = new TintedColour(TintedColour.Colour, value);
+            private set => TintedColour = new TintedColour(TintedColour.Colour, value);
         }
 
         /// <summary> Accessor for <see cref="TintedColour.Mixed"/>. </summary>

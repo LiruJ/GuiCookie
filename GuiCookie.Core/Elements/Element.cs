@@ -234,25 +234,25 @@ namespace GuiCookie.Core.Elements
         /// <summary> Called after every element has been fully created. Use this to set references to other elements. </summary>
         public virtual void OnFullSetup(IReadOnlyAttributeCollection attributes) { }
 
-        internal void internalOnPostFullSetup(IReadOnlyAttributeCollection attributes)
+        internal void internalOnPostFullSetup()
         {
             // Ensure this function has not been called before.
             if ((InitialisationState & InitialisationState.PostSetup) == InitialisationState.PostSetup)
                 return;
 
             // Call the overrideable function.
-            OnPostFullSetup(attributes);
+            OnPostFullSetup();
 
             // Set initialisation state.
             InitialisationState |= InitialisationState.PostSetup;
 
             // Post setup each component.
             foreach (Component component in components.Values)
-                component.OnPostSetup(attributes);
+                component.OnPostSetup();
         }
 
         /// <summary> Called after every element's <see cref="OnFullSetup"/> function has been called. Use this to initialise elements who required element references from <see cref="OnFullSetup"/>. </summary>
-        public virtual void OnPostFullSetup(IReadOnlyAttributeCollection attributes) { }
+        public virtual void OnPostFullSetup() { }
         #endregion
 
         #region Event Functions

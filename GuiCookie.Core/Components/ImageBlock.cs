@@ -37,21 +37,21 @@ namespace GuiCookie.Core.Components
         public Color? Colour
         {
             get => contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content) ? content!.Colour : null;
-            set { if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content)) content!.Colour = value; }
+            //set { if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content)) content!.Colour = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public DropShadow DropShadow
         {
             get => contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content) ? content!.DropShadow : new DropShadow((Vector2?)null, null);
-            set { if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content)) content!.DropShadow = value; }
+            //set { if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content)) content!.DropShadow = value; }
         }
 
         /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
         public Color? Tint
         {
             get => contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content) ? content!.Tint : null;
-            set { if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content)) content!.Tint = value; }
+            //set { if (contentCache.TryGetVariantAttribute(Style.BaseVariant, out ContentStyleAttribute? content)) content!.Tint = value; }
         }
 
         /// <summary> The current image that is being displayed. </summary>
@@ -68,9 +68,9 @@ namespace GuiCookie.Core.Components
             string imageName = attributes.GetAttributeOrDefault(imageAttributeName, string.Empty)!;
             if (!string.IsNullOrEmpty(imageName))
                 SetImageFromName(imageName);
-            if (contentCache.TryGetVariantAttribute(Style?.BaseVariant, out ContentStyleAttribute? content))
-                content!.TintedColour = TintedColour.CreateCombination(content.TintedColour, new TintedColour(resourceManager, attributes));
-            DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, attributes));
+            //if (contentCache.TryGetVariantAttribute(Style?.BaseVariant, out ContentStyleAttribute? content))
+            //    content!.TintedColour = TintedColour.CreateCombination(content.TintedColour, new TintedColour(resourceManager, attributes));
+            //DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, attributes));
             ClippingMode = attributes.GetEnumAttributeOrDefault(clippingModeAttributeName, ClippingMode.Squeeze);
             Centred = attributes.GetAttributeOrDefault(centredAttributeName, false);
         }

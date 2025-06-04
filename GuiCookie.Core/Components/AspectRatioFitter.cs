@@ -46,7 +46,7 @@ namespace GuiCookie.Core.Components
                 ratio = attributes.GetAttributeOrDefault(valueAttributeName, (float)Bounds.TotalSize.X / Bounds.TotalSize.Y);
         }
 
-        public override void OnPostSetup(IReadOnlyAttributeCollection attributes)
+        public override void OnPostSetup()
         {
             if (ratio.HasValue) 
                 ValidateSizeChanged();

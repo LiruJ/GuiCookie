@@ -14,10 +14,10 @@ namespace GuiCookie.Core.Elements
         public ImageBlock ImageBlock { get; private set; }
 
         /// <summary> The <see cref="ClippingMode"/> of the current image. </summary>
-        public ClippingMode ClippingMode { get => ImageBlock.ClippingMode; set => ImageBlock.ClippingMode = value; }
+        public ClippingMode ClippingMode { get => ImageBlock.ClippingMode; }
 
         /// <summary> The colour of the current image. </summary>
-        public Color? Colour { get => ImageBlock.Colour; set => ImageBlock.Colour = value; }
+        public Color? Colour { get => ImageBlock.Colour; }
 
         /// <summary> The current image. </summary>
         public Image? Image { get => ImageBlock.Image; set => ImageBlock.Image = value; }

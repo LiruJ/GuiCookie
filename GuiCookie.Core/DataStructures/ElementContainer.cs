@@ -118,10 +118,12 @@ namespace GuiCookie.Core.DataStructures
 
                 // If the given value is null, then just remove this container from its parent.
                 if (value == null)
-                    { if (!parent.RemoveChild(this)) 
-                        throw new Exception("Child could not be removed from its parent."); }
+                {
+                    if (!parent.RemoveChild(this))
+                        throw new Exception("Child could not be removed from its parent.");
+                }
                 // Otherwise; if the given value is another container, add this child to it. This will handle setting the parent and handling the switch.
-                else if (!value.AddChild(this)) 
+                else if (!value.AddChild(this))
                     throw new Exception("Child could not be added to new parent.");
             }
         }
@@ -182,22 +184,24 @@ namespace GuiCookie.Core.DataStructures
                 throw new ArgumentException("Cannot find a child by name with the given name as it is null or empty.", nameof(name));
 
             // Try to get the element with the name, if it is found then return it.
-            if (childrenByName.TryGetValue(name, out ElementContainer? child)) 
+            if (childrenByName.TryGetValue(name, out ElementContainer? child))
                 return child.Element;
             // Otherwise; if the element could not be found, handle it.
             else
             {
                 // Search the addition queue.
                 foreach (ElementContainer additionChild in additionQueue)
-                    if (additionChild.Element != null && additionChild.Element.Name == name) return additionChild.Element;
+                    if (additionChild.Element.Name == name)
+                        return additionChild.Element;
 
                 // If the search is recursive, try to find the element in the children.
                 if (recursive)
                     // If the element was found, return it.
                     foreach (Element searchChild in this)
                     {
-                        Element foundChild = searchChild.GetChildByName(name, true);
-                        if (foundChild != null) return foundChild;
+                        Element? foundChild = searchChild.GetChildByName(name, true);
+                        if (foundChild != null) 
+                            return foundChild;
                     }
                 // Regardless of if the search is recursive or not, if the code reaches here, nothing could be found, so return null.
                 return null;
@@ -339,15 +343,15 @@ namespace GuiCookie.Core.DataStructures
             ArgumentNullException.ThrowIfNull(child);
 
             // Ensure the child is actually a child.
-            if (!Contains(child)) 
+            if (!Contains(child))
                 throw new Exception("Given container is not a child of this container.");
 
             // If the old name was empty, it does not need to be removed.
-            if (!string.IsNullOrWhiteSpace(oldName) && !childrenByName.Remove(oldName)) 
+            if (!string.IsNullOrWhiteSpace(oldName) && !childrenByName.Remove(oldName))
                 throw new Exception("Failed to remove child from named collection despite child being named.");
 
             // If the element now has a name, add it.
-            if (child.Element.HasName) 
+            if (child.Element.HasName)
                 childrenByName.Add(child.Element.Name, child);
         }
 

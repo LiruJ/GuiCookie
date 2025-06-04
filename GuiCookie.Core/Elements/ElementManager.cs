@@ -58,7 +58,7 @@ namespace GuiCookie.Core.Elements
             rootElement.internalOnCreated(attributes, null, components);
 
             rootElement.internalOnFullSetup(attributes);
-            rootElement.internalOnPostFullSetup(attributes);
+            rootElement.internalOnPostFullSetup();
 
             return rootElement;
         }
@@ -92,7 +92,7 @@ namespace GuiCookie.Core.Elements
             // Named template children can be overridden, any overridden children should already exist within the element at this point, so the only ones that need to be created at the ones that are named but not overriden.
             foreach (Template childTemplate in template.Children)
                 if (childTemplate.ChildIdentifierName == null || element.GetChildByName(childTemplate.ChildIdentifierName) == null)
-                    createElementFromTemplateNoSetup(childTemplate, template, null, element, true);
+                    createElementFromTemplateNoSetup(childTemplate, template, null, element);
             
             // Return the element.
             return element;
@@ -161,11 +161,11 @@ namespace GuiCookie.Core.Elements
             IReadOnlyAttributeCollection totalAttributes = attributes == null ? baseTemplate.Attributes : new ReadOnlyDerivedAttributeCollection(baseTemplate.Attributes, attributes);
 
             // Create the element.
-            string? controllerName = totalAttributes.GetAttributeOrDefault(Template.ControllerAttributeName, nameof(Element));
+            string? controllerName = totalAttributes.GetAttributeOrDefault(Template.ControllerAttributeName, baseTemplate.ControllerName);
             Element element = elementCache.CreateInstance(controllerName, serviceProvider, inputs);
 
             // Create the components, which internally initialises each one.
-            List<string> componentNames = Template.GetComponentNames(totalAttributes);
+            IEnumerable<string> componentNames = baseTemplate.CombineComponentNames(totalAttributes);
             Dictionary<Type, Component> components = componentManager.CreateComponents(componentNames, element, inputs);
 
             // Initialise the element internally.
@@ -219,14 +219,14 @@ namespace GuiCookie.Core.Elements
         {
             // First setup should be depth-first, so that children elements can fully set up and their parents can control them easier.
             fullSetupElements(mainElement);
-            // Second setup should be breadth-first, so that parent elements can be sure that their parents are fully set up.
-            postFullSetupElements(mainElement);
-
 #if DEBUG
             if (loadingElements.Count != 0)
                 throw new InvalidOperationException($"{loadingElements.Count} element(s) were created but not set up!");
 #endif
             loadingElements.Clear();
+
+            // Second setup should be breadth-first, so that parent elements can be sure that their parents are fully set up.
+            postFullSetupElements(mainElement);
         }
 
         private void fullSetupElements(Element element)
@@ -238,17 +238,15 @@ namespace GuiCookie.Core.Elements
                 throw new InvalidOperationException("Attempted to set up element whose attributes were never stored!");
 
             element.internalOnFullSetup(attributes);
-        }
-
-        private void postFullSetupElements(Element element)
-        {
-            if (!loadingElements.TryGetValue(element, out IReadOnlyAttributeCollection? attributes))
-                throw new InvalidOperationException("Attempted to set up element whose attributes were never stored!");
-            element.internalOnPostFullSetup(attributes);
 
 #if DEBUG
             loadingElements.Remove(element);
 #endif
+        }
+
+        private static void postFullSetupElements(Element element)
+        {
+            element.internalOnPostFullSetup();
 
             foreach (Element childElement in element)
                 postFullSetupElements(childElement);

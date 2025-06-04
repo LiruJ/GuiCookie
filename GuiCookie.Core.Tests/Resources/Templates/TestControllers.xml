@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Templates>
+
+  <ControllerlessBase/>
+  <ControllerlessDerived Base="ControllerlessBase" Controller="TextBlock"/>
+
+  <ControlleredBase Controller="TextBlock"/>
+  <ControlleredDerived Base="ControlleredBase"/>
+
+  <TestParent>
+    <ControlleredDerived/>
+  </TestParent>
+</Templates>
