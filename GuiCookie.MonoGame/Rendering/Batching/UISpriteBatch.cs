@@ -57,28 +57,23 @@ namespace GuiCookie.MonoGame.Rendering.Batching
         #region Validity Functions
         private void checkValid(Texture2D texture)
         {
-            if (texture == null)
-                throw new ArgumentNullException("texture");
+            ArgumentNullException.ThrowIfNull(texture);
             if (!beginCalled)
                 throw new InvalidOperationException("Draw was called, but Begin has not yet been called. Begin must be called successfully before you can call Draw.");
         }
 
         private void checkValid(SpriteFont spriteFont, string text)
         {
-            if (spriteFont == null)
-                throw new ArgumentNullException("spriteFont");
-            if (text == null)
-                throw new ArgumentNullException("text");
+            ArgumentNullException.ThrowIfNull(spriteFont);
+            ArgumentNullException.ThrowIfNull(text);
             if (!beginCalled)
                 throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
         }
 
         private void checkValid(SpriteFont spriteFont, StringBuilder text)
         {
-            if (spriteFont == null)
-                throw new ArgumentNullException("spriteFont");
-            if (text == null)
-                throw new ArgumentNullException("text");
+            ArgumentNullException.ThrowIfNull(spriteFont);
+            ArgumentNullException.ThrowIfNull(text);
             if (!beginCalled)
                 throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
         }

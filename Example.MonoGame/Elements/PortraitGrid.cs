@@ -1,13 +1,7 @@
 ﻿using GuiCookie.Core.Components;
 using GuiCookie.Core.Data;
-using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Templates;
-using GuiCookie.MonoGame.Extensions;
-using GuiCookie.MonoGame.Rendering;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Example.MonoGame.Elements
 {

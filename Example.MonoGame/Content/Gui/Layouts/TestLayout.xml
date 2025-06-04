@@ -7,7 +7,7 @@
 		<Partition Components="DirectionalLayout" Size="20%, 100%" Spacing="4">
 
 			<!--The slider bars-->
-			<Panel Size="100%, 0">
+			<Panel Size="100%, 0" Style="Default">
 				<TextBox Size="100%, 20" Text="Horizontal Sliders" Style="TitleBar" Name="TitleBar"/>
 
 				<Pane Components="DirectionalLayout" Spacing="4" Padding="5" Style="Inlay" Name="Content">

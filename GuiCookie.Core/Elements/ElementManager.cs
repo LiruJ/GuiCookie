@@ -38,7 +38,7 @@ namespace GuiCookie.Core.Elements
             if (loadingElements.Count != 0)
                 throw new InvalidOperationException("Layout sheet loading was started when elements were awaiting loading!");
 
-            RootElement = createRootElement(layoutSheet.RootNode.Attributes);
+            createRootElement(layoutSheet.RootNode.Attributes);
 
             // Load each element node within the main node.
             foreach (IReadOnlySheetDataNode elementNode in layoutSheet.RootNode.ChildNodes)
@@ -50,17 +50,14 @@ namespace GuiCookie.Core.Elements
                 setupElements(childElement);
         }
 
-        private static Element createRootElement(IReadOnlyAttributeCollection attributes)
+        private void createRootElement(IReadOnlyAttributeCollection attributes)
         {
             Dictionary<Type, Component> components = [];
 
-            Element rootElement = new();
-            rootElement.internalOnCreated(attributes, null, components);
+            RootElement.internalOnCreated(attributes, null, components);
 
-            rootElement.internalOnFullSetup(attributes);
-            rootElement.internalOnPostFullSetup();
-
-            return rootElement;
+            RootElement.internalOnFullSetup(attributes);
+            RootElement.internalOnPostFullSetup();
         }
 
         /// <summary>

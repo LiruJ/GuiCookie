@@ -2,15 +2,15 @@
 <Templates>
 	<!--Spatial templates-->
 	<Partition/>
-	<Pane Components="Frame"/>
-	<Square Components="Frame, AspectRatioFitter" Ratio="1" RatioMode="WidthControlsHeight"/>
+	<Pane Components="StyleStateMachine, Frame"/>
+	<Square Components="StyleStateMachine, Frame, AspectRatioFitter" Ratio="1" RatioMode="WidthControlsHeight"/>
 
 	<!--Sliders-->
-	<SliderBar Components="Frame, MouseHandler" Controller="SliderBar">
+	<SliderBar Components="StyleStateMachine, Frame, MouseHandler" Controller="SliderBar">
 		<SliderHandle Name="Handle"/>
 	</SliderBar>
 
-	<SliderHandle Components="Frame" Size="12, 100%" Pivot="50%"/>
+	<SliderHandle Components="StyleStateMachine, Frame" Size="12, 100%" Pivot="50%"/>
 
 	<HorizontalSliderBar Base="SliderBar" Direction="Horizontal" Style="HorizontalSliderBar">
 		<SliderHandle Name="Handle" Size="10%, 100%" Style="HorizontalSliderHandle"/>
@@ -36,7 +36,7 @@
 		</Pane>
 	</ScrollPane>
 
-	<Panel Components="Frame, TitledPanel"/>
+	<Panel Components="StyleStateMachine, Frame, TitledPanel"/>
 	
 	<!--Numbers-->
 	<NumberCounter Controller="NumberCounter" Components="DirectionalLayout">

@@ -1,7 +1,9 @@
 ﻿using GuiCookie.Core.Data.Xml;
+using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Screens;
 using GuiCookie.Core.Services;
 using GuiCookie.MonoGame.Extensions;
+using GuiCookie.MonoGame.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,6 +19,7 @@ namespace Example.MonoGame
         private SpriteBatch _spriteBatch;
 
         private GuiScreen root;
+        private MonoGameRenderManager guiCamera;
 
         public Game1()
         {
@@ -35,6 +38,8 @@ namespace Example.MonoGame
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            guiCamera = new MonoGameRenderManager(GraphicsDevice);
 
             ServiceCollection serviceProvider = new ServiceCollection()
                 .AddMonoGameInput(Window)
@@ -71,6 +76,9 @@ namespace Example.MonoGame
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            guiCamera.Begin();
+            root.Draw(guiCamera);
+            guiCamera.End();
 
             base.Draw(gameTime);
         }

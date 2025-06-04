@@ -82,10 +82,10 @@ namespace GuiCookie.Core.Styles.DataStructures
         /// <returns> The combined colour. </returns>
         /// <remarks> If both <paramref name="colour"/> and <paramref name="tint"/> have values, the mixed value is used. Otherwise; defaults to using the first non-null value in the order: Colour, Tint, <see cref="Color.White"/>.   </remarks>
         public static Color CalculateMixedColour(Color? colour, Color? tint) => colour.HasValue && tint.HasValue
-            ? Color.FromArgb((int)MathF.Floor((colour.Value.A / byte.MaxValue) * (tint.Value.A / byte.MaxValue) * byte.MaxValue),
-                (int)MathF.Floor((colour.Value.R / byte.MaxValue) * (tint.Value.R / byte.MaxValue) * byte.MaxValue),
-                (int)MathF.Floor((colour.Value.G / byte.MaxValue) * (tint.Value.G / byte.MaxValue) * byte.MaxValue),
-                (int)MathF.Floor((colour.Value.B / byte.MaxValue) * (tint.Value.B / byte.MaxValue) * byte.MaxValue))
+            ? Color.FromArgb((int)MathF.Floor((colour.Value.A / (float)byte.MaxValue) * (tint.Value.A / (float)byte.MaxValue) * byte.MaxValue),
+                (int)MathF.Floor((colour.Value.R / (float)byte.MaxValue) * (tint.Value.R / (float)byte.MaxValue) * byte.MaxValue),
+                (int)MathF.Floor((colour.Value.G / (float)byte.MaxValue) * (tint.Value.G / (float)byte.MaxValue) * byte.MaxValue),
+                (int)MathF.Floor((colour.Value.B / (float)byte.MaxValue) * (tint.Value.B / (float)byte.MaxValue) * byte.MaxValue))
             : colour ?? tint ?? Color.White;
         #endregion
 

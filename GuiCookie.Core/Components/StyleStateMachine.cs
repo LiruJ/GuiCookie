@@ -93,8 +93,6 @@ namespace GuiCookie.Core.Components
             MouseHandler = Element.GetComponent<MouseHandler>();
 
             StyleName = attributes.GetAttributeOrDefault(StyleAttributeName, (string?)null);
-
-            base.OnCreated(attributes);
         }
         #endregion
 

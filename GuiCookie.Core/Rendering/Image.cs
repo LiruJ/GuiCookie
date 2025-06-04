@@ -19,9 +19,9 @@ namespace GuiCookie.Core.Rendering
 
         public override int GetHashCode() => HashCode.Combine(Name, Source);
 
-        public static bool operator ==(Image? left, Image? right) => left != null && left.Equals(right);
+        public static bool operator ==(Image? left, Image? right) => left is not null && left.Equals(right);
 
-        public static bool operator !=(Image? left, Image? right) => !(left == right);
+        public static bool operator !=(Image? left, Image? right) => left is null || !left.Equals(right);
         #endregion
     }
 }

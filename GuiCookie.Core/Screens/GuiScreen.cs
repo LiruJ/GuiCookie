@@ -44,8 +44,6 @@ namespace GuiCookie.Core.Screens
             ElementManager = elementManager;
             ElementInputManager = serviceProvider.GetService<ElementInputManager>();
 
-            //elementManager.onRootCreated(this);
-
             Window? window = serviceProvider.GetService<Window>();
             if (window != null)
             {
@@ -94,7 +92,10 @@ namespace GuiCookie.Core.Screens
         #endregion
 
         #region Draw Functions
-
+        public void Draw(IGuiCamera guiCamera)
+        {
+            ElementManager.RootElement.InternalDraw(guiCamera);
+        }
         #endregion
 
         #region Disposable Functions

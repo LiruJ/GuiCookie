@@ -72,8 +72,6 @@ namespace GuiCookie.Core.Templates
             // Create a copy of the node attributes, and remove any redundant attributes.
             this.attributes = attributes.CreateCopy();
             this.attributes.Remove(baseAttributeName);
-            //this.attributes.Remove(ControllerAttributeName);
-            //this.attributes.Remove(componentListAttributeName);
         }
 
         public Template(string name, string? identifierName, string? controllerName, List<Template> childTemplates, List<string> componentNames, AttributeCollection attributes)

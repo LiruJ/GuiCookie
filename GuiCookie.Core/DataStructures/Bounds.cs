@@ -221,13 +221,13 @@ namespace GuiCookie.Core.DataStructures
         public void LoadFromAttributes(IReadOnlyAttributeCollection attributes)
         {
             // Get all associated attributes from the element attributes.
-            scaledPosition = attributes.GetAttributeOrDefault(positionAttributeName, new Space(0, Axes.None));
-            scaledSize = attributes.GetAttributeOrDefault(sizeAttributeName, new Space(0, Axes.None));
-            padding = attributes.GetAttributeOrDefault(paddingAttributeName, new Sides(0, SideMask.None));
-            anchor = attributes.GetAttributeOrDefault(anchorAttributeName, new Space(0, Axes.Both));
-            pivot = attributes.GetAttributeOrDefault(pivotAttributeName, new Space(0, Axes.Both));
-            minimumSize = attributes.GetAttributeOrDefault(minimumSizeAttributeName, new Space(0, Axes.None));
-            maximumSize = attributes.GetAttributeOrDefault(maximumSizeAttributeName, new Space(0, Axes.None));
+            scaledPosition = attributes.GetAttributeOrDefault(positionAttributeName, scaledPosition);
+            scaledSize = attributes.GetAttributeOrDefault(sizeAttributeName, scaledSize);
+            padding = attributes.GetAttributeOrDefault(paddingAttributeName, padding);
+            anchor = attributes.GetAttributeOrDefault(anchorAttributeName, anchor);
+            pivot = attributes.GetAttributeOrDefault(pivotAttributeName, pivot);
+            minimumSize = attributes.GetAttributeOrDefault(minimumSizeAttributeName, minimumSize);
+            maximumSize = attributes.GetAttributeOrDefault(maximumSizeAttributeName, maximumSize);
         }
         #endregion
 

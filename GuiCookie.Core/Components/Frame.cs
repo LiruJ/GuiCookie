@@ -73,11 +73,14 @@ namespace GuiCookie.Core.Components
             DropShadow dropShadow = new(resourceManager, attributes);
             if (dropShadow.HasData)
                 DropShadow = dropShadow;
+
+            sliceCache.Refresh(Style);
         }
         #endregion
 
         #region Texture Functions
-        public override void OnStyleChanged(Style? style) => sliceCache.Refresh(style);
+        public override void OnStyleChanged(Style? style)
+            => sliceCache.Refresh(style);
         #endregion
 
         #region Draw Functions
@@ -87,14 +90,15 @@ namespace GuiCookie.Core.Components
             if (!sliceCache.TryGetVariantAttribute(CurrentStyleVariant, out SliceFrameStyleAttribute? sliceFrame))
                 return;
 
-            guiCamera.DrawNineSlice(FrameImage, Bounds.AbsoluteTotalArea, FrameImage.Source, sliceFrame.MixedColour, sliceFrame.NineSlice.Value.ToVector4());
+            if (sliceFrame.NineSlice != null)
+                guiCamera.DrawNineSlice(FrameImage, Bounds.AbsoluteTotalArea, FrameImage.Source, sliceFrame.MixedColour, sliceFrame.NineSlice.Value.ToVector4());
             //// If a shadow is to be drawn, do that first.
             //if (sliceFrame.DropShadow.HasData)
             //    NineSliceDrawer.DrawFrameOnDemand(sliceFrame, new Rectangle(Bounds.AbsoluteTotalPosition + sliceFrame.DropShadow.Offset.Value.ToPoint(), Bounds.TotalSize), guiCamera, sliceFrame.DropShadow.Colour.Value);
 
             //// Draw the frame.
             //NineSliceDrawer.DrawFrameOnDemand(sliceFrame, Bounds.AbsoluteTotalArea, guiCamera, sliceFrame.MixedColour);
-        
+
         }
         #endregion
     }
