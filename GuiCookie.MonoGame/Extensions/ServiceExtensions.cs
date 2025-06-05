@@ -7,6 +7,7 @@ using GuiCookie.MonoGame.Styles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace GuiCookie.MonoGame.Extensions
 {
@@ -29,9 +30,9 @@ namespace GuiCookie.MonoGame.Extensions
             return services;
         }
 
-        public static ServiceCollection AddMonoGameResources(this ServiceCollection services, ContentManager contentManager)
+        public static ServiceCollection AddMonoGameResources(this ServiceCollection services, ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
-            MonoGameResourceManager resourceManager = new(contentManager);
+            MonoGameResourceManager resourceManager = new(contentManager, graphicsDevice);
             services.AddSingleton<ResourceManager>(resourceManager);
             services.AddSingleton(resourceManager);
             return services;

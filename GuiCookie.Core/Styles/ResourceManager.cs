@@ -157,7 +157,6 @@ namespace GuiCookie.Core.Styles
         #endregion
 
         #region Load Functions
-
         public virtual void LoadFromSheet(IReadOnlySheetDataSource styleSheet)
         {
             IReadOnlySheetDataNode resourceNode = styleSheet.GetChildWithName(StyleManager.ResourcesNodeName) ?? throw new ArgumentException("Given style sheet is missing resource node!");

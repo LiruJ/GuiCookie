@@ -43,9 +43,6 @@ namespace GuiCookie.Core.Templates
             Assembly.GetExecutingAssembly().GetManifestResourceStream(defaultTemplateSheetPath)
                 ?? throw new InvalidDataException("Missing default template sheet!");
 
-        /// <summary> Loads the default template definitions from an embedded xml file. </summary>
-        //public void LoadDefault() => LoadFromSheet(LoadDefaultSheetData());
-
         public void LoadFromSheets(IEnumerable<IReadOnlySheetDataSource> templateSheets)
         {
             var templateNodes = templateSheets.SelectMany(x => x.RootNode.ChildNodes);

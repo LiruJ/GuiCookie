@@ -9,10 +9,11 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace GuiCookie.MonoGame.Styles
 {
-    public class MonoGameResourceManager(ContentManager contentManager) : ResourceManager
+    public class MonoGameResourceManager(ContentManager contentManager, GraphicsDevice graphicsDevice) : ResourceManager
     {
         #region Properties
         /// <summary> The <see cref="Microsoft.Xna.Framework.Content.ContentManager"/> used by this resource manager to load the resources. </summary>
@@ -45,9 +46,18 @@ namespace GuiCookie.MonoGame.Styles
             // Get the URI of the image from the node.
             string? imageURI = imageNode.Attributes.GetAttributeOrDefault(uriAttributeName, (string?)null)
                 ?? throw new Exception($"{imagesNodeName} node was missing {uriAttributeName} attribute.");
+            bool isEmbedded = imageNode.Attributes.GetAttributeOrDefault("Embedded", false);
 
             // Load the texture.
-            Texture2D texture = ContentManager.Load<Texture2D>(string.IsNullOrWhiteSpace(rootFolder) ? imageURI : Path.Combine(rootFolder, imageURI));
+            Texture2D texture;
+            if (isEmbedded)
+            {
+                using Stream imageStream = Assembly.GetAssembly(typeof(ResourceManager))!.GetManifestResourceStream(imageURI)
+                    ?? throw new InvalidDataException("Missing embedded resource image!");
+                texture = Texture2D.FromStream(graphicsDevice, imageStream);
+            }
+            else
+                texture = ContentManager.Load<Texture2D>(string.IsNullOrWhiteSpace(rootFolder) ? imageURI : Path.Combine(rootFolder, imageURI));
 
             // Add the root image to the dictionary.
             AddImage(new MonoGameImage(imageNode.Name, texture, texture.Bounds.ToDrawingRectangle()));

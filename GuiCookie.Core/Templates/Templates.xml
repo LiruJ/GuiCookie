@@ -2,8 +2,8 @@
 <Templates>
 	<!--Spatial templates-->
 	<Partition/>
-	<Pane Components="StyleStateMachine, Frame"/>
-	<Square Components="StyleStateMachine, Frame, AspectRatioFitter" Ratio="1" RatioMode="WidthControlsHeight"/>
+	<Pane Components="StyleStateMachine, Frame" Style="Pane"/>
+	<Square Components="StyleStateMachine, Frame, AspectRatioFitter" Style="Pane" Ratio="1" RatioMode="WidthControlsHeight"/>
 
 	<!--Sliders-->
 	<SliderBar Components="StyleStateMachine, Frame, MouseHandler" Controller="SliderBar">

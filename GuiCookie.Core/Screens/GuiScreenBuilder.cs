@@ -240,6 +240,13 @@ namespace GuiCookie.Core.Screens
             return this;
         }
 
+        public GuiScreenBuilder<T> WithDefaultStyleSheet()
+        {
+            if (!styleSheetSourceFunctions.Contains(StyleManager.LoadDefaultSheetData))
+                styleSheetSourceFunctions.Add(StyleManager.LoadDefaultSheetData);
+            return this;
+        }
+
         private void ensureStyleManager()
         {
             if (HasService<StyleManager>())

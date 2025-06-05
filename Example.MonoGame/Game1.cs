@@ -44,7 +44,7 @@ namespace Example.MonoGame
             ServiceCollection serviceProvider = new ServiceCollection()
                 .AddMonoGameInput(Window)
                 .AddMonoGameWindow(Window)
-                .AddMonoGameResources(Content);
+                .AddMonoGameResources(Content, GraphicsDevice);
 
             root = GuiScreenBuilder<GuiScreen>.Create(serviceProvider)
                 .With(Content)
@@ -55,6 +55,7 @@ namespace Example.MonoGame
                 .WithDefaultElementNamespace()
                 .WithElementNamespace(Assembly.GetExecutingAssembly(), "Example.MonoGame.Elements")
                 .WithDefaultTemplateSheet()
+                .WithDefaultStyleSheet()
                 .Build();
 
             // TODO: use this.Content to load your game content here

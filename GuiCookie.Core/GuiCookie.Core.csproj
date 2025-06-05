@@ -7,10 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Styles\DefaultStyleImage.png" />
+    <None Remove="Styles\Styles.xml" />
     <None Remove="Templates\Templates.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Styles\DefaultStyleImage.png" />
+    <EmbeddedResource Include="Styles\Styles.xml" />
     <EmbeddedResource Include="Templates\Templates.xml" />
   </ItemGroup>
 

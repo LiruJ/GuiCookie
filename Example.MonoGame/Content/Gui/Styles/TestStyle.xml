@@ -3,28 +3,13 @@
   <!--The resources for this style-->
   <Resources >
     <Colours>
-      <MainColour Colour="#5F628A"/>
-      <InlayColour Colour="#8488BC"/>
-      <MainTint Colour="#DDD"/>
-      <ClickedTint Colour="#AAA"/>
-      <DisabledTint Colour="#222"/>
+
     </Colours>
     <Fonts>
       <Default URI="Gui/Fonts/TestFont"/>
       <Small URI="Gui/Fonts/SmallFont"/>
     </Fonts>
     <Images>
-      <Main URI="Gui/Images/TestSprites" Tilemap="4, 4">
-        <Button/>
-        <Pane/>
-        <Inlay/>
-        <VerticalSliderBar Bounds="0, 48, 16, 24"/>
-        <VerticalSliderBarFrame Bounds="0, 72, 16, 24"/>
-        <HorizontalSliderBar Bounds="32, 48, 24, 16"/>
-        <HorizontalSliderBarFrame Bounds="17, 80, 24, 16"/>
-        <VerticalSliderHandle Bounds="17, 49, 14, 10"/>
-        <HorizontalSliderHandle Bounds="33, 65, 10, 14"/>
-      </Main>
       <Icons URI="Gui/Images/Icons" Tilemap="3, 3">
         <RemoveButton Tile="0, 1"/>
         <AddButton Tile="0, 2"/>

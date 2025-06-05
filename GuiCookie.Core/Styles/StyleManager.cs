@@ -1,7 +1,9 @@
 ﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Data.Xml;
 using GuiCookie.Core.Styles.Attributes;
 using LiruGameHelper.Reflection;
 using System.Buffers;
+using System.Reflection;
 
 namespace GuiCookie.Core.Styles
 {
@@ -13,6 +15,8 @@ namespace GuiCookie.Core.Styles
         public const string DefaultStyleAttributeName = "DefaultStyle";
         
         private const string stylesNodeName = "Styles";
+
+        private const string defaultStyleSheetPath = "GuiCookie.Core.Styles.Styles.xml";
         #endregion
 
         #region Backing Fields
@@ -40,6 +44,18 @@ namespace GuiCookie.Core.Styles
         #endregion
 
         #region Load Functions
+        public static SheetDataSource LoadDefaultSheetData()
+        {
+            // Load the contents of the file.
+            using Stream stream = CreateDefaultTemplatesStream();
+            return XmlSheetDataSource.Load(stream, defaultStyleSheetPath);
+        }
+
+        public static Stream CreateDefaultTemplatesStream() =>
+            // Load the embedded xml file into a stream and make sure it exists.
+            Assembly.GetExecutingAssembly().GetManifestResourceStream(defaultStyleSheetPath)
+                ?? throw new InvalidDataException("Missing default template sheet!");
+
         public void LoadFromSheet(IReadOnlySheetDataSource styleSheet, bool includeResources = false)
         {
             if (includeResources)
