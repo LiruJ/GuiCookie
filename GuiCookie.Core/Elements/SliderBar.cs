@@ -147,28 +147,28 @@ namespace GuiCookie.Core.Elements
         #region Draw Functions
         protected override void drawFill(IGuiCamera guiCamera)
         {
-            // TODO: Should this really be in an element, or can it go into a component a lot better?
+            //// TODO: Should this really be in an element, or can it go into a component a lot better?
 
-            // Do nothing if there is no fill.
-            if (!fillCache.TryGetVariantAttribute(StyleStateMachine?.CurrentStyleVariant, out SliceFrameStyleAttribute? fill)) 
-                return;
+            //// Do nothing if there is no fill.
+            //if (!fillCache.TryGetVariantAttribute(StyleStateMachine?.CurrentStyleVariant, out SliceFrameStyleAttribute? fill)) 
+            //    return;
 
-            // If there is no handle, fall back on the progress bar's way of drawing the fill.
-            if (Handle == null) 
-                base.drawFill(guiCamera);
-            // Otherwise; draw the fill so that it is hidden behind the handle.
-            else
-            {
-                // Calculate the absolute area for the fill to be drawn.
-                Rectangle fillArea = FillPadding.ScaleRectangle(Bounds.AbsoluteTotalArea);
+            //// If there is no handle, fall back on the progress bar's way of drawing the fill.
+            //if (Handle == null) 
+            //    base.drawFill(guiCamera);
+            //// Otherwise; draw the fill so that it is hidden behind the handle.
+            //else
+            //{
+            //    // Calculate the absolute area for the fill to be drawn.
+            //    Rectangle fillArea = FillPadding.ScaleRectangle(Bounds.AbsoluteTotalArea);
 
-                // Adjust the fill area's width or height so that it is hidden behind the handle.
-                if (LayoutDirection == Direction.Horizontal) fillArea.Width = Handle.Bounds.AbsoluteTotalArea.GetCentre().X - fillArea.X;
-                else fillArea.Height = Handle.Bounds.AbsoluteTotalArea.GetCentre().Y - fillArea.Y;
+            //    // Adjust the fill area's width or height so that it is hidden behind the handle.
+            //    if (LayoutDirection == Direction.Horizontal) fillArea.Width = Handle.Bounds.AbsoluteTotalArea.GetCentre().X - fillArea.X;
+            //    else fillArea.Height = Handle.Bounds.AbsoluteTotalArea.GetCentre().Y - fillArea.Y;
 
-                // Draw the fill.
-                //NineSliceDrawer.DrawFrameOnDemand(fill, fillArea, guiCamera, fill!.MixedColour);
-            }
+            //    // Draw the fill.
+            //    //NineSliceDrawer.DrawFrameOnDemand(fill, fillArea, guiCamera, fill!.MixedColour);
+            //}
         }
         #endregion
     }

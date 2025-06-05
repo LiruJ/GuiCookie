@@ -1,11 +1,17 @@
 ﻿using GuiCookie.Core.Components;
 using GuiCookie.Core.Data;
+using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Elements;
+using GuiCookie.Core.Styles;
 using GuiCookie.Core.Templates;
+using GuiCookie.MonoGame.Rendering;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using System.Drawing;
 
 namespace Example.MonoGame.Elements
 {
-    public class PortraitGrid(TemplateManager templateManager) : Element
+    public class PortraitGrid(TemplateManager templateManager, ElementManager elementManager, ResourceManager resourceManager, ContentManager contentManager) : Element
     {
         #region Constants
         /// <summary> The number of portraits that exist in the sheet. </summary>
@@ -25,11 +31,16 @@ namespace Example.MonoGame.Elements
 
         #region Fields
         /// <summary> The spritesheet that holds every single portrait. </summary>
-        //private readonly Texture2D portraitSheet = content.Load<Texture2D>("Portraits");
+        private Texture2D portraitSheet;
         #endregion
 
         #region Initialisation Functions
-        public override void OnFullSetup(IReadOnlyAttributeCollection attributes)
+        public override void OnCreated(IReadOnlyAttributeCollection attributes)
+        {
+            // TODO: Have some way of loading images that aren't defined as resources, so this isn't MonoGame specific.
+            portraitSheet = contentManager.Load<Texture2D>("Gui/Images/Portraits");
+        }
+        public override void OnPostFullSetup()
         {
             grid = GetChildByName("Grid").GetComponent<GridLayout>();
             xSpaceSlider = GetChildByName<LabelledSlider>("XSpaceSlider");
@@ -38,32 +49,28 @@ namespace Example.MonoGame.Elements
 
             Template cellTemplate = templateManager.GetTemplateFromName("ImageLabel");
 
-            //int x = 0, y = 0;
-            //for (int portraitIndex = 0; portraitIndex < portraitCount; portraitIndex++)
-            //{
-            //    ImageBlock portraitImage = Root.ElementManager.CreateElementFromTemplate(cellTemplate, null, grid.Element).GetComponent<ImageBlock>();
-            //    portraitImage.ClippingMode = ClippingMode.Stretch;
+            int x = 0, y = 0;
+            for (int portraitIndex = 0; portraitIndex < portraitCount; portraitIndex++)
+            {
+                ImageBlock portraitImage = elementManager.CreateElementFromTemplate(cellTemplate, null, grid.Element).GetComponent<ImageBlock>();
+                portraitImage.ClippingMode = ClippingMode.Stretch;
 
-            //    Rectangle source = new(x * portraitDimension, y * portraitDimension, portraitDimension, portraitDimension);
+                Rectangle source = new(x * portraitDimension, y * portraitDimension, portraitDimension, portraitDimension);
 
-            //    portraitImage.Image = new MonoGameImage(portraitSheet, source.ToDrawingRectangle());
+                portraitImage.Image = new MonoGameImage(portraitSheet, source);
 
-            //    if ((x + 1) * portraitDimension >= portraitSheet.Width)
-            //    {
-            //        x = 0;
-            //        y++;
-            //    }
-            //    else x++;
-            //}
-        }
+                if ((x + 1) * portraitDimension >= portraitSheet.Width)
+                {
+                    x = 0;
+                    y++;
+                }
+                else x++;
+            }
 
-        public override void OnPostFullSetup()
-        {
-            grid.Spacing = new System.Drawing.Point((int)xSpaceSlider.Slider.Value, (int)ySpaceSlider.Slider.Value);
+            grid.Spacing = new Point((int)xSpaceSlider.Slider.Value, (int)ySpaceSlider.Slider.Value);
 
-            xSpaceSlider?.Slider?.ConnectValueChanged(() => grid.Spacing = new System.Drawing.Point((int)xSpaceSlider.Slider.Value, grid.Spacing.Y));
-            ySpaceSlider?.Slider?.ConnectValueChanged(() => grid.Spacing = new System.Drawing.Point(grid.Spacing.X, (int)ySpaceSlider.Slider.Value));
-
+            xSpaceSlider?.Slider?.ConnectValueChanged(() => grid.Spacing = new Point((int)xSpaceSlider.Slider.Value, grid.Spacing.Y));
+            ySpaceSlider?.Slider?.ConnectValueChanged(() => grid.Spacing = new Point(grid.Spacing.X, (int)ySpaceSlider.Slider.Value));
         }
         #endregion
     }

@@ -47,6 +47,7 @@ namespace Example.MonoGame
                 .AddMonoGameResources(Content);
 
             root = GuiScreenBuilder<GuiScreen>.Create(serviceProvider)
+                .With(Content)
                 .WithRandom()
                 .WithXmlLayoutSheet(Path.Combine(Content.RootDirectory, "Gui", "Layouts", "TestLayout"))
                 .WithXmlStyleSheet(Path.Combine(Content.RootDirectory, "Gui", "Styles", "TestStyle"))

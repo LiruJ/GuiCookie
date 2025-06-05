@@ -1,12 +1,10 @@
-﻿using GuiCookie.Core.Components;
-using GuiCookie.Core.Data;
+﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles;
 using GuiCookie.Core.Styles.Attributes;
 using GuiCookie.Core.Styles.DataStructures;
 using LiruGameHelper.Parsers;
-using LiruGameHelper.Signals;
 using System.Drawing;
 
 namespace GuiCookie.Core.Elements
@@ -31,15 +29,7 @@ namespace GuiCookie.Core.Elements
         private const string fillName = "Fill";
         #endregion
 
-        #region Fields
-        protected readonly StyleAttributeCache<SliceFrameStyleAttribute> fillCache = new(fillName);
-
-        private SignalConnection? styleChangedConnection = null;
-        #endregion
-
         #region Backing Fields
-        private StyleStateMachine? styleStateMachine;
-
         private int decimalDigits;
 
         private Direction layoutDirection = Direction.Horizontal;
@@ -52,20 +42,6 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Properties
-        public StyleStateMachine? StyleStateMachine
-        {
-            get => styleStateMachine;
-            set
-            {
-                if (styleStateMachine == value)
-                    return;
-
-                styleStateMachine = value;
-                styleChangedConnection?.Disconnect();
-                styleChangedConnection = styleStateMachine?.OnStyleChanged?.Connect(fillCache.Refresh);
-            }
-        }
-
         /// <summary> The number of decimal digits used when rounding the value. </summary>
         public int DecimalDigits
         {
@@ -159,43 +135,43 @@ namespace GuiCookie.Core.Elements
             set => Value = MinimumValue + (Math.Clamp(value, 0, 1) * (MaximumValue - MinimumValue));
         }
 
-        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name for the fill. </summary>
-        public Color? FillColour
-        {
-            get => fillCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Colour : null;
-            set
-            {
-                // Try to create the fill attributes if they do not exist already.
-                tryCreateFillAttributes();
+        ///// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name for the fill. </summary>
+        //public Color? FillColour
+        //{
+        //    get => fillCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Colour : null;
+        //    set
+        //    {
+        //        // Try to create the fill attributes if they do not exist already.
+        //        tryCreateFillAttributes();
 
-                // Set the value for all variants.
-                //foreach (StyleVariant variant in StyleStateMachine?.Style?.StyleVariantsByName.Values)
-                //    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame)
-                //        fillFrame.Colour = value;
-            }
-        }
+        //        // Set the value for all variants.
+        //        //foreach (StyleVariant variant in StyleStateMachine?.Style?.StyleVariantsByName.Values)
+        //        //    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame)
+        //        //        fillFrame.Colour = value;
+        //    }
+        //}
 
-        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name for the fill. </summary>
-        public Color? FillTint
-        {
-            get => fillCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Tint : null;
-            set
-            {
-                // Try to create the fill attributes if they do not exist already.
-                tryCreateFillAttributes();
+        ///// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name for the fill. </summary>
+        //public Color? FillTint
+        //{
+        //    get => fillCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out SliceFrameStyleAttribute? sliceFrame) ? sliceFrame!.Tint : null;
+        //    set
+        //    {
+        //        // Try to create the fill attributes if they do not exist already.
+        //        tryCreateFillAttributes();
 
-                // Set the value for all variants.
-                //foreach (StyleVariant variant in StyleStateMachine?.Style?.StyleVariantsByName.Values)
-                //    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame)
-                //        fillFrame.Tint = value;
-            }
-        }
+        //        // Set the value for all variants.
+        //        //foreach (StyleVariant variant in StyleStateMachine?.Style?.StyleVariantsByName.Values)
+        //        //    if (variant.GetNamedAttributeOfType<SliceFrameStyleAttribute>(fillName) is SliceFrameStyleAttribute fillFrame)
+        //        //        fillFrame.Tint = value;
+        //    }
+        //}
 
-        /// <summary> The padding applied to the fill, completely separate of <see cref="Bounds.Padding"/>. </summary>
-        public Sides FillPadding { get; set; }
+        ///// <summary> The padding applied to the fill, completely separate of <see cref="Bounds.Padding"/>. </summary>
+        //public Sides FillPadding { get; set; }
 
-        /// <summary> If this is <c>true</c>, the fill is drawn first; otherwise it is drawn last. </summary>
-        public bool DrawFillBehind { get; set; }
+        ///// <summary> If this is <c>true</c>, the fill is drawn first; otherwise it is drawn last. </summary>
+        //public bool DrawFillBehind { get; set; }
         #endregion
 
         #region Initialisation Functions
@@ -205,14 +181,14 @@ namespace GuiCookie.Core.Elements
             decimalDigits = attributes.GetAttributeOrDefault(decimalDigitsAttributeName, 10);
             layoutDirection = attributes.GetEnumAttributeOrDefault(directionAttributeName, Direction.Horizontal);
 
-            // Set the graphical data.
-            if (attributes.HasAttribute(fillName + ResourceManager.ColourAttributeName))
-                FillColour = attributes.GetAttributeOrDefault(fillName + ResourceManager.ColourAttributeName, (Color?)null, Colour.TryParse);
-            if (attributes.HasAttribute(fillName + TintedColour.TintAttributeName))
-                FillTint = attributes.GetAttributeOrDefault(fillName + TintedColour.TintAttributeName, (Color?)null, Colour.TryParse);
+            //// Set the graphical data.
+            //if (attributes.HasAttribute(fillName + ResourceManager.ColourAttributeName))
+            //    FillColour = attributes.GetAttributeOrDefault(fillName + ResourceManager.ColourAttributeName, (Color?)null, Colour.TryParse);
+            //if (attributes.HasAttribute(fillName + TintedColour.TintAttributeName))
+            //    FillTint = attributes.GetAttributeOrDefault(fillName + TintedColour.TintAttributeName, (Color?)null, Colour.TryParse);
 
-            FillPadding = attributes.GetAttributeOrDefault(fillPaddingAttributeName, new Sides(0, SideMask.None));
-            DrawFillBehind = attributes.GetAttributeOrDefault(drawBehindAttributeName, false);
+            //FillPadding = attributes.GetAttributeOrDefault(fillPaddingAttributeName, new Sides(0, SideMask.None));
+            //DrawFillBehind = attributes.GetAttributeOrDefault(drawBehindAttributeName, false);
 
             // Set the minimum and maximum values, throw an error if they're invalid.
             SetMinimumAndMaximum(attributes.GetAttributeOrDefault(minimumValueAttributeName, 0.0f), attributes.GetAttributeOrDefault(maximumValueAttributeName, 1.0f));
@@ -263,54 +239,55 @@ namespace GuiCookie.Core.Elements
 
         private SliceFrameStyleAttribute tryCreateFillAttributes()
         {
-            // If the fill frame does not exist, create it.
-            if (!fillCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out SliceFrameStyleAttribute? fillFrame) && fillFrame != null)
-            {
-                // Create an empty slice frame.
-                fillFrame = new SliceFrameStyleAttribute(resourceManager, new AttributeCollection() { { "Name", fillName } });
+            //// If the fill frame does not exist, create it.
+            //if (!fillCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out SliceFrameStyleAttribute? fillFrame) && fillFrame != null)
+            //{
+            //    // Create an empty slice frame.
+            //    fillFrame = new SliceFrameStyleAttribute(resourceManager, new AttributeCollection() { { "Name", fillName } });
 
-                // Add the fill frame to the base variant of the style. Do the same for the hovered, clicked, and disabled.
-                StyleStateMachine?.Style?.BaseVariant.AddAttribute(fillFrame);
-                StyleStateMachine?.Style?.GetStyleVariantFromName(Style.HoveredVariantName).AddAttribute(fillFrame.CreateCopy());
-                StyleStateMachine?.Style?.GetStyleVariantFromName(Style.ClickedVariantName).AddAttribute(fillFrame.CreateCopy());
-                StyleStateMachine?.Style?.GetStyleVariantFromName(Style.DisabledVariantName).AddAttribute(fillFrame.CreateCopy());
+            //    // Add the fill frame to the base variant of the style. Do the same for the hovered, clicked, and disabled.
+            //    StyleStateMachine?.Style?.BaseVariant.AddAttribute(fillFrame);
+            //    StyleStateMachine?.Style?.GetStyleVariantFromName(Style.HoveredVariantName).AddAttribute(fillFrame.CreateCopy());
+            //    StyleStateMachine?.Style?.GetStyleVariantFromName(Style.ClickedVariantName).AddAttribute(fillFrame.CreateCopy());
+            //    StyleStateMachine?.Style?.GetStyleVariantFromName(Style.DisabledVariantName).AddAttribute(fillFrame.CreateCopy());
 
-                // Refresh the cache.
-                fillCache.Refresh(StyleStateMachine?.Style);
-            }
+            //    // Refresh the cache.
+            //    fillCache.Refresh(StyleStateMachine?.Style);
+            //}
 
-            // Return the created/found fill frame.
-            return fillFrame;
+            //// Return the created/found fill frame.
+            //return fillFrame;
+            return null;
         }
         #endregion
 
         #region Draw Functions
         protected override void Draw(IGuiCamera guiCamera)
         {
-            // If the fill should be drawn behind, don't draw the components just yet.
-            if (!DrawFillBehind)
-                base.Draw(guiCamera);
+            //// If the fill should be drawn behind, don't draw the components just yet.
+            //if (!DrawFillBehind)
+            //    base.Draw(guiCamera);
 
-            // Draw the fill.
-            drawFill(guiCamera);
+            //// Draw the fill.
+            //drawFill(guiCamera);
 
-            // If the fill should be drawn behind, draw the components after the fill.
-            if (DrawFillBehind)
-                base.Draw(guiCamera);
+            //// If the fill should be drawn behind, draw the components after the fill.
+            //if (DrawFillBehind)
+            //    base.Draw(guiCamera);
         }
 
         protected virtual void drawFill(IGuiCamera guiCamera)
         {
-            // Do nothing if there is no fill.
-            if (!fillCache.TryGetVariantAttribute(StyleStateMachine?.CurrentStyleVariant, out SliceFrameStyleAttribute? fill))
-                return;
+            //// Do nothing if there is no fill.
+            //if (!fillCache.TryGetVariantAttribute(StyleStateMachine?.CurrentStyleVariant, out SliceFrameStyleAttribute? fill))
+            //    return;
 
-            // Calculate the absolute area for the fill to be drawn.
-            Rectangle fillArea = FillPadding.ScaleRectangle(Bounds.AbsoluteTotalArea);
+            //// Calculate the absolute area for the fill to be drawn.
+            //Rectangle fillArea = FillPadding.ScaleRectangle(Bounds.AbsoluteTotalArea);
 
-            // Adjust the fill area's width or height to match the progress.
-            if (LayoutDirection == Direction.Horizontal) fillArea.Width = (int)MathF.Floor(fillArea.Width * NormalisedValue);
-            else fillArea.Height = (int)MathF.Floor(fillArea.Height * NormalisedValue);
+            //// Adjust the fill area's width or height to match the progress.
+            //if (LayoutDirection == Direction.Horizontal) fillArea.Width = (int)MathF.Floor(fillArea.Width * NormalisedValue);
+            //else fillArea.Height = (int)MathF.Floor(fillArea.Height * NormalisedValue);
 
             // Draw the fill.
             //NineSliceDrawer.DrawFrameOnDemand(fill, fillArea, guiCamera, fill!.MixedColour);

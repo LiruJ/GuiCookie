@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		GuiCookie\GuiCookie.xml = GuiCookie\GuiCookie.xml
 		License.txt = License.txt
+		TODO.txt = TODO.txt
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GuiCookie.Core", "GuiCookie.Core\GuiCookie.Core.csproj", "{9176B9E9-0071-4611-A792-640C12898950}"

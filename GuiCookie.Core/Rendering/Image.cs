@@ -15,11 +15,11 @@ namespace GuiCookie.Core.Rendering
         #region Equality Functions
         public override bool Equals(object? obj) => obj is Image image && Equals(image);
 
-        public bool Equals(Image? other) => Name.Equals(other?.Name) && Source.Equals(other.Source);
+        public bool Equals(Image? other) => other is not null && ReferenceEquals(Name, other.Name) && Source.Equals(other.Source);
 
         public override int GetHashCode() => HashCode.Combine(Name, Source);
 
-        public static bool operator ==(Image? left, Image? right) => left is not null && left.Equals(right);
+        public static bool operator ==(Image? left, Image? right) => ReferenceEquals(left, right) || (left is not null && left.Equals(right));
 
         public static bool operator !=(Image? left, Image? right) => left is null || !left.Equals(right);
         #endregion

@@ -5,22 +5,17 @@ using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles;
 using GuiCookie.Core.Styles.Attributes;
 using GuiCookie.Core.Styles.DataStructures;
-using LiruGameHelper.Parsers;
 using System.Drawing;
 using System.Numerics;
 using System.Text;
 
 namespace GuiCookie.Core.Components
 {
-    public class TextBlock(ResourceManager resourceManager) : StyledComponent
+    public class TextBlock : StyledComponent
     {
         #region Constants
         private const string textAttributeName = "Text";
         private const string resizeAttributeName = "ResizeDirection";
-        #endregion
-
-        #region Fields
-        private readonly StyleAttributeCache<FontStyleAttribute> fontCache = new();
         #endregion
 
         #region Backing Fields
@@ -44,54 +39,19 @@ namespace GuiCookie.Core.Components
         /// <summary> The size in pixels that the text wants to use. </summary>
         public Vector2 TextSize { get; private set; }
 
-        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
-        public Space? TextAnchor
-        {
-            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.TextAnchor : null;
-            //set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.TextAnchor = value; }
-        }
+        public Space? TextAnchor { get; set; } = null;
 
-        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
-        public Space? TextPivot
-        {
-            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.TextPivot : null;
-            //set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.TextPivot = value; }
-        }
+        public Space? TextPivot { get; set; } = null;
 
-        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
-        public DropShadow DropShadow
-        {
-            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.DropShadow : new DropShadow((Vector2?)null, null);
-            //set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.DropShadow = value; }
-        }
+        public DropShadow? DropShadow { get; set; } = null;
 
-        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
-        public Color? Colour
-        {
-            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.Colour : null;
-            //set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.Colour = value; }
-        }
+        public Color? Colour { get; set; } = null;
 
-        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
-        public Color? Tint
-        {
-            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.Tint : null;
-            //set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.Tint = value; }
-        }
+        public Color? Tint { get; set; } = null;
 
-        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
-        public Vector2? Offset
-        {
-            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font) ? font!.Offset : null;
-            //set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? font)) font!.Offset = value; }
-        }
+        public Vector2? Offset { get; set; } = null;
 
-        /// <summary> A shortcut to the <see cref="Style.BaseVariant"/> property of the same name. </summary>
-        public Font? Font
-        {
-            get => fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? fontStyle) ? fontStyle!.Font : null;
-            //set { if (fontCache.TryGetVariantAttribute(Style?.BaseVariant, out FontStyleAttribute? fontStyle)) fontStyle!.Font = value; }
-        }
+        public Font? Font { get; set; } = null;
 
         /// <summary> The direction in which this text's element resizes. </summary>
         public DirectionMask ResizeDirection
@@ -136,8 +96,6 @@ namespace GuiCookie.Core.Components
         #endregion
 
         #region Style Functions
-        public override void OnStyleChanged(Style? style) => fontCache.Refresh(style);
-
         private void recalculateTextSizeProperties()
         {
             // Calculate and save the text size.
@@ -156,10 +114,11 @@ namespace GuiCookie.Core.Components
         #endregion
 
         #region Calculation Functions
-        public Vector2 CalculateSize(string text) 
-            => !string.IsNullOrWhiteSpace(text) && fontCache.TryGetVariantAttribute(CurrentStyleVariant, out FontStyleAttribute? font)
-                ? font!.Font.MeasureString(text)
-                : Vector2.Zero;
+        public Vector2 CalculateSize(string text)
+            => Vector2.One;
+            //!string.IsNullOrWhiteSpace(text) && fontCache.TryGetVariantAttribute(CurrentStyleVariant, out FontStyleAttribute? font)
+            //    ? font!.Font.MeasureString(text)
+            //    : Vector2.Zero;
         #endregion
 
         #region Draw Functions
@@ -182,35 +141,35 @@ namespace GuiCookie.Core.Components
         public void DrawText(IGuiCamera guiCamera, string text)
         {
             // Ensure there is text and a font to draw.
-            if (string.IsNullOrWhiteSpace(text) || !fontCache.TryGetVariantAttribute(CurrentStyleVariant, out FontStyleAttribute? fontVariant)) 
+            if (string.IsNullOrWhiteSpace(text) || StyleStateMachine?.CurrentFontAttribute == null) 
                 return;
 
             // Calculate the position of the text.
-            Vector2 position = CalculateTextPosition(fontVariant!, TextSize);
+            Vector2 position = CalculateTextPosition(StyleStateMachine.CurrentFontAttribute, TextSize);
 
-            // If a drop shadow is to be drawn, draw it first.
-            if (fontVariant!.DropShadow.HasData)
-                guiCamera.DrawString(fontVariant.Font, text, position + fontVariant.DropShadow.Offset!.Value, fontVariant.DropShadow.Colour!.Value);
+            //// If a drop shadow is to be drawn, draw it first.
+            //if (StyleStateMachine.CurrentFontAttribute.DropShadow.HasData)
+            //    guiCamera.DrawString(fontVariant.Font, text, position + fontVariant.DropShadow.Offset!.Value, fontVariant.DropShadow.Colour!.Value);
 
-            // Draw the text itself.
-            guiCamera.DrawString(fontVariant.Font, text, position, fontVariant.MixedColour);
+            //// Draw the text itself.
+            //guiCamera.DrawString(fontVariant.Font, text, position, fontVariant.MixedColour);
         }
 
         public void DrawText(IGuiCamera guiCamera, StringBuilder text)
         {
-            // Ensure there is text and a font to draw.
-            if (text.Length == 0 || !fontCache.TryGetVariantAttribute(CurrentStyleVariant, out FontStyleAttribute? fontVariant))
-                return;
+            //// Ensure there is text and a font to draw.
+            //if (text.Length == 0 || !fontCache.TryGetVariantAttribute(CurrentStyleVariant, out FontStyleAttribute? fontVariant))
+            //    return;
 
-            // Calculate the position of the text.
-            Vector2 position = CalculateTextPosition(fontVariant!, fontVariant!.Font.MeasureString(text));
+            //// Calculate the position of the text.
+            //Vector2 position = CalculateTextPosition(fontVariant!, fontVariant!.Font.MeasureString(text));
 
-            // If a drop shadow is to be drawn, draw it first.
-            if (fontVariant.DropShadow.HasData)
-                guiCamera.DrawString(fontVariant.Font, text, position + fontVariant.DropShadow.Offset.Value, fontVariant.DropShadow.Colour.Value);
+            //// If a drop shadow is to be drawn, draw it first.
+            //if (fontVariant.DropShadow.HasData)
+            //    guiCamera.DrawString(fontVariant.Font, text, position + fontVariant.DropShadow.Offset.Value, fontVariant.DropShadow.Colour.Value);
 
-            // Draw the text itself.
-            guiCamera.DrawString(fontVariant.Font, text, position, fontVariant.MixedColour);
+            //// Draw the text itself.
+            //guiCamera.DrawString(fontVariant.Font, text, position, fontVariant.MixedColour);
         }
         #endregion
     }
