@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles.DataStructures;
 using System.Drawing;
@@ -101,6 +102,39 @@ namespace GuiCookie.Core.Styles.Attributes
             if (NineSlice == null) NineSlice = baseSliceFrame.NineSlice;
             TintedColour = TintedColour.CreateCombination(baseSliceFrame.TintedColour, TintedColour);
             DropShadow = DropShadow.CreateCombination(baseSliceFrame.DropShadow, DropShadow);
+        }
+        #endregion
+
+        #region Draw Functions
+        public void Draw(IGuiCamera camera, Rectangle destination, Image? frameImage = null, TintedColour? tintedColour = null, DropShadow? dropShadow = null)
+        {
+            dropShadow ??= DropShadow;
+            if (dropShadow.Value.HasData)
+            {
+                Rectangle shadowDestination = new(PointExtensions.Add(destination.Location, DropShadow.Offset!.Value.ToPoint()), destination.Size);
+                draw(camera, shadowDestination, frameImage, DropShadow.Colour!.Value);
+            }
+
+            Color colour = TintedColour.CalculateOverriddenColour(tintedColour);
+            draw(camera, destination, frameImage, colour);
+        }
+
+        private void draw(IGuiCamera camera, Rectangle destination, Image? frameImage, Color colour)
+        {
+            frameImage ??= Image;
+            if (frameImage == null)
+            {
+                camera.DrawStretched(camera.WhitePixel, destination, camera.WhitePixel.Source, colour);
+                return;
+            }
+
+            if (NineSlice != null)
+            {
+                camera.DrawNineSlice(frameImage, destination, frameImage.Source, colour, NineSlice.Value.Values);
+                return;
+            }
+
+            camera.DrawStretched(frameImage, destination, frameImage.Source, colour);
         }
         #endregion
     }

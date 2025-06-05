@@ -45,6 +45,8 @@ namespace GuiCookie.Core.Styles.DataStructures
         /// <summary> The combination of the <see cref="Colour"/> and the <see cref="Tint"/>. </summary>
         /// <remarks> If both <see cref="Colour"/> and <see cref="Tint"/> have values, the mixed value is used. Otherwise; defaults to using the first non-null value in the order: Colour, Tint, <see cref="Color.White"/>.   </remarks>
         public Color Mixed { get; private set; }
+
+        public readonly bool HasData => Tint != null && Colour != null;
         #endregion
 
         #region Constructors
@@ -87,6 +89,17 @@ namespace GuiCookie.Core.Styles.DataStructures
                 (int)MathF.Floor((colour.Value.G / (float)byte.MaxValue) * (tint.Value.G / (float)byte.MaxValue) * byte.MaxValue),
                 (int)MathF.Floor((colour.Value.B / (float)byte.MaxValue) * (tint.Value.B / (float)byte.MaxValue) * byte.MaxValue))
             : colour ?? tint ?? Color.White;
+
+        public readonly Color CalculateOverriddenColour(TintedColour? other)
+        {
+            if (other == null || (Colour == null && Tint == null))
+                return Mixed;
+
+            Color? colour = other?.Colour ?? Colour;
+            Color? tint = other?.Tint ?? Tint;
+
+            return CalculateMixedColour(colour, tint);
+        }
         #endregion
 
         #region Combination Functions

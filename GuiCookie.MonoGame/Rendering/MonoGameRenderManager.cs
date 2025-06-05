@@ -13,12 +13,23 @@ namespace GuiCookie.MonoGame.Rendering
         public GraphicsDevice GraphicsDevice { get; } = graphicsDevice;
 
         public UISpriteBatch SpriteBatch { get; } = spriteBatch;
+
+        public Image WhitePixel { get; } = createWhitePixel(graphicsDevice);
         #endregion
 
         #region Constructors
         public MonoGameRenderManager(GraphicsDevice graphicsDevice) : this(graphicsDevice, new UISpriteBatch(graphicsDevice))
         {
             
+        }
+        #endregion
+
+        #region Texture Functions
+        private static MonoGameImage createWhitePixel(GraphicsDevice graphicsDevice)
+        {
+            Texture2D whitePixel = new(graphicsDevice, 1, 1);
+            whitePixel.SetData([Color.White]);
+            return new MonoGameImage(whitePixel, whitePixel.Bounds.ToDrawingRectangle());
         }
         #endregion
 
@@ -270,7 +281,6 @@ namespace GuiCookie.MonoGame.Rendering
         #endregion
 
         #region Draw Text Functions
-
         void IGuiCamera.DrawString(Font font, string text, System.Numerics.Vector2 position, System.Drawing.Color? colour)
             => DrawString(font, text, new Vector2(position.X, position.Y), colour != null ? new Color((uint)colour.Value.ToArgb()) : null);
 

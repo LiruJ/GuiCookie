@@ -17,13 +17,15 @@ namespace GuiCookie.Core.Styles.DataStructures
         #endregion
 
         #region Properties
-        public float MaxY { get; } = maxY;
+        public readonly Vector4 Values { get; } = new(minX, maxX, minY, maxY);
 
-        public float MinY { get; } = minY;
+        public readonly float MaxY => Values.W;
 
-        public float MaxX { get; } = maxX;
+        public readonly float MinY => Values.Z;
 
-        public float MinX { get; } = minX;
+        public readonly float MaxX => Values.Y;
+
+        public readonly float MinX => Values.X;
         #endregion
 
         #region Presets
@@ -54,7 +56,7 @@ namespace GuiCookie.Core.Styles.DataStructures
             nineSlice = Empty;
 
             // If the input is invalid, handle it.
-            if (string.IsNullOrWhiteSpace(input)) 
+            if (string.IsNullOrWhiteSpace(input))
                 return throwException ? throw new ArgumentNullException(nameof(input), "Given string cannot be null, empty, or whitespace.") : false;
 
             // Split the input into separate values.
@@ -92,10 +94,6 @@ namespace GuiCookie.Core.Styles.DataStructures
         }
         #endregion
 
-        #region Vector Functions
-        public readonly Vector4 ToVector4() => new(MinX, MaxX, MinY, MaxY);
-        #endregion
-
         #region String Functions
         public override readonly string ToString() => $"X: {MinX}-{MaxX} Y: {MinY}-{MaxY}";
         #endregion
@@ -104,7 +102,7 @@ namespace GuiCookie.Core.Styles.DataStructures
         public override readonly bool Equals(object? obj) => obj is NineSlice slice && Equals(slice);
 
         public readonly bool Equals(NineSlice other)
-            =>  MaxY == other.MaxY &&
+            => MaxY == other.MaxY &&
                 MinY == other.MinY &&
                 MaxX == other.MaxX &&
                 MinX == other.MinX;

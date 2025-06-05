@@ -1,6 +1,7 @@
 ﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Styles;
+using GuiCookie.Core.Styles.Attributes;
 using LiruGameHelper.Signals;
 
 namespace GuiCookie.Core.Components
@@ -11,10 +12,12 @@ namespace GuiCookie.Core.Components
         public const string StyleAttributeName = "Style";
         #endregion
 
-        #region Fields
+        #region Backing Fields
         private Style? style;
 
         private string? styleName;
+
+        private StyleVariant? currentStyleVariant = null;
         #endregion
 
         #region Cached Variants
@@ -33,9 +36,28 @@ namespace GuiCookie.Core.Components
         public StyleVariant? DisabledVariant { get; protected set; }
         #endregion
 
+        #region Cached Attributes
+        public SliceFrameStyleAttribute? CurrentSliceAttribute { get; protected set; }
+
+        public FontStyleAttribute? CurrentFontAttribute { get; protected set; }
+
+        public ContentStyleAttribute? CurrentContentAttribute { get; protected set; }
+        #endregion
+
         #region Properties
         /// <summary> The current style variant according to the state of the element. </summary>
-        public StyleVariant? CurrentStyleVariant { get; protected set; }
+        public StyleVariant? CurrentStyleVariant
+        {
+            get => currentStyleVariant;
+            set
+            {
+                if (currentStyleVariant == value)
+                    return;
+
+                currentStyleVariant = value;
+                onCurrentVariantChanged(currentStyleVariant);
+            }
+        }
 
         /// <summary> The style to work with. </summary>
         public Style? Style
@@ -110,8 +132,14 @@ namespace GuiCookie.Core.Components
             UpdateCurrentStyle();
 
             // Tell the element that its style was changed.
-            //Element.onStyleChanged();
             onStyleChanged.Invoke(Style);
+        }
+
+        protected virtual void onCurrentVariantChanged(StyleVariant? currentVariant)
+        {
+            CurrentSliceAttribute = currentVariant?.GetFirstAttributeOfType<SliceFrameStyleAttribute>();
+            CurrentFontAttribute = currentVariant?.GetFirstAttributeOfType<FontStyleAttribute>();
+            CurrentContentAttribute = currentVariant?.GetFirstAttributeOfType<ContentStyleAttribute>();
         }
         #endregion
 

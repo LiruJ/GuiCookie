@@ -6,6 +6,8 @@ namespace GuiCookie.Core.Rendering
 {
     public interface IGuiCamera
     {
+        Image WhitePixel { get; }
+
         void DrawString(Font font, string text, Vector2 position, Color? colour = null);
 
         void DrawString(Font font, StringBuilder stringBuilder, Vector2 position, Color? colour = null);

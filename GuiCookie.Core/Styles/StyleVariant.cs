@@ -60,7 +60,8 @@ namespace GuiCookie.Core.Styles
 
             // If the unnamed collection does not contain the type, return the first instance of the type within the main collection.
             foreach (IStyleAttribute namedAttribute in styleAttributesByTypeAndName.Values)
-                if (namedAttribute is T typedAttribute) return typedAttribute;
+                if (namedAttribute is T typedAttribute) 
+                    return typedAttribute;
 
             // Otherwise; return null.
             return null;

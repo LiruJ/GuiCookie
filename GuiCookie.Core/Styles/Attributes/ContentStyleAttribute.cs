@@ -1,4 +1,6 @@
 ﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Helpers;
+using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Styles.DataStructures;
 using System.Drawing;
 
@@ -74,6 +76,23 @@ namespace GuiCookie.Core.Styles.Attributes
             // Override the properties.
             TintedColour = TintedColour.CreateCombination(baseContent.TintedColour, TintedColour);
             DropShadow = DropShadow.CreateCombination(baseContent.DropShadow, DropShadow);
+        }
+        #endregion
+
+        #region Draw Functions
+        public void Draw(IGuiCamera camera, Rectangle destination, Rectangle? source, Image image, TintedColour? tintedColour = null, DropShadow? dropShadow = null)
+        {
+            source ??= image.Source;
+
+            dropShadow ??= DropShadow;
+            if (dropShadow.Value.HasData)
+            {
+                Rectangle shadowDestination = new(PointExtensions.Add(destination.Location, DropShadow.Offset!.Value.ToPoint()), destination.Size);
+                camera.DrawStretched(image, shadowDestination, source.Value, DropShadow.Colour!.Value);
+            }
+
+            Color colour = TintedColour.CalculateOverriddenColour(tintedColour);
+            camera.DrawStretched(image, destination, source, colour);
         }
         #endregion
     }
