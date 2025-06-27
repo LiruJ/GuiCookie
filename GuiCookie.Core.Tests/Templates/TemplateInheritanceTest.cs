@@ -4,7 +4,6 @@ using GuiCookie.Core.Data.Xml;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Templates;
 using GuiCookie.Core.Tests.Resources.Templates;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GuiCookie.Core.Tests.Templates;
 

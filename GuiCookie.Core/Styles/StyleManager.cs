@@ -10,10 +10,11 @@ namespace GuiCookie.Core.Styles
     public class StyleManager(ResourceManager resourceManager)
     {
         #region Constants
+        public const string StyleSheetsNodeName = "StyleSheets";
+        public const string StyleSheetNodeName = "StyleSheet";
+
         public const string ResourcesNodeName = "Resources";
 
-        public const string DefaultStyleAttributeName = "DefaultStyle";
-        
         private const string stylesNodeName = "Styles";
 
         private const string defaultStyleSheetPath = "GuiCookie.Core.Styles.Styles.xml";
@@ -25,8 +26,6 @@ namespace GuiCookie.Core.Styles
 
         #region Properties
         public IReadOnlyDictionary<string, Style> StylesByName => stylesByName;
-
-        public Style? DefaultStyle { get; set; }
 
         public ResourceManager ResourceManager => resourceManager;
 
@@ -55,6 +54,12 @@ namespace GuiCookie.Core.Styles
             // Load the embedded xml file into a stream and make sure it exists.
             Assembly.GetExecutingAssembly().GetManifestResourceStream(defaultStyleSheetPath)
                 ?? throw new InvalidDataException("Missing default template sheet!");
+
+        public void LoadFromSheets(IEnumerable<IReadOnlySheetDataSource> styleSheets, bool includeResources = false)
+        {
+            foreach (IReadOnlySheetDataSource styleSheet in styleSheets)
+                LoadFromSheet(styleSheet, includeResources);
+        }
 
         public void LoadFromSheet(IReadOnlySheetDataSource styleSheet, bool includeResources = false)
         {

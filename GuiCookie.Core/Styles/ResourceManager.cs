@@ -18,7 +18,7 @@ namespace GuiCookie.Core.Styles
         #region XML Constants
         protected const string rootFolderAttributeName = "Folder";
 
-        protected const string uriAttributeName = "URI";
+        protected const string uriAttributeName = "Source";
 
         protected const string coloursNodeName = "Colours";
 

@@ -10,11 +10,11 @@
 			<DisabledTint Colour="#222"/>
 		</Colours>
 		<Fonts>
-			<Default URI="Gui\\Fonts\\TestFont"/>
-			<Small URI="Gui\\Fonts\\SmallFont"/>
+			<Default Source="Gui\\Fonts\\TestFont"/>
+			<Small Source="Gui\\Fonts\\SmallFont"/>
 		</Fonts>
 		<Images>
-			<Main URI="Gui\\Images\\TestSprites" Tilemap="4, 4">
+			<Main Source="Gui\\Images\\TestSprites" Tilemap="4, 4">
 				<Button/>
 				<Pane/>
 				<Inlay/>
@@ -25,7 +25,7 @@
 				<VerticalSliderHandle Bounds="17, 49, 14, 10"/>
 				<HorizontalSliderHandle Bounds="33, 65, 10, 14"/>
 			</Main>
-			<Icons URI="Gui\\Images\\Icons" Tilemap="3, 3">
+			<Icons Source="Gui\\Images\\Icons" Tilemap="3, 3">
 				<RemoveButton Tile="0, 1"/>
 				<AddButton Tile="0, 2"/>
 			</Icons>

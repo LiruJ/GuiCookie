@@ -12,7 +12,7 @@
     <Fonts>
     </Fonts>
     <Images>
-      <Main URI="GuiCookie.Core.Styles.DefaultStyleImage.png" Embedded="True" Tilemap="4, 4">
+      <Main Source="GuiCookie.Core.Styles.DefaultStyleImage.png" Embedded="True" Tilemap="4, 4">
         <Button/>
         <Pane/>
         <Inlay/>

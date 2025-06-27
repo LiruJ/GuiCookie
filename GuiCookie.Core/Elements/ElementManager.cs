@@ -16,6 +16,8 @@ namespace GuiCookie.Core.Elements
     {
         #region Constants
         private const string nameAttributeName = "Name";
+
+        public const string RootNodeNodeName = "Root";
         #endregion
 
         #region Fields
@@ -31,17 +33,17 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Load Functions
-        internal void LoadFromSheet(IReadOnlySheetDataSource layoutSheet)
+        internal void LoadFromRootNode(IReadOnlySheetDataNode rootElementNode)
         {
             if (RootElement.ChildCount != 0)
                 throw new InvalidOperationException("Layout sheet loading was started when a layout sheet was already loaded!");
             if (loadingElements.Count != 0)
                 throw new InvalidOperationException("Layout sheet loading was started when elements were awaiting loading!");
 
-            createRootElement(layoutSheet.RootNode.Attributes);
+            createRootElement(rootElementNode.Attributes);
 
             // Load each element node within the main node.
-            foreach (IReadOnlySheetDataNode elementNode in layoutSheet.RootNode.ChildNodes)
+            foreach (IReadOnlySheetDataNode elementNode in rootElementNode.ChildNodes)
                 loadElementFromNode(elementNode);
 
             // TODO: This really sucks. I think the element manager needs a root element that's separate from the actual root.

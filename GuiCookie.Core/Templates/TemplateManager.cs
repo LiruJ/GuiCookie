@@ -8,6 +8,9 @@ namespace GuiCookie.Core.Templates
     public class TemplateManager : IReadOnlyTemplateManager
     {
         #region Constants
+        public const string TemplateSheetsNodeName = "TemplateSheets";
+        public const string TemplateSheetNodeName = "TemplateSheet";
+
         private const string defaultTemplateSheetPath = "GuiCookie.Core.Templates.Templates.xml";
         #endregion
 

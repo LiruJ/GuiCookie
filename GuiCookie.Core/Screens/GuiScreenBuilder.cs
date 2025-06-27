@@ -1,6 +1,8 @@
 ﻿using GuiCookie.Core.Components;
 using GuiCookie.Core.Data;
+using GuiCookie.Core.Data.Xml;
 using GuiCookie.Core.Elements;
+using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Input;
 using GuiCookie.Core.Styles;
 using GuiCookie.Core.Templates;
@@ -242,6 +244,7 @@ namespace GuiCookie.Core.Screens
 
         public GuiScreenBuilder<T> WithDefaultStyleSheet()
         {
+            WithDefaultStyleAttributes();
             if (!styleSheetSourceFunctions.Contains(StyleManager.LoadDefaultSheetData))
                 styleSheetSourceFunctions.Add(StyleManager.LoadDefaultSheetData);
             return this;
@@ -269,19 +272,14 @@ namespace GuiCookie.Core.Screens
             StyleManager? styleManager = serviceProvider.GetService<StyleManager>() ?? throw new InvalidOperationException("Style manager should have been created before loading!");
 
             if (useDefaultStyleAttributes)
-                styleManager!.RegisterDefaultAttributes();
+                styleManager.RegisterDefaultAttributes();
 
             List<SheetDataSource> styleSheetSources = [.. styleSheetSourceFunctions.Select(x => x())];
             foreach (SheetDataSource styleSheetSource in styleSheetSources)
-                styleManager!.ResourceManager.LoadFromSheet(styleSheetSource);
+                styleManager.ResourceManager.LoadFromSheet(styleSheetSource);
+            // Load the styles, but don't load their resources, since that has already been done.
             foreach (SheetDataSource styleSheetSource in styleSheetSources)
-                styleManager!.LoadFromSheet(styleSheetSource);
-
-            string? defaultStyleName = styleSheetSources
-                .Select(x => x.RootNode.Attributes.GetAttributeOrDefault(StyleManager.DefaultStyleAttributeName, (string?)null))
-                .FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
-            if (!string.IsNullOrWhiteSpace(defaultStyleName))
-                styleManager!.DefaultStyle = styleManager.GetStyleFromName(defaultStyleName);
+                styleManager.LoadFromSheet(styleSheetSource, false);
         }
         #endregion
 
@@ -314,7 +312,39 @@ namespace GuiCookie.Core.Screens
 
             SheetDataSource layoutSheetData = layoutSheetSourceFunction();
 
-            elementManager!.LoadFromSheet(layoutSheetData);
+            SheetDataNode? templateSheetsNode = layoutSheetData.GetChildWithName(TemplateManager.TemplateSheetsNodeName);
+            TemplateManager? templateManager = serviceProvider.GetService<TemplateManager>();
+            if (templateSheetsNode != null && templateManager != null)
+            {
+                // TODO: Register readers, use possible extensions from that. Also throw and handle exceptions.
+                List<string> failedPaths = [];
+                IEnumerable<string> templateFilePaths = PathHelpers.ResolveFilePaths(templateSheetsNode, ["xml"], failedPaths);
+                if (failedPaths.Count > 0)
+                    throw new InvalidDataException($"The following template sheets either had no registered loaders or were missing files: {string.Join('\n', failedPaths)}");
+
+                // TODO: Feed this into registered data readers.
+                IEnumerable<SheetDataSource> templateSheetSources = templateFilePaths.Select(XmlSheetDataSource.Load);
+                templateManager.LoadFromSheets(templateSheetSources);
+            }
+
+            SheetDataNode? styleSheetsNode = layoutSheetData.GetChildWithName(StyleManager.StyleSheetsNodeName);
+            StyleManager? styleManager = serviceProvider.GetService<StyleManager>();
+            if (styleSheetsNode != null && styleManager != null)
+            {
+                // TODO: Register readers, use possible extensions from that. Also throw and handle exceptions.
+                List<string> failedPaths = [];
+                IEnumerable<string> styleFilePaths = PathHelpers.ResolveFilePaths(styleSheetsNode, ["xml"], failedPaths);
+                if (failedPaths.Count > 0)
+                    throw new InvalidDataException($"The following style sheets either had no registered loaders or were missing files: {string.Join('\n', failedPaths)}");
+                
+                // TODO: Feed this into registered data readers.
+                IEnumerable<SheetDataSource> styleSheetSources = styleFilePaths.Select(XmlSheetDataSource.Load);
+                styleManager.LoadFromSheets(styleSheetSources, true);
+            }
+
+            SheetDataNode? rootElementNode = layoutSheetData.GetChildWithName(ElementManager.RootNodeNodeName)
+                ?? throw new InvalidOperationException($"Layout sheet was missing the \"{ElementManager.RootNodeNodeName}\" node!");
+            elementManager!.LoadFromRootNode(rootElementNode);
         }
 
         public T Build()
