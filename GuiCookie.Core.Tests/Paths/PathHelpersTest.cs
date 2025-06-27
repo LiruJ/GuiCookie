@@ -1,5 +1,6 @@
 using FluentAssertions;
 using GuiCookie.Core.Helpers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GuiCookie.Core.Tests.Paths;
 
@@ -86,5 +87,22 @@ public class PathHelpersTest
         failedPaths.Should().BeEmpty();
         result.Should().AllSatisfy(x => Path.HasExtension(x).Should().BeTrue());
         result.Should().AllSatisfy(x => Path.GetExtension(x).Should().Be(Path.GetExtension(Path.ChangeExtension("_", extension))));
+    }
+
+    [TestMethod]
+    public void Test_NormaliseExtension()
+    {
+        // Arrange.
+        var withoutDot = "xml";
+        var withDot = ".xml";
+
+        // Act.
+        var withoutDotNormalised = PathHelpers.NormaliseExtension(withoutDot);
+        var withDotNormalised = PathHelpers.NormaliseExtension(withDot);
+
+        // Assert.
+        withDotNormalised.Should().Be(withDot);
+        withoutDotNormalised.Should().Be(withDot);
+        withoutDotNormalised.Should().Be(".xml");
     }
 }

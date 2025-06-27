@@ -38,7 +38,7 @@ namespace GuiCookie.Core.Helpers
                     string wildcardPath = Path.GetDirectoryName(fullPath) ?? rootPath;
                     string? fileExtension = Path.GetExtension(fullPath);
                     foreach (string wildcardFilePath in Directory.EnumerateFiles(wildcardPath))
-                        ResolveFilePath(wildcardFilePath, string.IsNullOrEmpty(fileExtension) ? possibleExtensions : [fileExtension], ref resolvedPaths, failedPaths);
+                        ResolveFilePath(wildcardFilePath, string.IsNullOrEmpty(fileExtension) ? possibleExtensions : [fileExtension], ref resolvedPaths, null);
                 }
                 else
                     ResolveFilePath(fullPath, possibleExtensions, ref resolvedPaths, failedPaths);
@@ -52,7 +52,7 @@ namespace GuiCookie.Core.Helpers
             if (!string.IsNullOrWhiteSpace(fileExtension))
             {
                 // The path has an extension and it is in the list.
-                if (possibleExtensions.Any(x => !string.IsNullOrWhiteSpace(x) && (x[0] == '.' ? x == fileExtension : x == fileExtension[1..])))
+                if (possibleExtensions.Any(x => !string.IsNullOrWhiteSpace(x) && (NormaliseExtension(x) == fileExtension)))
                 {
                     if (File.Exists(fullPath))
                         resolvedPaths.Add(fullPath);
@@ -77,6 +77,14 @@ namespace GuiCookie.Core.Helpers
                 if (previousCount == resolvedPaths.Count)
                     failedPaths?.Add(fullPath);
             }
+        }
+
+        public static string NormaliseExtension(string fileExtension)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(fileExtension);
+            if (!fileExtension.StartsWith('.'))
+                fileExtension = "." + fileExtension;
+            return fileExtension;
         }
     }
 }

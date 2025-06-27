@@ -8,6 +8,7 @@ using GuiCookie.Core.Styles;
 using GuiCookie.Core.Templates;
 using LiruGameHelper.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel.Design;
 using System.Reflection;
 
 namespace GuiCookie.Core.Screens
@@ -28,6 +29,8 @@ namespace GuiCookie.Core.Screens
         private readonly ConstructorCache<Element> elementConstructors = new();
 
         private readonly ConstructorCache<Component> componentConstructors = new();
+
+        private readonly SheetDataSourceLoader sourceLoader = new();
         #endregion
 
         #region Constructors
@@ -83,6 +86,25 @@ namespace GuiCookie.Core.Screens
         public GuiScreenBuilder<T> WithRandom() => With(new Random());
 
         public GuiScreenBuilder<T> WithRandom(int seed) => With(new Random(seed));
+        #endregion
+
+        #region Data Source Functions
+        public GuiScreenBuilder<T> WithXmlLoader()
+            => WithLoader("xml", (filePath, stream) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(filePath))
+                        return XmlSheetDataSource.Load(filePath);
+                    else if (stream != null)
+                        return XmlSheetDataSource.Load(stream, filePath);
+                    else
+                        throw new ArgumentException("Cannot load xml file without a file path or a stream!");
+                });
+
+        public GuiScreenBuilder<T> WithLoader(string fileExtension, Func<string?, Stream?, SheetDataSource> loader)
+        {
+            sourceLoader.RegisterLoader(fileExtension, loader);
+            return this;
+        }
         #endregion
 
         #region Manager Functions
@@ -318,12 +340,14 @@ namespace GuiCookie.Core.Screens
             {
                 // TODO: Register readers, use possible extensions from that. Also throw and handle exceptions.
                 List<string> failedPaths = [];
-                IEnumerable<string> templateFilePaths = PathHelpers.ResolveFilePaths(templateSheetsNode, ["xml"], failedPaths);
+                IEnumerable<string> templateFilePaths = PathHelpers.ResolveFilePaths(templateSheetsNode, sourceLoader.RegisteredFileExtensions, failedPaths);
                 if (failedPaths.Count > 0)
                     throw new InvalidDataException($"The following template sheets either had no registered loaders or were missing files: {string.Join('\n', failedPaths)}");
 
                 // TODO: Feed this into registered data readers.
-                IEnumerable<SheetDataSource> templateSheetSources = templateFilePaths.Select(XmlSheetDataSource.Load);
+                IEnumerable<SheetDataSource> templateSheetSources = sourceLoader.TryLoad(templateFilePaths, out List<string> failedSources);
+                if (failedSources.Count > 0)
+                    throw new InvalidDataException($"The following template sheets failed to load: {string.Join('\n', failedSources)}");
                 templateManager.LoadFromSheets(templateSheetSources);
             }
 
@@ -333,12 +357,14 @@ namespace GuiCookie.Core.Screens
             {
                 // TODO: Register readers, use possible extensions from that. Also throw and handle exceptions.
                 List<string> failedPaths = [];
-                IEnumerable<string> styleFilePaths = PathHelpers.ResolveFilePaths(styleSheetsNode, ["xml"], failedPaths);
+                IEnumerable<string> styleFilePaths = PathHelpers.ResolveFilePaths(styleSheetsNode, sourceLoader.RegisteredFileExtensions, failedPaths);
                 if (failedPaths.Count > 0)
                     throw new InvalidDataException($"The following style sheets either had no registered loaders or were missing files: {string.Join('\n', failedPaths)}");
-                
+
                 // TODO: Feed this into registered data readers.
-                IEnumerable<SheetDataSource> styleSheetSources = styleFilePaths.Select(XmlSheetDataSource.Load);
+                IEnumerable<SheetDataSource> styleSheetSources = sourceLoader.TryLoad(styleFilePaths, out List<string> failedSources);
+                if (failedSources.Count > 0)
+                    throw new InvalidDataException($"The following template sheets failed to load: {string.Join('\n', failedSources)}");
                 styleManager.LoadFromSheets(styleSheetSources, true);
             }
 
