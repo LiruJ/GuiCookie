@@ -7,7 +7,7 @@ namespace GuiCookie.Core.Input
     public abstract class InputManager(IKeyboardState currentKeyboardState, IKeyboardState previousKeyboardState, IMouseState currentMouseState, IMouseState previousMouseState) : IUpdatableUIService
     {
         #region Properties
-        public int Order { get; } = 0;
+        public int UpdateOrder { get; } = 0;
         #endregion
 
         #region State Properties

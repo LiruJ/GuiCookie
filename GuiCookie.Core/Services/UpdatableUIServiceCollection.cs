@@ -17,7 +17,7 @@ namespace GuiCookie.Core.Services
         private UpdatableUIServiceCollection(List<IUpdatableUIService> updatableServices)
         {
             this.updatableServices = updatableServices;
-            this.updatableServices.Sort((left, right) => left.Order.CompareTo(right.Order));
+            this.updatableServices.Sort((left, right) => left.UpdateOrder.CompareTo(right.UpdateOrder));
         }
         #endregion
 
@@ -41,8 +41,6 @@ namespace GuiCookie.Core.Services
                     && serviceProvider.GetService(item.ServiceType) is IUpdatableUIService updatableService
                     && !updatableServices.Contains(updatableService))
                     updatableServices.Add(updatableService);
-               
-
             return new(updatableServices);
         }
         #endregion

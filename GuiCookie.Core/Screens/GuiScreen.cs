@@ -1,12 +1,11 @@
-﻿using GuiCookie.Core.Data;
-using GuiCookie.Core.DataStructures;
+﻿using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Input;
 using GuiCookie.Core.Rendering;
 using GuiCookie.Core.Services;
 using LiruGameHelper.Signals;
-using System.Drawing;
 using Microsoft.Extensions.DependencyInjection;
+using System.Drawing;
 
 namespace GuiCookie.Core.Screens
 {
@@ -24,6 +23,7 @@ namespace GuiCookie.Core.Screens
         private readonly List<SignalConnection> connections = [];
 
         private readonly UpdatableUIServiceCollection updateableServices;
+        private readonly DrawableUIServiceCollection drawableServices;
         #endregion
 
         #region Properties
@@ -54,6 +54,7 @@ namespace GuiCookie.Core.Screens
             }
 
             updateableServices = serviceProvider.GetRequiredService<UpdatableUIServiceCollection>();
+            drawableServices = serviceProvider.GetRequiredService<DrawableUIServiceCollection>();
         }
         #endregion
 
@@ -89,7 +90,8 @@ namespace GuiCookie.Core.Screens
         #region Draw Functions
         public void Draw(IGuiCamera guiCamera)
         {
-            ElementManager.RootElement.InternalDraw(guiCamera);
+            foreach (IDrawableUIService service in drawableServices)
+                service.Draw(guiCamera);
         }
         #endregion
 

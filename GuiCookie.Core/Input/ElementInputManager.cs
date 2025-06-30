@@ -26,7 +26,7 @@ namespace GuiCookie.Core.Input
 
         public ElementManager ElementManager { get; } = elementManager;
 
-        public int Order { get; } = 5;
+        public int UpdateOrder { get; } = 5;
 
         /// <summary> 
         /// The deepest <see cref="Element"/> that the mouse is currently hovering over.

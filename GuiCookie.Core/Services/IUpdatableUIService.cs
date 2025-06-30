@@ -2,7 +2,7 @@
 {
     public interface IUpdatableUIService : IUIService
     {
-        int Order { get; }
+        int UpdateOrder { get; }
 
         void PreUpdate(TimeSpan elapsedTime, TimeSpan totalTime);
         void Update(TimeSpan elapsedTime, TimeSpan totalTime);

@@ -12,7 +12,7 @@ namespace GuiCookie.Core.Elements
     /// Allows for elements to be created from templates.
     /// </summary>
     public class ElementManager(ComponentManager componentManager, TemplateManager templateManager, ConstructorCache<Element> elementCache, IServiceProvider serviceProvider) 
-        : IEnumerable<Element>, IUpdatableUIService
+        : IEnumerable<Element>, IUpdatableUIService, IDrawableUIService
     {
         #region Constants
         private const string nameAttributeName = "Name";
@@ -27,7 +27,9 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Properties
-        public int Order => 10;
+        public int UpdateOrder => 10;
+
+        public int DrawOrder => 10;
 
         public Element RootElement { get; private set; } = new();
         #endregion
@@ -289,11 +291,10 @@ namespace GuiCookie.Core.Elements
         #endregion
 
         #region Draw Functions
-        internal void Draw(IGuiCamera guiCamera)
+        public void Draw(IGuiCamera guiCamera)
         {
             // Draw root-level elements, they will then recursively draw their children.
-            foreach (Element element in RootElement) 
-                element.InternalDraw(guiCamera);
+            RootElement.InternalDraw(guiCamera);
         }
         #endregion
     }

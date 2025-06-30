@@ -319,6 +319,7 @@ namespace GuiCookie.Core.Screens
         private void ensureServiceCollections()
         {
             UpdatableUIServiceCollection.AddToServices(services);
+            DrawableUIServiceCollection.AddToServices(services);
         }
         #endregion
 
