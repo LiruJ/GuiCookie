@@ -1,6 +1,6 @@
 ﻿namespace GuiCookie.Core.Services
 {
-    public interface IUpdateableUIService : IUIService
+    public interface IUpdatableUIService : IUIService
     {
         int Order { get; }
 

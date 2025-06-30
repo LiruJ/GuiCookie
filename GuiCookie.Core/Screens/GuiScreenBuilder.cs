@@ -4,6 +4,7 @@ using GuiCookie.Core.Data.Xml;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Input;
+using GuiCookie.Core.Services;
 using GuiCookie.Core.Styles;
 using GuiCookie.Core.Templates;
 using LiruGameHelper.Reflection;
@@ -63,6 +64,7 @@ namespace GuiCookie.Core.Screens
                 return this;
 
             services.AddSingleton<TService, TImplementation>(x => service);
+
             return this;
         }
 
@@ -72,6 +74,8 @@ namespace GuiCookie.Core.Screens
                 return this;
 
             services.AddSingleton(instance);
+            //if (instance is IUpdateableUIService updateable)
+            //    services.AddSingleton(x => updateable);
             return this;
         }
 
@@ -311,9 +315,17 @@ namespace GuiCookie.Core.Screens
         }
         #endregion
 
+        #region Collection Functions
+        private void ensureServiceCollections()
+        {
+            UpdatableUIServiceCollection.AddToServices(services);
+        }
+        #endregion
+
         #region Build Functions
         private void ensureDependencies()
         {
+            ensureServiceCollections();
             ensureComponentManager();
             ensureTemplateManager();
             ensureStyleManager();

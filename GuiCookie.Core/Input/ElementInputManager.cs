@@ -9,7 +9,7 @@ namespace GuiCookie.Core.Input
     /// <summary>
     /// A manager responsible for keeping track of the interaction between the user's inputs and the UI's elements. E.g. clicking, hovering, typing into a textbox, etc.
     /// </summary>
-    public class ElementInputManager(InputManager inputManager, ElementManager elementManager) : IUpdateableUIService
+    public class ElementInputManager(InputManager inputManager, ElementManager elementManager) : IUpdatableUIService
     {
         #region Backing Fields
         private bool isClickableDirty = true;

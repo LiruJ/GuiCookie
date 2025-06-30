@@ -12,7 +12,7 @@ namespace GuiCookie.Core.Elements
     /// Allows for elements to be created from templates.
     /// </summary>
     public class ElementManager(ComponentManager componentManager, TemplateManager templateManager, ConstructorCache<Element> elementCache, IServiceProvider serviceProvider) 
-        : IEnumerable<Element>, IUpdateableUIService
+        : IEnumerable<Element>, IUpdatableUIService
     {
         #region Constants
         private const string nameAttributeName = "Name";

@@ -23,7 +23,7 @@ namespace GuiCookie.Core.Screens
 
         private readonly List<SignalConnection> connections = [];
 
-        private readonly List<IUpdateableUIService> updateableServices = [];
+        private readonly UpdatableUIServiceCollection updateableServices;
         #endregion
 
         #region Properties
@@ -53,12 +53,7 @@ namespace GuiCookie.Core.Screens
                 elementManager.RootElement.Bounds.TotalSize = window.Size;
             }
 
-            foreach (object? service in serviceProvider.GetServices(typeof(IUpdateableUIService)))
-            {
-                if (service is IUpdateableUIService serviceUpdateableService)
-                    updateableServices.Add(serviceUpdateableService);
-            }
-            updateableServices.Sort((left, right) => left.Order.CompareTo(right.Order));
+            updateableServices = serviceProvider.GetRequiredService<UpdatableUIServiceCollection>();
         }
         #endregion
 
@@ -82,11 +77,11 @@ namespace GuiCookie.Core.Screens
         #region Update Functions
         public void Update(TimeSpan elapsedTime, TimeSpan totalTime)
         {
-            foreach (IUpdateableUIService service in updateableServices)
+            foreach (IUpdatableUIService service in updateableServices)
                 service.PreUpdate(elapsedTime, totalTime);
-            foreach (IUpdateableUIService service in updateableServices)
+            foreach (IUpdatableUIService service in updateableServices)
                 service.Update(elapsedTime, totalTime);
-            foreach (IUpdateableUIService service in updateableServices)
+            foreach (IUpdatableUIService service in updateableServices)
                 service.PostUpdate(elapsedTime, totalTime);
         }
         #endregion
