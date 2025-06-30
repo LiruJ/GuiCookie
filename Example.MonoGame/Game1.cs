@@ -46,21 +46,15 @@ namespace Example.MonoGame
                 .AddMonoGameWindow(Window)
                 .AddMonoGameResources(Content, GraphicsDevice);
 
-            root = GuiScreenBuilder<GuiScreen>.Create(serviceProvider)
+            root = GuiScreenBuilder<GuiScreen>.CreateWithDefaults(serviceProvider)
                 .With(Content)
                 .WithRandom()
 
+                // Use the example's elements.
+                .WithElementNamespace(Assembly.GetExecutingAssembly(), "Example.MonoGame.Elements")
+
                 // Use the layout sheet.
                 .WithXmlLayoutSheet(Path.Combine(Content.RootDirectory, "Gui", "Layouts", "TestLayout"))
-
-                // Use the default templates and styles.
-                .WithDefaultTemplateSheet()
-                .WithDefaultStyleSheet()
-                .WithXmlLoader()
-
-                // Use the default GuiCookie elements, and the example elements.
-                .WithDefaultElementNamespace()
-                .WithElementNamespace(Assembly.GetExecutingAssembly(), "Example.MonoGame.Elements")
                 .Build();
 
             // TODO: use this.Content to load your game content here

@@ -8,7 +8,6 @@ using GuiCookie.Core.Styles;
 using GuiCookie.Core.Templates;
 using LiruGameHelper.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using System.ComponentModel.Design;
 using System.Reflection;
 
 namespace GuiCookie.Core.Screens
@@ -41,11 +40,18 @@ namespace GuiCookie.Core.Screens
         #endregion
 
         #region Create Functions
-        public static GuiScreenBuilder<T> Create(ServiceCollection services)
-        {
-            GuiScreenBuilder<T> builder = new(services);
-            return builder.With(serviceProvider => serviceProvider);
-        }
+        public static GuiScreenBuilder<T> Create(ServiceCollection services) 
+            => new GuiScreenBuilder<T>(services).With(serviceProvider => serviceProvider);
+
+        public static GuiScreenBuilder<T> CreateWithDefaults(ServiceCollection services)
+            => new GuiScreenBuilder<T>(services)
+            .With(serviceProvider => serviceProvider)
+            .WithXmlLoader()
+            .WithDefaultComponentNamespace()
+            .WithDefaultElementNamespace()
+            .WithDefaultStyleAttributes()
+            .WithDefaultStyleSheet()
+            .WithDefaultTemplateSheet();
         #endregion
 
         #region Base With Functions
@@ -147,7 +153,7 @@ namespace GuiCookie.Core.Screens
             // TODO: Update constructor cache to be better for this.
             try
             {
-                elementConstructors.GetTypeFromName(nameof(Element));
+                elementConstructors.GetTypeFromName(nameof(Button));
             }
             catch
             {
@@ -184,7 +190,7 @@ namespace GuiCookie.Core.Screens
             // TODO: Improve this in LiruGameHelpers.
             try
             {
-                componentConstructors.GetTypeFromName(nameof(Component));
+                componentConstructors.GetTypeFromName(nameof(MouseHandler));
             }
             catch
             {
@@ -326,10 +332,6 @@ namespace GuiCookie.Core.Screens
             if (layoutSheetSourceFunction == null)
                 throw new InvalidOperationException("No layout sheet was given!");
 
-            // TODO: Load linked templates/styles from layout sheet. Need to work out how to determine which loader to use.
-            //string? layoutTemplateSheets = layoutSheetData.RootNode.Attributes.GetAttributeOrDefault("Templates", (string?)null);
-            //layoutTemplateSheets.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
             ElementManager? elementManager = serviceProvider.GetService<ElementManager>() ?? throw new InvalidOperationException("Cannot load layout sheet, as there is no element manager!");
 
             SheetDataSource layoutSheetData = layoutSheetSourceFunction();
@@ -338,13 +340,13 @@ namespace GuiCookie.Core.Screens
             TemplateManager? templateManager = serviceProvider.GetService<TemplateManager>();
             if (templateSheetsNode != null && templateManager != null)
             {
-                // TODO: Register readers, use possible extensions from that. Also throw and handle exceptions.
+                // Try to resolve all template filepaths defined in the layout.
                 List<string> failedPaths = [];
                 IEnumerable<string> templateFilePaths = PathHelpers.ResolveFilePaths(templateSheetsNode, sourceLoader.RegisteredFileExtensions, failedPaths);
                 if (failedPaths.Count > 0)
                     throw new InvalidDataException($"The following template sheets either had no registered loaders or were missing files: {string.Join('\n', failedPaths)}");
 
-                // TODO: Feed this into registered data readers.
+                // Try to load all of the resolved template files.
                 IEnumerable<SheetDataSource> templateSheetSources = sourceLoader.TryLoad(templateFilePaths, out List<string> failedSources);
                 if (failedSources.Count > 0)
                     throw new InvalidDataException($"The following template sheets failed to load: {string.Join('\n', failedSources)}");
@@ -355,13 +357,13 @@ namespace GuiCookie.Core.Screens
             StyleManager? styleManager = serviceProvider.GetService<StyleManager>();
             if (styleSheetsNode != null && styleManager != null)
             {
-                // TODO: Register readers, use possible extensions from that. Also throw and handle exceptions.
+                // Try to resolve all style filepaths defined in the layout.
                 List<string> failedPaths = [];
                 IEnumerable<string> styleFilePaths = PathHelpers.ResolveFilePaths(styleSheetsNode, sourceLoader.RegisteredFileExtensions, failedPaths);
                 if (failedPaths.Count > 0)
                     throw new InvalidDataException($"The following style sheets either had no registered loaders or were missing files: {string.Join('\n', failedPaths)}");
 
-                // TODO: Feed this into registered data readers.
+                // Try to load all of the resolved style files.
                 IEnumerable<SheetDataSource> styleSheetSources = sourceLoader.TryLoad(styleFilePaths, out List<string> failedSources);
                 if (failedSources.Count > 0)
                     throw new InvalidDataException($"The following template sheets failed to load: {string.Join('\n', failedSources)}");
