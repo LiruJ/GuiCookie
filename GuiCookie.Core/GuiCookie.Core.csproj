@@ -9,13 +9,19 @@
   <ItemGroup>
     <None Remove="Styles\DefaultStyleImage.png" />
     <None Remove="Styles\Styles.xml" />
+    <None Remove="Templates\Defaults\Buttons.xml" />
+    <None Remove="Templates\Defaults\Partitions.xml" />
+    <None Remove="Templates\Defaults\Sliders.xml" />
     <None Remove="Templates\Templates.xml" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Styles\DefaultStyleImage.png" />
-    <EmbeddedResource Include="Styles\Styles.xml" />
-    <EmbeddedResource Include="Templates\Templates.xml" />
+    <EmbeddedResource Include="Styles\Defaults\Styles.xml" />
+    <EmbeddedResource Include="Templates\Defaults\Buttons.xml" />
+    <EmbeddedResource Include="Templates\Defaults\Partitions.xml" />
+    <EmbeddedResource Include="Templates\Defaults\Sliders.xml" />
+    <EmbeddedResource Include="Templates\Defaults\Labels.xml" />
   </ItemGroup>
 
   <ItemGroup>

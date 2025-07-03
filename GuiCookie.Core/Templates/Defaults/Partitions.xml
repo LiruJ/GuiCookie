@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Templates>
+  
+  <Partition/>
+  <Pane Components="StyleStateMachine, Frame" Style="Pane"/>
+  <Square Components="StyleStateMachine, Frame, AspectRatioFitter" Style="Pane" Ratio="1" RatioMode="WidthControlsHeight"/>
+  <StackPanel Components="DirectionalLayout" LayoutDirection="Horizontal"/>
+  
+  <CellGrid Components="GridLayout, MouseHandler" Controller="CellGrid"/>
+
+  <ScrollPane Components="Frame" Size="160">
+    <HorizontalSliderBar Name="HorizontalSlider" Size="90%, 10%" Position="0%, 100%" Pivot="0%, 100%"/>
+    <VerticalSliderBar Name="VerticalSlider" Size="10%, 90%" Position="100%, 0%" Pivot="100%, 0%"/>
+    <Pane Name="ContentContainer" Size="90%">
+      <Partition Name="Content" Size="100%"/>
+    </Pane>
+  </ScrollPane>
+
+  <Panel Components="StyleStateMachine, Frame, TitledPanel"/>
+</Templates>

@@ -1,7 +1,6 @@
 ﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.Rendering;
 using LiruGameHelper.Parsers;
-using LiruGameHelper.XML;
 using System.Drawing;
 
 namespace GuiCookie.Core.Styles

@@ -11,7 +11,22 @@ namespace GuiCookie.Core.Templates
         public const string TemplateSheetsNodeName = "TemplateSheets";
         public const string TemplateSheetNodeName = "TemplateSheet";
 
-        private const string defaultTemplateSheetPath = "GuiCookie.Core.Templates.Templates.xml";
+        private const string defaultTemplateSheetPath = "GuiCookie.Core.Templates.Defaults";
+
+        internal static IDictionary<string, Func<SheetDataSource>> DefaultSheetDataLoadFunctions { get; }
+
+        static TemplateManager()
+        {
+            DefaultSheetDataLoadFunctions = Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                .Where(x => x.StartsWith(defaultTemplateSheetPath))
+                .ToDictionary(x => x, x =>
+                    new Func<SheetDataSource>(() =>
+                    {
+                        using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(x)
+                            ?? throw new InvalidDataException($"Missing default template sheet \"{x}\"!");
+                        return XmlSheetDataSource.Load(stream, x);
+                    }));
+        }
         #endregion
 
         #region Fields
@@ -25,7 +40,7 @@ namespace GuiCookie.Core.Templates
         public Template GetTemplateFromName(string templateName)
             => string.IsNullOrWhiteSpace(templateName)
                 ? throw new ArgumentException("Template name cannot be null")
-                : TryGetTemplateFromName(templateName, out Template? template) 
+                : TryGetTemplateFromName(templateName, out Template? template)
                     ? template!
                     : throw new Exception($"Template with name {templateName} was not defined or included.");
 
@@ -34,13 +49,6 @@ namespace GuiCookie.Core.Templates
         #endregion
 
         #region Load Functions
-        public static SheetDataSource LoadDefaultSheetData()
-        {
-            // Load the contents of the file.
-            using Stream stream = CreateDefaultTemplatesStream();
-            return XmlSheetDataSource.Load(stream, defaultTemplateSheetPath);
-        }
-
         public static Stream CreateDefaultTemplatesStream() =>
             // Load the embedded xml file into a stream and make sure it exists.
             Assembly.GetExecutingAssembly().GetManifestResourceStream(defaultTemplateSheetPath)

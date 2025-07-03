@@ -17,7 +17,22 @@ namespace GuiCookie.Core.Styles
 
         private const string stylesNodeName = "Styles";
 
-        private const string defaultStyleSheetPath = "GuiCookie.Core.Styles.Styles.xml";
+        private const string defaultStyleSheetPath = "GuiCookie.Core.Styles.Defaults";
+
+        internal static IDictionary<string, Func<SheetDataSource>> DefaultSheetDataLoadFunctions { get; }
+
+        static StyleManager()
+        {
+            DefaultSheetDataLoadFunctions = Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                .Where(x => x.StartsWith(defaultStyleSheetPath))
+                .ToDictionary(x => x, x =>
+                    new Func<SheetDataSource>(() =>
+                    {
+                        using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(x)
+                            ?? throw new InvalidDataException($"Missing default style sheet \"{x}\"!");
+                        return XmlSheetDataSource.Load(stream, x);
+                    }));
+        }
         #endregion
 
         #region Backing Fields

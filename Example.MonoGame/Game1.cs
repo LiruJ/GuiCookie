@@ -1,7 +1,4 @@
-﻿using GuiCookie.Core.Data.Xml;
-using GuiCookie.Core.Rendering;
-using GuiCookie.Core.Screens;
-using GuiCookie.Core.Services;
+﻿using GuiCookie.Core.Screens;
 using GuiCookie.MonoGame.Extensions;
 using GuiCookie.MonoGame.Rendering;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,7 +51,7 @@ namespace Example.MonoGame
                 .WithElementNamespace(Assembly.GetExecutingAssembly(), "Example.MonoGame.Elements")
 
                 // Use the layout sheet.
-                .WithXmlLayoutSheet(Path.Combine(Content.RootDirectory, "Gui", "Layouts", "TestLayout"))
+                .WithLayoutSheet(Path.Combine(Content.RootDirectory, "Gui", "Layouts", "TestLayout.xml"))
                 .Build();
 
             // TODO: use this.Content to load your game content here

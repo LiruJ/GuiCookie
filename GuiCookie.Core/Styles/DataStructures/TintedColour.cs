@@ -46,7 +46,7 @@ namespace GuiCookie.Core.Styles.DataStructures
         /// <remarks> If both <see cref="Colour"/> and <see cref="Tint"/> have values, the mixed value is used. Otherwise; defaults to using the first non-null value in the order: Colour, Tint, <see cref="Color.White"/>.   </remarks>
         public Color Mixed { get; private set; }
 
-        public readonly bool HasData => Tint != null && Colour != null;
+        public readonly bool HasData => Tint != null || Colour != null;
         #endregion
 
         #region Constructors

@@ -20,9 +20,9 @@ namespace GuiCookie.Core.Screens
 
         private bool useDefaultStyleAttributes = false;
 
-        private readonly List<Func<SheetDataSource>> styleSheetSourceFunctions = [];
+        private readonly Dictionary<string, Func<SheetDataSource>> styleSheetSourceFunctions = [];
 
-        private readonly List<Func<SheetDataSource>> templateSheetSourceFunctions = [];
+        private readonly Dictionary<string, Func<SheetDataSource>> templateSheetSourceFunctions = [];
 
         private Func<SheetDataSource>? layoutSheetSourceFunction = null;
 
@@ -41,7 +41,7 @@ namespace GuiCookie.Core.Screens
         #endregion
 
         #region Create Functions
-        public static GuiScreenBuilder<T> Create(ServiceCollection services) 
+        public static GuiScreenBuilder<T> Create(ServiceCollection services)
             => new GuiScreenBuilder<T>(services).With(serviceProvider => serviceProvider);
 
         public static GuiScreenBuilder<T> CreateWithDefaults(ServiceCollection services)
@@ -51,8 +51,8 @@ namespace GuiCookie.Core.Screens
             .WithDefaultComponentNamespace()
             .WithDefaultElementNamespace()
             .WithDefaultStyleAttributes()
-            .WithDefaultStyleSheet()
-            .WithDefaultTemplateSheet();
+            .WithDefaultStyleSheets()
+            .WithDefaultTemplateSheets();
         #endregion
 
         #region Base With Functions
@@ -74,8 +74,6 @@ namespace GuiCookie.Core.Screens
                 return this;
 
             services.AddSingleton(instance);
-            //if (instance is IUpdateableUIService updateable)
-            //    services.AddSingleton(x => updateable);
             return this;
         }
 
@@ -211,6 +209,12 @@ namespace GuiCookie.Core.Screens
         #endregion
 
         #region Layout Sheet Functions
+        public GuiScreenBuilder<T> WithLayoutSheet(string filePath)
+            => WithLayoutSheet(() =>
+                !sourceLoader.TryLoad(filePath, out SheetDataSource? sheetDataSource)
+                    ? throw new InvalidOperationException($"Layout sheet \"{filePath}\" failed to load!")
+                    : sheetDataSource!);
+
         public GuiScreenBuilder<T> WithLayoutSheet(Func<SheetDataSource> layoutSheetDataFactory)
         {
             layoutSheetSourceFunction = layoutSheetDataFactory;
@@ -227,16 +231,22 @@ namespace GuiCookie.Core.Screens
             return With(templateManager);
         }
 
-        public GuiScreenBuilder<T> WithDefaultTemplateSheet()
+        public GuiScreenBuilder<T> WithDefaultTemplateSheets()
         {
-            if (!templateSheetSourceFunctions.Contains(TemplateManager.LoadDefaultSheetData))
-                templateSheetSourceFunctions.Add(TemplateManager.LoadDefaultSheetData);
+            foreach (KeyValuePair<string, Func<SheetDataSource>> loaderFunction in TemplateManager.DefaultSheetDataLoadFunctions)
+                templateSheetSourceFunctions.TryAdd(loaderFunction.Key, loaderFunction.Value);
             return this;
         }
 
-        public GuiScreenBuilder<T> WithTemplateSheet(Func<SheetDataSource> templateSheetDataFactory)
+        public GuiScreenBuilder<T> WithTemplateSheet(string filePath)
+            => WithTemplateSheet(filePath, () =>
+                !sourceLoader.TryLoad(filePath, out SheetDataSource? sheetDataSource)
+                    ? throw new InvalidOperationException($"Template sheet \"{filePath}\" failed to load!")
+                    : sheetDataSource!);
+
+        public GuiScreenBuilder<T> WithTemplateSheet(string filePath, Func<SheetDataSource> templateSheetDataFactory)
         {
-            templateSheetSourceFunctions.Add(templateSheetDataFactory);
+            templateSheetSourceFunctions.Add(filePath, templateSheetDataFactory);
             return this;
         }
 
@@ -246,7 +256,7 @@ namespace GuiCookie.Core.Screens
                 return;
 
             TemplateManager templateManager = new();
-            WithDefaultTemplateSheet();
+            WithDefaultTemplateSheets();
             With(templateManager);
         }
 
@@ -257,7 +267,7 @@ namespace GuiCookie.Core.Screens
 
             TemplateManager? templateManager = serviceProvider.GetService<TemplateManager>() ?? throw new InvalidOperationException("Template manager should have been created before loading!");
 
-            templateManager.LoadFromSheets(templateSheetSourceFunctions.Select(x => x()));
+            templateManager.LoadFromSheets(templateSheetSourceFunctions.Values.Select(x => x()));
         }
         #endregion
 
@@ -268,17 +278,23 @@ namespace GuiCookie.Core.Screens
             return this;
         }
 
-        public GuiScreenBuilder<T> WithStyleSheet(Func<SheetDataSource> styleSheetDataFactory)
+        public GuiScreenBuilder<T> WithStyleSheet(string filePath)
+            => WithStyleSheet(filePath, () =>
+                !sourceLoader.TryLoad(filePath, out SheetDataSource? sheetDataSource)
+                    ? throw new InvalidOperationException($"Style sheet \"{filePath}\" failed to load!")
+                    : sheetDataSource!);
+
+        public GuiScreenBuilder<T> WithStyleSheet(string filePath, Func<SheetDataSource> styleSheetDataFactory)
         {
-            styleSheetSourceFunctions.Add(styleSheetDataFactory);
+            styleSheetSourceFunctions.Add(filePath, styleSheetDataFactory);
             return this;
         }
 
-        public GuiScreenBuilder<T> WithDefaultStyleSheet()
+        public GuiScreenBuilder<T> WithDefaultStyleSheets()
         {
             WithDefaultStyleAttributes();
-            if (!styleSheetSourceFunctions.Contains(StyleManager.LoadDefaultSheetData))
-                styleSheetSourceFunctions.Add(StyleManager.LoadDefaultSheetData);
+            foreach (KeyValuePair<string, Func<SheetDataSource>> loaderFunction in StyleManager.DefaultSheetDataLoadFunctions)
+                styleSheetSourceFunctions.TryAdd(loaderFunction.Key, loaderFunction.Value);
             return this;
         }
 
@@ -306,7 +322,7 @@ namespace GuiCookie.Core.Screens
             if (useDefaultStyleAttributes)
                 styleManager.RegisterDefaultAttributes();
 
-            List<SheetDataSource> styleSheetSources = [.. styleSheetSourceFunctions.Select(x => x())];
+            List<SheetDataSource> styleSheetSources = [.. styleSheetSourceFunctions.Values.Select(x => x())];
             foreach (SheetDataSource styleSheetSource in styleSheetSources)
                 styleManager.ResourceManager.LoadFromSheet(styleSheetSource);
             // Load the styles, but don't load their resources, since that has already been done.

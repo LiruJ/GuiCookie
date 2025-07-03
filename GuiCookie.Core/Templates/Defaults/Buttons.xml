@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Templates>
+
+  <Button Components="StyleStateMachine, Frame, MouseHandler" Controller="Button" Style="Pane"/>
+  <TextButton Components="StyleStateMachine, Frame, TextBlock, MouseHandler" Controller="TextButton" Style="Pane"/>
+  <ImageButton Components="StyleStateMachine, Frame, ImageBlock, MouseHandler" Controller="ImageButton" Style="Pane"/>
+</Templates>
