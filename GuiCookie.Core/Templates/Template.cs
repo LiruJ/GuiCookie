@@ -216,7 +216,7 @@ namespace GuiCookie.Core.Templates
             return componentNames;
         }
 
-        public IEnumerable<string> CombineComponentNames(IReadOnlyAttributeCollection attributes) => GetComponentNames(attributes).Concat(componentNames).Distinct();
+        public IEnumerable<string> CombineComponentNames(IReadOnlyAttributeCollection attributes) => GetComponentNames(attributes).Union(componentNames);
         #endregion
 
         #region String Functions

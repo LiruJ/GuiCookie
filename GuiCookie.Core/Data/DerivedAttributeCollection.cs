@@ -13,7 +13,7 @@
         #region Properties
         public IReadOnlyAttributeCollection BaseAttributes { get; }
 
-        public override int Count => this.Concat(BaseAttributes).Distinct().Count();
+        public override int Count => BaseAttributes.Union(this).Count();
         #endregion
 
         #region Constructors
@@ -38,7 +38,7 @@
         #endregion
 
         #region Get Functions
-        public override IEnumerator<string> GetEnumerator() => (IEnumerator<string>)this.Concat(BaseAttributes).Distinct();
+        public override IEnumerator<string> GetEnumerator() => BaseAttributes.Union(this).GetEnumerator();
         
         public override T GetAttributeOrDefault<T>(string attributeName, T defaultTo, TryParse<T> tryParser)
         {

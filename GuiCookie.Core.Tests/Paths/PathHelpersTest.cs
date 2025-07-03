@@ -1,6 +1,5 @@
 using FluentAssertions;
 using GuiCookie.Core.Helpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GuiCookie.Core.Tests.Paths;
 

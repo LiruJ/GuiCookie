@@ -9,14 +9,12 @@ namespace GuiCookie.Core.Data
     public class ReadOnlyDerivedAttributeCollection(IReadOnlyAttributeCollection baseAttributes, IReadOnlyAttributeCollection derivedAttributes) : IReadOnlyAttributeCollection
     {
         #region Indexers
-        public string? this[string name]
-        {
-            get => DerivedAttributes.TryGetAttribute(name, out string? value) 
+        public string? this[string name] 
+            => DerivedAttributes.TryGetAttribute(name, out string? value)
                 ? value
                 : BaseAttributes.TryGetAttribute(name, out value)
                     ? value
                     : null;
-        }
         #endregion
 
         #region Properties
@@ -24,7 +22,7 @@ namespace GuiCookie.Core.Data
 
         public IReadOnlyAttributeCollection DerivedAttributes { get; } = derivedAttributes;
 
-        public int Count => DerivedAttributes.Concat(BaseAttributes).Distinct().Count();
+        public int Count => BaseAttributes.Union(DerivedAttributes).Count();
         #endregion
 
         #region Constructors
@@ -49,7 +47,7 @@ namespace GuiCookie.Core.Data
         #endregion
 
         #region Get Functions
-        public IEnumerator<string> GetEnumerator() => (IEnumerator<string>)DerivedAttributes.Concat(BaseAttributes).Distinct();
+        public IEnumerator<string> GetEnumerator() => BaseAttributes.Union(DerivedAttributes).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
