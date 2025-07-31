@@ -10,12 +10,12 @@
     </NumberCounter>
 
     <!--Boxes and labels-->
-    <TextBox Components="Frame, TextBlock" Controller="TextBox"/>
-    <ImageBox Components="Frame, ImageBlock" Controller="ImageBox"/>
-    <BoxIcon Components="Frame, ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze" Ratio="1" RatioMode="WidthControlsHeight"/>
+    <TextBox Components="StyleStateMachine, Frame, TextBlock" Controller="TextBox"/>
+    <ImageBox Components="StyleStateMachine, Frame, ImageBlock" Controller="ImageBox"/>
+    <BoxIcon Components="StyleStateMachine, Frame, ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze" Ratio="1" RatioMode="WidthControlsHeight"/>
 
-    <TextLabel Components="TextBlock" Controller="TextBox"/>
-    <ImageLabel Components="ImageBlock" Controller="ImageBox"/>
-    <LabelIcon Components="ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze" Ratio="1" RatioMode="WidthControlsHeight"/>
+    <TextLabel Components="StyleStateMachine, TextBlock" Controller="TextBox"/>
+    <ImageLabel Components="StyleStateMachine, ImageBlock" Controller="ImageBox"/>
+    <LabelIcon Components="StyleStateMachine, ImageBlock, AspectRatioFitter" Controller="ImageBox" ClippingMode="Squeeze" Ratio="1" RatioMode="WidthControlsHeight"/>
   </Templates>
 </Main>

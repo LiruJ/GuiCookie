@@ -90,8 +90,9 @@ namespace GuiCookie.Core.Data
             if (failedPaths.Count > 0)
                 throw new InvalidDataException($"The following included sheets either had no registered loaders or were missing files: {string.Join('\n', failedPaths)}");
 
+            // TODO: The creation of all these lists should probably be looked at.
             // Exclude any filepaths that are in the set, and add those that aren't into the set.
-            includedFilePaths = includedFilePaths.Where(x => !excludedFilePaths.Contains(x));
+            includedFilePaths = [.. includedFilePaths.Where(x => !excludedFilePaths.Contains(x))];
             foreach (string filePath in includedFilePaths)
                 excludedFilePaths.Add(filePath);
 

@@ -73,6 +73,8 @@ namespace GuiCookie.Core.Components
         #region Initialisation Functions
         public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
+            base.OnCreated(attributes);
+
             // Set the attributes.
             text = attributes.GetAttributeOrDefault(textAttributeName, string.Empty)!;
             ResizeDirection = attributes.GetEnumAttributeOrDefault(resizeAttributeName, DirectionMask.None);

@@ -33,13 +33,13 @@
     </Inlay>
 
     <!--Buttons-->
-    <Button Base="Default">
+    <!--<Button Base="Default">
       <SliceFrame Image="Button"/>
 
       <Clicked>
         <SliceFrame Image="Pane"/>
       </Clicked>
-    </Button>
+    </Button>-->
 
     <RemoveButton Base="Default">
       <SliceFrame Image="RemoveButton" Colour="$InlayColour"/>
