@@ -9,7 +9,7 @@ namespace GuiCookie.Core.Components
     public class DirectionalLayout : Component, ISizeCalculator
     {
         #region Constants
-        private const string layoutAttributeName = "Layout";
+        private const string layoutAttributeName = "LayoutDirection";
 
         private const string spacingAttributeName = "Spacing";
         #endregion

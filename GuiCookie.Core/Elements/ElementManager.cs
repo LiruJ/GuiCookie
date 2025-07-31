@@ -48,8 +48,6 @@ namespace GuiCookie.Core.Elements
             foreach (IReadOnlySheetDataNode elementNode in rootElementNode.ChildNodes)
                 loadElementFromNode(elementNode);
 
-            // TODO: This really sucks. I think the element manager needs a root element that's separate from the actual root.
-            // That way, the root node could be set up here, and it would also remove the dependency on the root.
             foreach (Element childElement in RootElement)
                 setupElements(childElement);
         }

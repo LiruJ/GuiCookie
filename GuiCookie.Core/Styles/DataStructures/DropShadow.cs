@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Resources;
 using LiruGameHelper.Parsers;
 using System.Drawing;
 using System.Numerics;

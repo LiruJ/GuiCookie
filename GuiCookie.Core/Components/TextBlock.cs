@@ -2,7 +2,6 @@
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
-using GuiCookie.Core.Styles;
 using GuiCookie.Core.Styles.Attributes;
 using GuiCookie.Core.Styles.DataStructures;
 using System.Drawing;
@@ -51,7 +50,12 @@ namespace GuiCookie.Core.Components
 
         public Vector2? Offset { get; set; } = null;
 
+        /// <summary>
+        /// The font override. If this is null, the font from the <see cref="StyleStateMachine.CurrentFontAttribute"/> will instead be used.
+        /// </summary>
         public Font? Font { get; set; } = null;
+
+        public Font? UsedFont => Font ?? StyleStateMachine?.CurrentFontAttribute?.Font;
 
         /// <summary> The direction in which this text's element resizes. </summary>
         public DirectionMask ResizeDirection
@@ -115,10 +119,10 @@ namespace GuiCookie.Core.Components
 
         #region Calculation Functions
         public Vector2 CalculateSize(string text)
-            => Vector2.One;
-            //!string.IsNullOrWhiteSpace(text) && fontCache.TryGetVariantAttribute(CurrentStyleVariant, out FontStyleAttribute? font)
-            //    ? font!.Font.MeasureString(text)
-            //    : Vector2.Zero;
+            => !string.IsNullOrWhiteSpace(text) && UsedFont != null ? UsedFont.MeasureString(text) : Vector2.Zero;
+
+        public Vector2 CalculateSize(StringBuilder stringBuilder)
+            => stringBuilder.Length != 0 && UsedFont != null ? UsedFont.MeasureString(stringBuilder) : Vector2.Zero;
         #endregion
 
         #region Draw Functions
@@ -129,7 +133,7 @@ namespace GuiCookie.Core.Components
             // Get the anchor and pivot, defaulting to the centre.
             Space textAnchor = fontVariant.TextAnchor ?? new Space(0.5f, Axes.Both);
             Space textPivot = fontVariant.TextPivot ?? new Space(0.5f, Axes.Both);
-
+            
             // Calculate the position based on the anchor and pivot. Round this down to avoid blurry text.
             Vector2 position = Bounds.AbsoluteContentPosition.ToVector2() + (textAnchor.GetScaledSpace(Bounds.ContentSize.ToVector2()) - textPivot.GetScaledSpace(textSize))
                                + (fontVariant.Offset ?? Vector2.Zero);
@@ -141,11 +145,13 @@ namespace GuiCookie.Core.Components
         public void DrawText(IGuiCamera guiCamera, string text)
         {
             // Ensure there is text and a font to draw.
-            if (string.IsNullOrWhiteSpace(text) || StyleStateMachine?.CurrentFontAttribute == null) 
+            if (string.IsNullOrWhiteSpace(text) || StyleStateMachine?.CurrentFontAttribute == null || UsedFont == null) 
                 return;
 
             // Calculate the position of the text.
             Vector2 position = CalculateTextPosition(StyleStateMachine.CurrentFontAttribute, TextSize);
+
+            StyleStateMachine.CurrentFontAttribute.Draw(guiCamera, Bounds.AbsoluteContentArea, position, UsedFont, text, null, DropShadow);
 
             //// If a drop shadow is to be drawn, draw it first.
             //if (StyleStateMachine.CurrentFontAttribute.DropShadow.HasData)

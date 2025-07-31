@@ -2,7 +2,7 @@
 using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Elements;
-using GuiCookie.Core.Styles;
+using GuiCookie.Core.Resources;
 using GuiCookie.Core.Templates;
 using GuiCookie.MonoGame.Rendering;
 using Microsoft.Xna.Framework.Content;

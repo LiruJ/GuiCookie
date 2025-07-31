@@ -73,7 +73,7 @@ namespace GuiCookie.Core.Input
 
         public virtual void Update(TimeSpan elapsedTime, TimeSpan totalTime)
         {
-
+            
         }
 
         public virtual void PostUpdate(TimeSpan elapsedTime, TimeSpan totalTime)

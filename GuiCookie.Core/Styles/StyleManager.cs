@@ -1,5 +1,6 @@
 ﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.Data.Xml;
+using GuiCookie.Core.Resources;
 using GuiCookie.Core.Styles.Attributes;
 using LiruGameHelper.Reflection;
 using System.Buffers;
@@ -12,8 +13,6 @@ namespace GuiCookie.Core.Styles
         #region Constants
         public const string StyleSheetsNodeName = "StyleSheets";
         public const string StyleSheetNodeName = "StyleSheet";
-
-        public const string ResourcesNodeName = "Resources";
 
         private const string stylesNodeName = "Styles";
 
@@ -37,12 +36,12 @@ namespace GuiCookie.Core.Styles
 
         #region Backing Fields
         private readonly Dictionary<string, Style> stylesByName = [];
+
+        private readonly Dictionary<string, List<Style>> stylesPerFilePath = [];
         #endregion
 
         #region Properties
         public IReadOnlyDictionary<string, Style> StylesByName => stylesByName;
-
-        public ResourceManager ResourceManager => resourceManager;
 
         public ConstructorCache<IStyleAttribute> AttributeConstructorCache { get; } = new ConstructorCache<IStyleAttribute>();
         #endregion
@@ -58,40 +57,30 @@ namespace GuiCookie.Core.Styles
         #endregion
 
         #region Load Functions
-        public static SheetDataSource LoadDefaultSheetData()
+        public void LoadIncluded(IReadOnlySheetDataNode styleSheetsNode, SheetDataSourceLoader sourceLoader)
         {
-            // Load the contents of the file.
-            using Stream stream = CreateDefaultTemplatesStream();
-            return XmlSheetDataSource.Load(stream, defaultStyleSheetPath);
+            HashSet<string> loadedFilePaths = [.. stylesPerFilePath.Keys];
+            List<SheetDataSource> includedSources = [];
+            sourceLoader.ResolveAndLoadIncluded(styleSheetsNode, StyleSheetsNodeName, ref includedSources, loadedFilePaths);
+            LoadFromSheets(includedSources);
         }
 
-        public static Stream CreateDefaultTemplatesStream() =>
-            // Load the embedded xml file into a stream and make sure it exists.
-            Assembly.GetExecutingAssembly().GetManifestResourceStream(defaultStyleSheetPath)
-                ?? throw new InvalidDataException("Missing default template sheet!");
-
-        public void LoadFromSheets(IEnumerable<IReadOnlySheetDataSource> styleSheets, bool includeResources = false)
+        public void LoadFromSheets(IEnumerable<IReadOnlySheetDataSource> styleSheets)
         {
             foreach (IReadOnlySheetDataSource styleSheet in styleSheets)
-                LoadFromSheet(styleSheet, includeResources);
+                LoadFromSheet(styleSheet);
         }
 
-        public void LoadFromSheet(IReadOnlySheetDataSource styleSheet, bool includeResources = false)
+        public void LoadFromSheet(IReadOnlySheetDataSource styleSheet)
         {
-            if (includeResources)
-            {
-                IReadOnlySheetDataNode resourceNode = styleSheet.GetChildWithName(ResourcesNodeName) ?? throw new ArgumentException("Given style sheet is missing resource node!");
-                ResourceManager.LoadFromNode(resourceNode);
-            }
-
-            IReadOnlySheetDataNode mainStyleNode = styleSheet.GetChildWithName(stylesNodeName) ?? throw new ArgumentException("Given style sheet is missing style node!");
-
+            // TODO: Have this work like templates, so styles can reference other sheet styles.
             // Go over each style in the styles node and add it.
-            Style[] addedStyles = ArrayPool<Style>.Shared.Rent(mainStyleNode.ChildNodes.Count);
+            Style[] addedStyles = ArrayPool<Style>.Shared.Rent(styleSheet.RootNode.ChildNodes.Count);
             int addedStyleIndex = 0;
-            foreach (IReadOnlySheetDataNode styleNode in mainStyleNode.ChildNodes)
+            foreach (IReadOnlySheetDataNode styleNode in styleSheet.RootNode.GetChildWithName(stylesNodeName)?.ChildNodes
+                ?? throw new InvalidDataException($"Style sheet \"{styleSheet.FilePath}\" is missing a \"{stylesNodeName}\" node!"))
             {
-                Style style = Style.Load(ResourceManager, AttributeConstructorCache, styleNode);
+                Style style = Style.Load(resourceManager, AttributeConstructorCache, styleNode);
                 Add(style);
                 addedStyles[addedStyleIndex] = style;
             }

@@ -4,11 +4,13 @@ using GuiCookie.Core.Data.Xml;
 using GuiCookie.Core.Elements;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Input;
+using GuiCookie.Core.Resources;
 using GuiCookie.Core.Services;
 using GuiCookie.Core.Styles;
 using GuiCookie.Core.Templates;
 using LiruGameHelper.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Reflection;
 
 namespace GuiCookie.Core.Screens
@@ -19,6 +21,8 @@ namespace GuiCookie.Core.Screens
         private readonly ServiceCollection services;
 
         private bool useDefaultStyleAttributes = false;
+
+        private readonly Dictionary<string, Func<SheetDataSource>> resourceSheetSourceFunctions = [];
 
         private readonly Dictionary<string, Func<SheetDataSource>> styleSheetSourceFunctions = [];
 
@@ -50,6 +54,7 @@ namespace GuiCookie.Core.Screens
             .WithXmlLoader()
             .WithDefaultComponentNamespace()
             .WithDefaultElementNamespace()
+            .WithDefaultResourceSheets()
             .WithDefaultStyleAttributes()
             .WithDefaultStyleSheets()
             .WithDefaultTemplateSheets();
@@ -169,6 +174,15 @@ namespace GuiCookie.Core.Screens
             elementConstructors.RegisterNamespace(assembly, namespacePath);
             return this;
         }
+
+        private void loadElementManager(IServiceProvider serviceProvider, IReadOnlySheetDataSource layoutSheet)
+        {
+            ElementManager? elementManager = serviceProvider.GetService<ElementManager>() ?? throw new InvalidOperationException("Cannot load layout sheet, as there is no element manager!");
+
+            IReadOnlySheetDataNode? rootElementNode = layoutSheet.GetChildWithName(ElementManager.RootNodeNodeName)
+                ?? throw new InvalidOperationException($"Layout sheet was missing the \"{ElementManager.RootNodeNodeName}\" node!");
+            elementManager!.LoadFromRootNode(rootElementNode);
+        }
         #endregion
 
         #region Component Functions
@@ -260,14 +274,23 @@ namespace GuiCookie.Core.Screens
             With(templateManager);
         }
 
-        private void loadTemplateManager(IServiceProvider serviceProvider)
+        private void loadTemplateManager(IServiceProvider serviceProvider, List<SheetDataSource> templateSheets)
         {
-            if (templateSheetSourceFunctions.Count == 0)
-                return;
-
             TemplateManager? templateManager = serviceProvider.GetService<TemplateManager>() ?? throw new InvalidOperationException("Template manager should have been created before loading!");
 
-            templateManager.LoadFromSheets(templateSheetSourceFunctions.Values.Select(x => x()));
+            templateManager.LoadFromSheets(templateSheets);
+        }
+
+        private List<SheetDataSource> resolveTemplates(ref HashSet<string> loadedFilePaths, IReadOnlySheetDataSource layoutSheetData)
+        {
+            IEnumerable<SheetDataSource> templateSheetSources = templateSheetSourceFunctions.Select(x => x.Value());
+            foreach (SheetDataSource? templateSheetSource in templateSheetSources)
+                loadedFilePaths.Add(PathHelpers.NormaliseFilePath(templateSheetSource.FilePath ?? throw new InvalidDataException($"Template sheet included via {GetType().Name} has no filepath!")));
+
+            // Iterate over all the template sheets included via this builder (this also includes stuff like defaults), plus the layout sheet. Find, resolve, and load all linked templates from these primary sources.
+            List<SheetDataSource> loadedTemplates = [.. templateSheetSources];
+            sourceLoader.ResolveAndLoadIncluded(templateSheetSources.Concat([layoutSheetData]), TemplateManager.TemplateSheetsNodeName, ref loadedTemplates, ref loadedFilePaths);
+            return loadedTemplates;
         }
         #endregion
 
@@ -312,22 +335,66 @@ namespace GuiCookie.Core.Screens
             });
         }
 
-        private void loadStyleManager(IServiceProvider serviceProvider)
+        private void loadStyleManager(IServiceProvider serviceProvider, IEnumerable<SheetDataSource> styleSheets)
         {
-            if (!useDefaultStyleAttributes && styleSheetSourceFunctions.Count == 0)
-                return;
-
             StyleManager? styleManager = serviceProvider.GetService<StyleManager>() ?? throw new InvalidOperationException("Style manager should have been created before loading!");
 
             if (useDefaultStyleAttributes)
                 styleManager.RegisterDefaultAttributes();
 
-            List<SheetDataSource> styleSheetSources = [.. styleSheetSourceFunctions.Values.Select(x => x())];
-            foreach (SheetDataSource styleSheetSource in styleSheetSources)
-                styleManager.ResourceManager.LoadFromSheet(styleSheetSource);
-            // Load the styles, but don't load their resources, since that has already been done.
-            foreach (SheetDataSource styleSheetSource in styleSheetSources)
-                styleManager.LoadFromSheet(styleSheetSource, false);
+            styleManager.LoadFromSheets(styleSheets);
+        }
+
+        private List<SheetDataSource> resolveStyles(ref HashSet<string> loadedFilePaths, List<SheetDataSource> loadedTemplates, IReadOnlySheetDataSource layoutSheetData)
+        {
+            IEnumerable<SheetDataSource> styleSheetSources = styleSheetSourceFunctions.Select(x => x.Value());
+            foreach (SheetDataSource? styleSheetSource in styleSheetSources)
+                loadedFilePaths.Add(PathHelpers.NormaliseFilePath(styleSheetSource.FilePath ?? throw new InvalidDataException($"Style sheet included via {GetType().Name} has no filepath!")));
+
+            // Iterate over all the style sheets included via this builder (this also includes stuff like defaults), plus those from template sheets, plus the layout sheet. Find, resolve, and load all linked styles from these primary sources.
+            List<SheetDataSource> loadedStyles = [.. styleSheetSources];
+            sourceLoader.ResolveAndLoadIncluded(styleSheetSources.Concat(loadedTemplates).Concat([layoutSheetData]), StyleManager.StyleSheetsNodeName, ref loadedStyles, ref loadedFilePaths);
+            return loadedStyles;
+        }
+        #endregion
+
+        #region Resource Functions
+        public GuiScreenBuilder<T> WithResourceSheet(string filePath)
+            => WithResourceSheet(filePath, () =>
+                !sourceLoader.TryLoad(filePath, out SheetDataSource? sheetDataSource)
+                    ? throw new InvalidOperationException($"Resource sheet \"{filePath}\" failed to load!")
+                    : sheetDataSource!);
+
+        public GuiScreenBuilder<T> WithResourceSheet(string filePath, Func<SheetDataSource> resourceSheetDataFactory)
+        {
+            resourceSheetSourceFunctions.Add(filePath, resourceSheetDataFactory);
+            return this;
+        }
+
+        public GuiScreenBuilder<T> WithDefaultResourceSheets()
+        {
+            foreach (KeyValuePair<string, Func<SheetDataSource>> loaderFunction in ResourceManager.DefaultSheetDataLoadFunctions)
+                resourceSheetSourceFunctions.TryAdd(loaderFunction.Key, loaderFunction.Value);
+            return this;
+        }
+
+        private void loadResourceManager(IServiceProvider serviceProvider, IEnumerable<SheetDataSource> resourceSheets)
+        {
+            ResourceManager resourceManager = serviceProvider.GetService<ResourceManager>() ?? throw new InvalidOperationException("Resource manager should have been created before loading!");
+
+            resourceManager.LoadFromSheets(resourceSheets);
+        }
+
+        private List<SheetDataSource> resolveResources(ref HashSet<string> loadedFilePaths, List<SheetDataSource> loadedTemplates, List<SheetDataSource> loadedStyles, IReadOnlySheetDataSource layoutSheetData)
+        {
+            IEnumerable<SheetDataSource> resourceSheetSources = resourceSheetSourceFunctions.Select(x => x.Value());
+            foreach (var resourceSheetSource in resourceSheetSources)
+                loadedFilePaths.Add(PathHelpers.NormaliseFilePath(resourceSheetSource.FilePath ?? throw new InvalidDataException($"Resource sheet included via {GetType().Name} has no filepath!")));
+
+            // Iterate over all the resource sheets included via this builder (this also includes stuff like defaults), plus those from template sheets, plus those from style sheets, plus the layout sheet. Find, resolve, and load all linked resources from these primary sources.
+            List<SheetDataSource> loadedResources = [.. resourceSheetSources];
+            sourceLoader.ResolveAndLoadIncluded(resourceSheetSources.Concat(loadedStyles).Concat(loadedTemplates).Concat([layoutSheetData]), ResourceManager.ResourceSheetsNodeName, ref loadedResources, ref loadedFilePaths);
+            return loadedResources;
         }
         #endregion
 
@@ -340,6 +407,9 @@ namespace GuiCookie.Core.Screens
         #endregion
 
         #region Build Functions
+        /// <summary>
+        /// Ensures that certain dependencies exist, does not cause any of them to load.
+        /// </summary>
         private void ensureDependencies()
         {
             ensureServiceCollections();
@@ -350,65 +420,30 @@ namespace GuiCookie.Core.Screens
             ensureElementInputManager();
         }
 
-        private void loadDependencies(IServiceProvider serviceProvider)
+        private void resolveAndLoadFromSheets(IServiceProvider serviceProvider)
         {
-            loadStyleManager(serviceProvider);
-            loadTemplateManager(serviceProvider);
-        }
+            SheetDataSource layoutSheet = layoutSheetSourceFunction?.Invoke() ?? throw new InvalidOperationException("No layout sheet was given!");
 
-        private void postLoadDependencies(IServiceProvider serviceProvider)
-        {
-            if (layoutSheetSourceFunction == null)
-                throw new InvalidOperationException("No layout sheet was given!");
+            // Resolve dependencies in the following order: layout -> templates -> styles -> resources
+            HashSet<string> loadedFilePaths = [];
+            List<SheetDataSource> loadedTemplates = resolveTemplates(ref loadedFilePaths, layoutSheet);
+            loadedFilePaths.Clear();
+            List<SheetDataSource> loadedStyles = resolveStyles(ref loadedFilePaths, loadedTemplates, layoutSheet);
+            loadedFilePaths.Clear();
+            List<SheetDataSource> loadedResources = resolveResources(ref loadedFilePaths, loadedTemplates, loadedStyles, layoutSheet);
 
-            ElementManager? elementManager = serviceProvider.GetService<ElementManager>() ?? throw new InvalidOperationException("Cannot load layout sheet, as there is no element manager!");
-
-            SheetDataSource layoutSheetData = layoutSheetSourceFunction();
-
-            SheetDataNode? templateSheetsNode = layoutSheetData.GetChildWithName(TemplateManager.TemplateSheetsNodeName);
-            TemplateManager? templateManager = serviceProvider.GetService<TemplateManager>();
-            if (templateSheetsNode != null && templateManager != null)
-            {
-                // Try to resolve all template filepaths defined in the layout.
-                List<string> failedPaths = [];
-                IEnumerable<string> templateFilePaths = PathHelpers.ResolveFilePaths(templateSheetsNode, sourceLoader.RegisteredFileExtensions, failedPaths);
-                if (failedPaths.Count > 0)
-                    throw new InvalidDataException($"The following template sheets either had no registered loaders or were missing files: {string.Join('\n', failedPaths)}");
-
-                // Try to load all of the resolved template files.
-                IEnumerable<SheetDataSource> templateSheetSources = sourceLoader.TryLoad(templateFilePaths, out List<string> failedSources);
-                if (failedSources.Count > 0)
-                    throw new InvalidDataException($"The following template sheets failed to load: {string.Join('\n', failedSources)}");
-                templateManager.LoadFromSheets(templateSheetSources);
-            }
-
-            SheetDataNode? styleSheetsNode = layoutSheetData.GetChildWithName(StyleManager.StyleSheetsNodeName);
-            StyleManager? styleManager = serviceProvider.GetService<StyleManager>();
-            if (styleSheetsNode != null && styleManager != null)
-            {
-                // Try to resolve all style filepaths defined in the layout.
-                List<string> failedPaths = [];
-                IEnumerable<string> styleFilePaths = PathHelpers.ResolveFilePaths(styleSheetsNode, sourceLoader.RegisteredFileExtensions, failedPaths);
-                if (failedPaths.Count > 0)
-                    throw new InvalidDataException($"The following style sheets either had no registered loaders or were missing files: {string.Join('\n', failedPaths)}");
-
-                // Try to load all of the resolved style files.
-                IEnumerable<SheetDataSource> styleSheetSources = sourceLoader.TryLoad(styleFilePaths, out List<string> failedSources);
-                if (failedSources.Count > 0)
-                    throw new InvalidDataException($"The following template sheets failed to load: {string.Join('\n', failedSources)}");
-                styleManager.LoadFromSheets(styleSheetSources, true);
-            }
-
-            SheetDataNode? rootElementNode = layoutSheetData.GetChildWithName(ElementManager.RootNodeNodeName)
-                ?? throw new InvalidOperationException($"Layout sheet was missing the \"{ElementManager.RootNodeNodeName}\" node!");
-            elementManager!.LoadFromRootNode(rootElementNode);
+            // Load dependencies in the reverse order: resources -> styles -> templates -> layout (done after screen creation).
+            loadResourceManager(serviceProvider, loadedResources);
+            loadStyleManager(serviceProvider, loadedStyles);
+            loadTemplateManager(serviceProvider, loadedTemplates);
+            loadElementManager(serviceProvider, layoutSheet);
         }
 
         public T Build()
         {
             ensureDependencies();
             IServiceProvider serviceProvider = services.BuildServiceProvider();
-            loadDependencies(serviceProvider);
+            resolveAndLoadFromSheets(serviceProvider);
 
             T? screen;
             try
@@ -419,7 +454,6 @@ namespace GuiCookie.Core.Screens
             {
                 throw new InvalidOperationException("Screen creation failed.", exception);
             }
-            postLoadDependencies(serviceProvider);
             return screen;
         }
 
@@ -427,12 +461,11 @@ namespace GuiCookie.Core.Screens
         {
             ensureDependencies();
             IServiceProvider serviceProvider = services.BuildServiceProvider();
-            loadDependencies(serviceProvider);
+            resolveAndLoadFromSheets(serviceProvider);
 
             try
             {
                 screen = Dependencies.CreateObjectWithDependencies<T>(serviceProvider);
-                postLoadDependencies(serviceProvider);
                 return true;
             }
             catch

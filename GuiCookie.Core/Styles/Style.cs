@@ -1,4 +1,5 @@
 ﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Resources;
 using GuiCookie.Core.Styles.Attributes;
 using LiruGameHelper.Reflection;
 

@@ -1,9 +1,9 @@
 ﻿using GuiCookie.Core.Input;
 using GuiCookie.Core.Rendering;
-using GuiCookie.Core.Styles;
+using GuiCookie.Core.Resources;
 using GuiCookie.MonoGame.Input;
 using GuiCookie.MonoGame.Rendering;
-using GuiCookie.MonoGame.Styles;
+using GuiCookie.MonoGame.Resources;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;

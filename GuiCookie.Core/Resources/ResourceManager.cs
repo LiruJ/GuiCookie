@@ -1,17 +1,37 @@
 ﻿using GuiCookie.Core.Data;
+using GuiCookie.Core.Data.Xml;
+using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
 using LiruGameHelper.Parsers;
 using System.Drawing;
+using System.Reflection;
 
-namespace GuiCookie.Core.Styles
+namespace GuiCookie.Core.Resources
 {
-    /// <summary> Handles loading and holding style resources. </summary>
-    /// <remarks> Creates a new resource manager using the given <paramref name="contentManager"/> to load content. </remarks>
-    /// <param name="contentManager"> The content manager with which content is loaded. </param>
     public abstract class ResourceManager
     {
         #region Constants
         public const string ColourAttributeName = "Colour";
+
+        public const string ResourceSheetsNodeName = "ResourceSheets";
+        public const string ResourceSheetNodeName = "ResourceSheet";
+
+        private const string defaultSheetPath = "GuiCookie.Core.Resources.Defaults";
+
+        internal static IDictionary<string, Func<SheetDataSource>> DefaultSheetDataLoadFunctions { get; }
+
+        static ResourceManager()
+        {
+            DefaultSheetDataLoadFunctions = Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                .Where(x => x.StartsWith(defaultSheetPath))
+                .ToDictionary(x => x, x =>
+                    new Func<SheetDataSource>(() =>
+                    {
+                        using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(x)
+                            ?? throw new InvalidDataException($"Missing default resource sheet \"{x}\"!");
+                        return XmlSheetDataSource.Load(stream, x);
+                    }));
+        }
         #endregion
 
         #region XML Constants
@@ -35,14 +55,17 @@ namespace GuiCookie.Core.Styles
         #endregion
 
         #region Fields
-        /// <summary> The font resources keyed by name. </summary>
+        private readonly Dictionary<string, Color> coloursByName = [];
+
         private readonly Dictionary<string, Font> fontsByName = [];
 
-        /// <summary> The image resources keyed by name. </summary>
         private readonly Dictionary<string, Image> imagesByName = [];
 
-        /// <summary> The colour resources keyed by name. </summary>
-        private readonly Dictionary<string, Color> coloursByName = [];
+        private readonly Dictionary<string, List<Color>> coloursBySheetFilePath = [];
+
+        private readonly Dictionary<string, List<Font>> fontsBySheetFilePath = [];
+
+        private readonly Dictionary<string, List<Image>> imagesBySheetFilePath = [];
         #endregion
 
         #region Properties
@@ -109,109 +132,149 @@ namespace GuiCookie.Core.Styles
         #region Add Functions
         /// <summary> Adds the given <paramref name="colour"/> to the <see cref="ColoursByName"/> keyed by the given <paramref name="name"/> </summary>
         /// <param name="name"> The key. </param>
+        /// <param name="sheetFilePath"> The file path which owns this colour. </param>
         /// <param name="colour"> The value. </param>
         /// <exception cref="ArgumentException"> The given <paramref name="name"/> was empty or null. </exception>
         /// <exception cref="ArgumentException"> The given <paramref name="name"/> has already been used as a key. </exception>
-        public void AddColour(string name, Color colour)
+        public void AddColour(string name, string sheetFilePath, Color colour)
         {
-            // Ensure validity.
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Given colour name was empty or null.");
-            if (coloursByName.ContainsKey(name)) throw new ArgumentException($"Colour with name {name} has already been defined.");
+            if (!TryAddColour(name, sheetFilePath, colour))
+                throw new ArgumentException($"Colour with name \"{name}\" has already been defined by sheet \"{sheetFilePath}\"");
+        }
 
-            // Add the colour.
-            coloursByName.Add(name, colour);
+        public bool TryAddColour(string name, string sheetFilePath, Color colour)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            ArgumentException.ThrowIfNullOrWhiteSpace(sheetFilePath);
+
+            if (!coloursByName.TryAdd(name, colour)) 
+                return false;
+            if (!coloursBySheetFilePath.TryGetValue(sheetFilePath, out List<Color>? fileColours))
+            {
+                fileColours = [];
+                coloursBySheetFilePath.Add(sheetFilePath, fileColours);
+            }
+            fileColours.Add(colour);
+            return true;
         }
 
         /// <summary> Adds the given <paramref name="font"/> to the <see cref="FontsByName"/> keyed by the given <paramref name="name"/> </summary>
         /// <param name="name"> The key. </param>
+        /// <param name="sheetFilePath"> The file path which owns this font. </param>
         /// <param name="font"> The value. </param>
         /// <exception cref="ArgumentException"> The given <paramref name="name"/> was empty or null. </exception>
         /// <exception cref="ArgumentException"> The given <paramref name="name"/> has already been used as a key. </exception>
-        public void AddFont(string name, Font font)
+        public void AddFont(string name, string sheetFilePath, Font font)
         {
-            // Ensure validity.
-            ArgumentNullException.ThrowIfNull(font);
-            if (string.IsNullOrWhiteSpace(name)) 
-                throw new ArgumentException("Given font name was empty or null.");
-            if (fontsByName.ContainsKey(name))
-                throw new ArgumentException($"Font with name {name} has already been defined.");
+            if (!TryAddFont(name, sheetFilePath, font))
+                throw new ArgumentException($"Font with name \"{name}\" has already been defined by sheet \"{sheetFilePath}\"");
+        }
 
-            // Add the font.
-            fontsByName.Add(name, font);
+        public bool TryAddFont(string name, string sheetFilePath, Font font)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(name);
+            ArgumentException.ThrowIfNullOrWhiteSpace(sheetFilePath);
+
+            if (!fontsByName.TryAdd(name, font)) 
+                return false;
+            if (!fontsBySheetFilePath.TryGetValue(sheetFilePath, out List<Font>? fileFonts))
+            {
+                fileFonts = [];
+                fontsBySheetFilePath.Add(sheetFilePath, fileFonts);
+            }
+            fileFonts.Add(font);
+            return true;
         }
 
         /// <summary> Adds the given <paramref name="image"/> to the <see cref="ImagesByName"/> keyed by <see cref="Image.Name"/>. </summary>
+        /// <param name="sheetFilePath"> The file path which owns this image. </param>
         /// <param name="image"> The value. </param>
         /// <exception cref="ArgumentException"> The given <see cref="Image.Name"/> was empty or null. </exception>
         /// <exception cref="ArgumentException"> The given <see cref="Image.Name"/> has already been used as a key. </exception>
-        public void AddImage(Image image)
+        public void AddImage(string sheetFilePath, Image image)
         {
-            // Ensure validity.
-            if (image.IsEmpty) throw new ArgumentException("Given image was empty.");
-            if (imagesByName.ContainsKey(image.Name)) throw new ArgumentException($"Image with name {image.Name} has already been defined.");
+            if (!TryAddImage(sheetFilePath, image)) 
+                throw new ArgumentException($"Image with name \"{image.Name}\" has already been defined by sheet \"{sheetFilePath}\"");
+        }
 
-            // Add the image.
-            imagesByName.Add(image.Name, image);
+        public bool TryAddImage(string sheetFilePath, Image image)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(sheetFilePath);
+
+            if (!imagesByName.TryAdd(image.Name, image))
+                return false;
+            if (!imagesBySheetFilePath.TryGetValue(sheetFilePath, out List<Image>? fileImages))
+            {
+                fileImages = [];
+                imagesBySheetFilePath.Add(sheetFilePath, fileImages);
+            }
+            fileImages.Add(image);
+            return true;
         }
         #endregion
 
         #region Load Functions
-        public virtual void LoadFromSheet(IReadOnlySheetDataSource styleSheet)
+        public virtual void LoadFromSheets(IEnumerable<IReadOnlySheetDataSource> resourceSheets)
         {
-            IReadOnlySheetDataNode resourceNode = styleSheet.GetChildWithName(StyleManager.ResourcesNodeName) ?? throw new ArgumentException("Given style sheet is missing resource node!");
-            LoadFromNode(resourceNode);
+            foreach (IReadOnlySheetDataSource resourceSheet in resourceSheets)
+                LoadFromSheet(resourceSheet);
         }
 
-        /// <summary> Loads the given <paramref name="resourceNode"/> into this resource manager. </summary>
-        /// <param name="resourceNode"> The node containing the resources. </param>
-        public virtual void LoadFromNode(IReadOnlySheetDataNode resourceNode)
+        public virtual void LoadFromSheet(IReadOnlySheetDataSource resourceSheet)
         {
             // Get the root path for the resources.
-            string? rootFolder = resourceNode.Attributes.GetAttributeOrDefault(rootFolderAttributeName, (string?)null);
+            string? rootFolder = resourceSheet.RootNode.Attributes.GetAttributeOrDefault(rootFolderAttributeName, (string?)null);
 
-            // Load the colours, fonts, and images.
-            loadColours(resourceNode.GetChildWithName(coloursNodeName));
-            loadFonts(resourceNode.GetChildWithName(fontsNodeName), rootFolder);
-            loadImages(resourceNode.GetChildWithName(imagesNodeName), rootFolder);
+            string sheetFilePath = PathHelpers.NormaliseFilePath(resourceSheet.FilePath ?? throw new ArgumentException("The given resource sheet has no file path!"));
+            loadColours(resourceSheet, sheetFilePath);
+            loadFonts(resourceSheet, sheetFilePath, rootFolder);
+            loadImages(resourceSheet, sheetFilePath, rootFolder);
         }
 
-        private void loadColours(IReadOnlySheetDataNode? coloursNode)
+        private void loadColours(IReadOnlySheetDataSource resourceSheet, string sheetFilePath)
         {
-            // Do nothing if the given node does not exist.
+            IReadOnlySheetDataNode? coloursNode = resourceSheet.GetChildWithName(coloursNodeName);
             if (coloursNode == null)
                 return;
-
-            // Load the colours.
             foreach (IReadOnlySheetDataNode colourNode in coloursNode.ChildNodes)
-                // Add the parsed colour to the dictionary with the node's name.
-                AddColour(colourNode.Name, colourNode.Attributes.GetAttribute(colourAttributeName, Colour.Parse));
+                loadColourFromNode(colourNode, sheetFilePath);
         }
 
-        private void loadFonts(IReadOnlySheetDataNode? fontsNode, string? rootFolder)
+        protected virtual void loadColourFromNode(IReadOnlySheetDataNode colourNode, string sheetFilePath)
+        {
+            if (!colourNode.Attributes.TryGetAttribute(colourAttributeName, out Color colour, Colour.TryParse))
+                throw new ArgumentException($"Colour node \"{colourNode.Name}\" has an invalid colour value!", nameof(colourNode));
+
+            AddColour(colourNode.Name, sheetFilePath, colour);
+        }
+
+        private void loadFonts(IReadOnlySheetDataSource resourceSheet, string sheetFilePath, string? rootFolder)
         {
             // Do nothing if the given node does not exist.
+            IReadOnlySheetDataNode? fontsNode = resourceSheet.GetChildWithName(fontsNodeName);
             if (fontsNode == null)
                 return;
 
             // Load the fonts.
             foreach (IReadOnlySheetDataNode fontNode in fontsNode.ChildNodes)
-                loadFontFromNode(fontNode, rootFolder);
+                loadFontFromNode(fontNode, sheetFilePath, rootFolder);
         }
 
-        protected abstract void loadFontFromNode(IReadOnlySheetDataNode? fontNode, string? rootFolder);
+        protected abstract void loadFontFromNode(IReadOnlySheetDataNode fontNode, string sheetFilePath, string? rootFolder);
 
-        private void loadImages(IReadOnlySheetDataNode? imagesNode, string? rootFolder)
+        private void loadImages(IReadOnlySheetDataSource resourceSheet, string sheetFilePath, string? rootFolder)
         {
             // Do nothing if the given node does not exist.
+            IReadOnlySheetDataNode? imagesNode = resourceSheet.GetChildWithName(imagesNodeName);
             if (imagesNode == null)
                 return;
 
             // Load the images.
             foreach (IReadOnlySheetDataNode imageNode in imagesNode.ChildNodes)
-                loadImageFromNode(imageNode, rootFolder);
+                loadImageFromNode(imageNode, sheetFilePath, rootFolder);
         }
 
-        protected abstract void loadImageFromNode(IReadOnlySheetDataNode? imageNode, string? rootFolder);
+        protected abstract void loadImageFromNode(IReadOnlySheetDataNode imageNode, string sheetFilePath, string? rootFolder);
         #endregion
     }
 }

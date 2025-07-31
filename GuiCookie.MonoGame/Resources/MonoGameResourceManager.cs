@@ -1,6 +1,6 @@
 ﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.Rendering;
-using GuiCookie.Core.Styles;
+using GuiCookie.Core.Resources;
 using GuiCookie.MonoGame.Extensions;
 using GuiCookie.MonoGame.Rendering;
 using LiruGameHelperMonoGame.Parsers;
@@ -11,7 +11,7 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace GuiCookie.MonoGame.Styles
+namespace GuiCookie.MonoGame.Resources
 {
     public class MonoGameResourceManager(ContentManager contentManager, GraphicsDevice graphicsDevice) : ResourceManager
     {
@@ -21,7 +21,7 @@ namespace GuiCookie.MonoGame.Styles
         #endregion
 
         #region Load Functions
-        protected override void loadFontFromNode(IReadOnlySheetDataNode? fontNode, string? rootFolder)
+        protected override void loadFontFromNode(IReadOnlySheetDataNode fontNode, string sheetFilePath, string? rootFolder)
         {
             if (fontNode == null)
                 return;
@@ -35,10 +35,10 @@ namespace GuiCookie.MonoGame.Styles
             Font font = new MonoGameFont(spriteFont);
 
             // Add the font to the dictionary.
-            AddFont(fontNode.Name, font);
+            AddFont(fontNode.Name, sheetFilePath, font);
         }
 
-        protected override void loadImageFromNode(IReadOnlySheetDataNode? imageNode, string? rootFolder)
+        protected override void loadImageFromNode(IReadOnlySheetDataNode imageNode, string sheetFilePath, string? rootFolder)
         {
             if (imageNode == null)
                 return;
@@ -60,7 +60,7 @@ namespace GuiCookie.MonoGame.Styles
                 texture = ContentManager.Load<Texture2D>(string.IsNullOrWhiteSpace(rootFolder) ? imageURI : Path.Combine(rootFolder, imageURI));
 
             // Add the root image to the dictionary.
-            AddImage(new MonoGameImage(imageNode.Name, texture, texture.Bounds.ToDrawingRectangle()));
+            AddImage(sheetFilePath, new MonoGameImage(imageNode.Name, texture, texture.Bounds.ToDrawingRectangle()));
 
             // If a tilemap tag was given and it parses into a point, use the image as a tilemap.
             Point? tilemapSize = imageNode.Attributes.GetAttributeOrDefault(tilemapTagName, (Point?)null, ToPoint.TryParse);
@@ -120,7 +120,7 @@ namespace GuiCookie.MonoGame.Styles
                 Image image = new MonoGameImage(sourceNode.Name, texture, sourceRectangle.ToDrawingRectangle());
 
                 // Add the image to the dictionary.
-                AddImage(image);
+                AddImage(sheetFilePath, image);
             }
         }
         #endregion

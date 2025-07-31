@@ -1,22 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Main DefaultStyle="Default">
-  <!--The resources for this style-->
-  <Resources >
-    <Colours>
 
-    </Colours>
-    <Fonts>
-      <Default Source="Gui/Fonts/TestFont"/>
-      <Small Source="Gui/Fonts/SmallFont"/>
-    </Fonts>
-    <Images>
-      <Icons Source="Gui/Images/Icons" Tilemap="3, 3">
-        <RemoveButton Tile="0, 1"/>
-        <AddButton Tile="0, 2"/>
-      </Icons>
-    </Images>
-  </Resources>
-
+  <ResourceSheets RootFolder="Content/Gui/Resources">
+    <ResourceSheet Source="TestResources.xml"/>
+  </ResourceSheets>
+  
   <!--The main content for the style-->
   <Styles>
 

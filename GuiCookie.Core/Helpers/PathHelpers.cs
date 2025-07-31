@@ -13,6 +13,7 @@ namespace GuiCookie.Core.Helpers
         public const string SourceAttributeName = "Source";
         #endregion
 
+        #region File Path Functions
         public static IEnumerable<string> ResolveFilePaths(IReadOnlySheetDataNode node, IEnumerable<string> possibleExtensions, IList<string>? failedPaths)
         {
             string rootPath = node.Attributes.GetAttributeOrDefault(RootFolderAttributeName, string.Empty)!;
@@ -78,7 +79,9 @@ namespace GuiCookie.Core.Helpers
                     failedPaths?.Add(fullPath);
             }
         }
+        #endregion
 
+        #region Normalisation Functions
         public static string NormaliseExtension(string fileExtension)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(fileExtension);
@@ -86,5 +89,9 @@ namespace GuiCookie.Core.Helpers
                 fileExtension = "." + fileExtension;
             return fileExtension;
         }
+
+        public static string NormaliseFilePath(string filePath)
+            => Path.GetFullPath(filePath.Replace("\\", "/"));
+        #endregion
     }
 }

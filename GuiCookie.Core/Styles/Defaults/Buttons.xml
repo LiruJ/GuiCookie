@@ -2,7 +2,7 @@
 <Main>
   <Styles>
 
-    <Pane>
+    <Button>
       <SliceFrame Image="Pane" NineSlice="Thirds" Colour="$MainColour" Tint="$MainTint" ShadowOffset="-2, 2" ShadowColour="#0002"/>
 
       <Hovered>
@@ -14,6 +14,6 @@
       <Disabled>
         <SliceFrame Tint="$DisabledTint"/>
       </Disabled>
-    </Pane>
+    </Button>
   </Styles>
 </Main>

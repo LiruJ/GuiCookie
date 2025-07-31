@@ -8,10 +8,6 @@ namespace GuiCookie.Core.Rendering
     {
         Image WhitePixel { get; }
 
-        void DrawString(Font font, string text, Vector2 position, Color? colour = null);
-
-        void DrawString(Font font, StringBuilder stringBuilder, Vector2 position, Color? colour = null);
-
         #region Image Functions
         void DrawNineSlice(Image image, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, float layerDepth, Vector4 nineSlice);
 
@@ -36,6 +32,16 @@ namespace GuiCookie.Core.Rendering
         void DrawTiled(Image image, Vector2 position, Rectangle? sourceRectangle, Color color);
 
         void DrawTiled(Image image, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color);
+        #endregion
+
+        #region String Functions
+        void DrawString(Font font, string text, Vector2 position, Color? colour = null);
+
+        void DrawString(Font font, string text, Vector2 position, Rectangle destination, Color? colour = null);
+
+        void DrawString(Font font, StringBuilder stringBuilder, Vector2 position, Color? colour = null);
+
+        void DrawString(Font font, StringBuilder stringBuilder, Vector2 position, Rectangle destination, Color? colour = null);
         #endregion
     }
 }

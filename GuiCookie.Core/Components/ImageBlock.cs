@@ -2,7 +2,7 @@
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
-using GuiCookie.Core.Styles;
+using GuiCookie.Core.Resources;
 using GuiCookie.Core.Styles.DataStructures;
 using System.Drawing;
 using System.Numerics;

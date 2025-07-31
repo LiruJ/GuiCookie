@@ -11,14 +11,16 @@ namespace GuiCookie.Core.Templates
         public const string TemplateSheetsNodeName = "TemplateSheets";
         public const string TemplateSheetNodeName = "TemplateSheet";
 
-        private const string defaultTemplateSheetPath = "GuiCookie.Core.Templates.Defaults";
+        private const string templatesNodeName = "Templates";
+
+        private const string defaultSheetPath = "GuiCookie.Core.Templates.Defaults";
 
         internal static IDictionary<string, Func<SheetDataSource>> DefaultSheetDataLoadFunctions { get; }
 
         static TemplateManager()
         {
             DefaultSheetDataLoadFunctions = Assembly.GetExecutingAssembly().GetManifestResourceNames()
-                .Where(x => x.StartsWith(defaultTemplateSheetPath))
+                .Where(x => x.StartsWith(defaultSheetPath))
                 .ToDictionary(x => x, x =>
                     new Func<SheetDataSource>(() =>
                     {
@@ -31,6 +33,8 @@ namespace GuiCookie.Core.Templates
 
         #region Fields
         private readonly Dictionary<string, Template> templatesByName = [];
+
+        private readonly Dictionary<string, List<Template>> templatesByFilePath = [];
         #endregion
 
         #region Get Functions
@@ -49,75 +53,66 @@ namespace GuiCookie.Core.Templates
         #endregion
 
         #region Load Functions
-        public static Stream CreateDefaultTemplatesStream() =>
-            // Load the embedded xml file into a stream and make sure it exists.
-            Assembly.GetExecutingAssembly().GetManifestResourceStream(defaultTemplateSheetPath)
-                ?? throw new InvalidDataException("Missing default template sheet!");
+        /// <summary>
+        /// Loads all the template sheets referenced in the given <paramref name="templateSheetsNode"/> (usually from the layout sheet), recursively loading all references.
+        /// </summary>
+        /// <param name="templateSheetsNode"></param>
+        /// <param name="sourceLoader"></param>
+        public void LoadIncluded(IReadOnlySheetDataNode templateSheetsNode, SheetDataSourceLoader sourceLoader)
+        {
+            HashSet<string> loadedFilePaths = [.. templatesByFilePath.Keys];
+            List<SheetDataSource> includedSources = [];
+            sourceLoader.ResolveAndLoadIncluded(templateSheetsNode, TemplateSheetsNodeName, ref includedSources, loadedFilePaths);
+            LoadFromSheets(includedSources);
+        }
 
         public void LoadFromSheets(IEnumerable<IReadOnlySheetDataSource> templateSheets)
         {
-            var templateNodes = templateSheets.SelectMany(x => x.RootNode.ChildNodes);
+            var templateNodes = templateSheets.SelectMany(x => x.GetChildWithName(templatesNodeName)?.ChildNodes 
+                ?? throw new InvalidDataException($"Template sheet \"{x.FilePath}\" is missing a \"{templatesNodeName}\" node!"));
+            List<SheetNodePathPair> templateNodeSourcePairs = SheetDataSourceLoader.RentNodesBySheetPath(templateSheets, templatesNodeName);
 
             // Stage 1: Load the templates themselves. This does not reference anything else, it purely sets up each template from a node.
-            foreach (var templateNode in templateNodes)
+            foreach (var templateNodeSourcePair in templateNodeSourcePairs)
             {
-                Template template = Template.Load(templateNode);
-                if (!templatesByName.TryAdd(template.Name, template))
-                    throw new InvalidDataException($"Template \"{template.Name}\" was defined more than once!");
+                Template template = Template.Load(templateNodeSourcePair.Node);
+                addTemplate(template, templateNodeSourcePair.FilePath);
             }
 
             // Stage 2: Resolve the template bases and children. This gets the base and child templates from this template manager, but does not do any combining.
-            foreach (var templateNode in templateNodes)
+            foreach (var templateNodeSourcePair in templateNodeSourcePairs)
             {
-                Template template = templatesByName[templateNode.Name];
+                Template template = templatesByName[templateNodeSourcePair.Node.Name];
                 template.ResolveBase(this);
             }
 
             // Stage 3: Combine templates with their bases.
-            foreach (var templateNode in templateNodes)
+            foreach (var templateNodeSourcePair in templateNodeSourcePairs)
             {
-                Template template = templatesByName[templateNode.Name];
+                Template template = templatesByName[templateNodeSourcePair.Node.Name];
                 template.CombineOverBase();
             }
 
-            foreach (var templateNode in templateNodes)
+            foreach (var templateNodeSourcePair in templateNodeSourcePairs)
             {
-                Template template = templatesByName[templateNode.Name];
-                template.ResolveChildren(this, templateNode.ChildNodes);
+                Template template = templatesByName[templateNodeSourcePair.Node.Name];
+                template.ResolveChildren(this, templateNodeSourcePair.Node.ChildNodes);
             }
+
+            SheetDataSourceLoader.ReturnNodesBySheetPath(templateNodeSourcePairs);
         }
 
-        //public void LoadFromSheet(IReadOnlySheetDataSource templateSheet)
-        //{
-        //    // Go over each template within the main node.
-        //    foreach (IReadOnlySheetDataNode templateNode in templateSheet.RootNode.ChildNodes)
-        //        getRootTemplate(templateSheet.RootNode, templateNode.Name);
-        //}
-
-        //private void loadTemplate(IReadOnlySheetDataNode templateNode)
-        //{
-        //    Template.Load(this, )
-        //}
-
-        //internal Template getRootTemplate(IReadOnlySheetDataNode mainNode, string name)
-        //{
-        //    // TODO: Split loading into two steps, so that all templates can be cross-referenced.
-        //    // If the root template is already loaded, return it.
-        //    if (templatesByName.TryGetValue(name, out Template? template))
-        //        return template;
-
-        //    // Otherwise; find it within the main node.
-        //    IReadOnlySheetDataNode templateNode = mainNode.GetChildWithName(name) ?? throw new Exception($"Could not find template node with name: {name}");
-
-        //    // Load the template.
-        //    template = Template.Load(this, mainNode, templateNode);
-
-        //    // Add the template to the dictionary keyed by its name.
-        //    templatesByName.Add(template.Name, template);
-
-        //    // Return the created template.
-        //    return template;
-        //}
+        private void addTemplate(Template template, string filePath)
+        {
+            if (!templatesByName.TryAdd(template.Name, template))
+                throw new InvalidDataException($"Template \"{template.Name}\" was defined more than once!");
+            if (!templatesByFilePath.TryGetValue(filePath, out List<Template>? sheetTemplates))
+            {
+                sheetTemplates = [];
+                templatesByFilePath.Add(filePath, sheetTemplates);
+            }
+            sheetTemplates.Add(template);
+        }
         #endregion
     }
 }

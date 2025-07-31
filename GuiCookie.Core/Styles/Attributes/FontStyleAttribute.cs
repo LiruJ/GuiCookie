@@ -1,10 +1,13 @@
 ﻿using GuiCookie.Core.Data;
 using GuiCookie.Core.DataStructures;
+using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
+using GuiCookie.Core.Resources;
 using GuiCookie.Core.Styles.DataStructures;
 using LiruGameHelper.Parsers;
 using System.Drawing;
 using System.Numerics;
+using System.Text;
 
 namespace GuiCookie.Core.Styles.Attributes
 {
@@ -107,7 +110,7 @@ namespace GuiCookie.Core.Styles.Attributes
 #endif
 
             // Ensure the attribute is a font.
-            if (baseAttribute is not FontStyleAttribute baseFont) 
+            if (baseAttribute is not FontStyleAttribute baseFont)
                 throw new ArgumentException($"Cannot combine with attribute as it is not a font. {baseAttribute}");
 
             // Override the base's properties.
@@ -117,6 +120,34 @@ namespace GuiCookie.Core.Styles.Attributes
             Offset ??= baseFont.Offset;
             TextAnchor ??= baseFont.TextAnchor;
             TextPivot ??= baseFont.TextPivot;
+        }
+        #endregion
+
+        #region Draw Functions
+        public void Draw(IGuiCamera camera, Rectangle destination, Vector2 position, Font font, string text, TintedColour? tintedColour = null, DropShadow? dropShadow = null)
+        {
+            dropShadow ??= DropShadow;
+            if (dropShadow.Value.HasData)
+            {
+                Rectangle shadowDestination = new(PointExtensions.Add(destination.Location, DropShadow.Offset!.Value.ToPoint()), destination.Size);
+                camera.DrawString(font, text, position, shadowDestination, DropShadow.Colour!.Value);
+            }
+
+            Color colour = TintedColour.CalculateOverriddenColour(tintedColour);
+            camera.DrawString(font, text, position, destination, colour);
+        }
+
+        public void Draw(IGuiCamera camera, Rectangle destination, Vector2 position, Font font, StringBuilder stringBuilder, TintedColour? tintedColour = null, DropShadow? dropShadow = null)
+        {
+            dropShadow ??= DropShadow;
+            if (dropShadow.Value.HasData)
+            {
+                Rectangle shadowDestination = new(PointExtensions.Add(destination.Location, DropShadow.Offset!.Value.ToPoint()), destination.Size);
+                camera.DrawString(font, stringBuilder, position, shadowDestination, DropShadow.Colour!.Value);
+            }
+
+            Color colour = TintedColour.CalculateOverriddenColour(tintedColour);
+            camera.DrawString(font, stringBuilder, position, destination, colour);
         }
         #endregion
     }

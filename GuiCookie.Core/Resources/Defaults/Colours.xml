@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Resources>
+  <Colours>
+    <MainColour Colour="#5F628A"/>
+    <InlayColour Colour="#8488BC"/>
+    <MainTint Colour="#DDD"/>
+    <ClickedTint Colour="#AAA"/>
+    <DisabledTint Colour="#222"/>
+  </Colours>
+</Resources>

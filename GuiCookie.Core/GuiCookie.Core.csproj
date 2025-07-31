@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Defaults\Colours.xml" />
+    <None Remove="Resources\Defaults\Frames.xml" />
     <None Remove="Styles\DefaultStyleImage.png" />
     <None Remove="Styles\Styles.xml" />
     <None Remove="Templates\Defaults\Buttons.xml" />
@@ -16,7 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Defaults\Colours.xml" />
+    <EmbeddedResource Include="Resources\Defaults\Frames.xml" />
     <EmbeddedResource Include="Styles\DefaultStyleImage.png" />
+    <EmbeddedResource Include="Styles\Defaults\Buttons.xml" />
     <EmbeddedResource Include="Styles\Defaults\Styles.xml" />
     <EmbeddedResource Include="Templates\Defaults\Buttons.xml" />
     <EmbeddedResource Include="Templates\Defaults\Partitions.xml" />

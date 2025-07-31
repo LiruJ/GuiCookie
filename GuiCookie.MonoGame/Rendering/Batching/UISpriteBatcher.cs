@@ -107,8 +107,7 @@ namespace GuiCookie.MonoGame.Rendering.Batching
         #region Draw Functions
         public unsafe void DrawBatch(SpriteSortMode spriteSortMode, GuiCookieEffect? effect)
         {
-            if (effect != null && effect.IsDisposed)
-                throw new ObjectDisposedException("effect");
+            ObjectDisposedException.ThrowIf(effect == null || effect.IsDisposed, typeof(GuiCookieEffect));
 
             if (nextBatchItemIndex == 0)
                 return;

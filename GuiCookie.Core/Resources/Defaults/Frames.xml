@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Resources>
+  <Images>
+    <DefaultFramesSheet Source="GuiCookie.Core.Styles.DefaultStyleImage.png" Embedded="True" Tilemap="4, 4">
+      <Button/>
+      <Pane/>
+      <Inlay/>
+      <VerticalSliderBar Bounds="0, 48, 16, 24"/>
+      <VerticalSliderBarFrame Bounds="0, 72, 16, 24"/>
+      <HorizontalSliderBar Bounds="32, 48, 24, 16"/>
+      <HorizontalSliderBarFrame Bounds="17, 80, 24, 16"/>
+      <VerticalSliderHandle Bounds="17, 49, 14, 10"/>
+      <HorizontalSliderHandle Bounds="33, 65, 10, 14"/>
+    </DefaultFramesSheet>
+  </Images>
+</Resources>

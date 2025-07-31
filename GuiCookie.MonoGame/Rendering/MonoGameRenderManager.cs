@@ -281,9 +281,6 @@ namespace GuiCookie.MonoGame.Rendering
         #endregion
 
         #region Draw Text Functions
-        void IGuiCamera.DrawString(Font font, string text, System.Numerics.Vector2 position, System.Drawing.Color? colour)
-            => DrawString(font, text, new Vector2(position.X, position.Y), colour != null ? new Color((uint)colour.Value.ToArgb()) : null);
-
         public void DrawString(Font font, string text, Vector2 position, Color? colour = null)
         {
             if (font is not MonoGameFont monoGameFont)
@@ -308,10 +305,29 @@ namespace GuiCookie.MonoGame.Rendering
             //SpriteBatch.DrawString(monoGameFont.SpriteFont, stringBuilder, new Vector2(position.X, position.Y), monoGameColour);
         }
 
-        void IGuiCamera.DrawString(Font font, StringBuilder stringBuilder, System.Numerics.Vector2 position, System.Drawing.Color? colour)
+        public void DrawString(Font font, string text, System.Numerics.Vector2 position, System.Drawing.Color? colour = null)
         {
+            throw new System.NotImplementedException();
+        }
 
+        public void DrawString(Font font, string text, System.Numerics.Vector2 position, System.Drawing.Rectangle destination, System.Drawing.Color? colour = null)
+        {
+            if (font is not MonoGameFont monoGameFont)
+                return;
 
+            for (int i = 0; i < text.Length; i++)
+            {
+
+            }
+        }
+
+        public void DrawString(Font font, StringBuilder stringBuilder, System.Numerics.Vector2 position, System.Drawing.Color? colour = null)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void DrawString(Font font, StringBuilder stringBuilder, System.Numerics.Vector2 position, System.Drawing.Rectangle destination, System.Drawing.Color? colour = null)
+        {
             throw new System.NotImplementedException();
         }
         #endregion
