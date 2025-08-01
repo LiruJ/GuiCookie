@@ -17,8 +17,9 @@
         <StackPanel Name="ButtonsTab" Size="100%">
           <!--ClickType examples-->
           <StackPanel Size="25%, 100%" LayoutDirection="Vertical" Spacing="5">
-            <TextButton Size="50%, 24" Text="ClickType.OnMouseDown" ClickType="OnMouseDown"/>
-            <TextButton Size="50%, 24" Text="ClickType.OnMouseUp" ClickType="OnMouseUp"/>
+            <TextBox Size="50%, 24" Text="ClickType"/>
+            <TextButton Size="50%, 24" Text="OnMouseDown" ClickType="OnMouseDown"/>
+            <TextButton Size="50%, 24" Text="OnMouseUp" ClickType="OnMouseUp"/>
           </StackPanel>
         </StackPanel>
       </Pane>

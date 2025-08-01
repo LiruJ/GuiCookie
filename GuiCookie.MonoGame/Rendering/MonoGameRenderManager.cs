@@ -3,7 +3,9 @@ using GuiCookie.MonoGame.Extensions;
 using GuiCookie.MonoGame.Rendering.Batching;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Text;
+using static Microsoft.Xna.Framework.Graphics.SpriteFont;
 
 namespace GuiCookie.MonoGame.Rendering
 {
@@ -20,7 +22,7 @@ namespace GuiCookie.MonoGame.Rendering
         #region Constructors
         public MonoGameRenderManager(GraphicsDevice graphicsDevice) : this(graphicsDevice, new UISpriteBatch(graphicsDevice))
         {
-            
+
         }
         #endregion
 
@@ -307,28 +309,108 @@ namespace GuiCookie.MonoGame.Rendering
 
         public void DrawString(Font font, string text, System.Numerics.Vector2 position, System.Drawing.Color? colour = null)
         {
-            throw new System.NotImplementedException();
+            if (font is not MonoGameFont monoGameFont)
+                return;
+            Color monoGameColour = Color.Black;
+            if (colour != null)
+                monoGameColour = new Color(colour.Value.R, colour.Value.G, colour.Value.B, colour.Value.A);
+
+            drawString(monoGameFont, text, position, monoGameColour, null);
         }
 
         public void DrawString(Font font, string text, System.Numerics.Vector2 position, System.Drawing.Rectangle destination, System.Drawing.Color? colour = null)
         {
             if (font is not MonoGameFont monoGameFont)
                 return;
+            Color monoGameColour = Color.Black;
+            if (colour != null)
+                monoGameColour = new Color(colour.Value.R, colour.Value.G, colour.Value.B, colour.Value.A);
 
-            for (int i = 0; i < text.Length; i++)
-            {
-
-            }
+            drawString(monoGameFont, text, position, monoGameColour, destination);
         }
 
         public void DrawString(Font font, StringBuilder stringBuilder, System.Numerics.Vector2 position, System.Drawing.Color? colour = null)
         {
-            throw new System.NotImplementedException();
+            if (font is not MonoGameFont monoGameFont)
+                return;
+            Color monoGameColour = Color.Black;
+            if (colour != null)
+                monoGameColour = new Color(colour.Value.R, colour.Value.G, colour.Value.B, colour.Value.A);
+
+            // TODO: This is incorrect, this draws each chunk to the same position. The function must be adapted to render partial strings.
+            foreach (ReadOnlyMemory<char> chunk in stringBuilder.GetChunks())
+                drawString(monoGameFont, chunk.Span, position, monoGameColour, null);
         }
 
         public void DrawString(Font font, StringBuilder stringBuilder, System.Numerics.Vector2 position, System.Drawing.Rectangle destination, System.Drawing.Color? colour = null)
         {
-            throw new System.NotImplementedException();
+            if (font is not MonoGameFont monoGameFont)
+                return;
+            Color monoGameColour = Color.Black;
+            if (colour != null)
+                monoGameColour = new Color(colour.Value.R, colour.Value.G, colour.Value.B, colour.Value.A);
+
+            drawChunks(monoGameFont, stringBuilder.GetChunks(), position, monoGameColour, destination);
+        }
+
+        private void drawString(MonoGameFont font, ReadOnlySpan<char> text, System.Numerics.Vector2 position, Color colour, System.Drawing.Rectangle? destination = null)
+        {
+            Vector2 offset = Vector2.Zero;
+            bool firstGlyphOfLine = true;
+            Rectangle? monogameDestination = destination?.ToMonoGameRectangle();
+
+            drawChunk(font, text, position, colour, ref firstGlyphOfLine, ref offset, monogameDestination);
+        }
+        private void drawChunks(MonoGameFont font, StringBuilder.ChunkEnumerator chunks, System.Numerics.Vector2 position, Color colour, System.Drawing.Rectangle? destination = null)
+        {
+            Vector2 offset = Vector2.Zero;
+            bool firstGlyphOfLine = true;
+            Rectangle? monogameDestination = destination?.ToMonoGameRectangle();
+
+            foreach (ReadOnlyMemory<char> chunk in chunks)
+                drawChunk(font, chunk.Span, position, colour, ref firstGlyphOfLine, ref offset, monogameDestination);
+        }
+
+        private void drawChunk(MonoGameFont font, ReadOnlySpan<char> text, System.Numerics.Vector2 position, Color colour, ref bool firstGlyphOfLine, ref Vector2 offset, Rectangle? monogameDestination)
+        {
+            SpriteFont spriteFont = font.SpriteFont;
+            for (int i = 0; i < text.Length; i++)
+            {
+                char currentCharacter = text[i];
+                switch (currentCharacter)
+                {
+                    case '\r':
+                        continue;
+                    case '\n':
+                        offset.X = 0;
+                        offset.Y += spriteFont.LineSpacing;
+                        firstGlyphOfLine = true;
+                        continue;
+                }
+
+                Glyph currentGlyph = font.GetGlyphOrDefault(currentCharacter);
+                if (firstGlyphOfLine)
+                {
+                    offset.X = Math.Max(currentGlyph.LeftSideBearing, 0);
+                    firstGlyphOfLine = false;
+                }
+                else
+                    offset.X += spriteFont.Spacing + currentGlyph.LeftSideBearing;
+
+                Point characterPosition = (offset + currentGlyph.Cropping.Location.ToVector2() + position).ToPoint();
+                Rectangle characterDestination = new(characterPosition, currentGlyph.BoundsInTexture.Size);
+                if (monogameDestination.HasValue)
+                    characterDestination = Rectangle.Intersect(characterDestination, monogameDestination.Value);
+
+                // If the character should be drawn.
+                if (characterDestination.Width > 0 && characterDestination.Height > 0)
+                {
+                    Point sourceOffset = characterDestination.Location - characterPosition;
+                    DrawStretched(spriteFont.Texture, characterDestination, new Rectangle(currentGlyph.BoundsInTexture.Location + sourceOffset, characterDestination.Size), colour);
+                }
+
+                offset.X += currentGlyph.Width + currentGlyph.RightSideBearing;
+            }
         }
         #endregion
     }
