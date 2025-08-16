@@ -32,7 +32,7 @@ namespace GuiCookie.Core.Data
         #endregion
 
         #region Properties
-        public ICollection<string> Keys => rawAttributesByName.Keys;
+        public virtual IEnumerable<string> Keys => rawAttributesByName.Keys;
 
         public virtual int Count => rawAttributesByName.Count;
         #endregion

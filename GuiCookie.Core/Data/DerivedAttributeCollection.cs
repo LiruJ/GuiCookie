@@ -5,7 +5,11 @@
         #region Indexers
         public override string? this[string name]
         {
-            get => rawAttributesByName.TryGetValue(name, out string? value) ? value : null;
+            get => rawAttributesByName.TryGetValue(name, out string? value) 
+                ? value 
+                : BaseAttributes.TryGetAttribute(name, out value) 
+                    ? value 
+                    : null;
             set => rawAttributesByName.Add(name, value!);
         }
         #endregion
@@ -13,7 +17,9 @@
         #region Properties
         public IReadOnlyAttributeCollection BaseAttributes { get; }
 
-        public override int Count => BaseAttributes.Union(this).Count();
+        public override IEnumerable<string> Keys => BaseAttributes.Union(rawAttributesByName.Keys);
+
+        public override int Count => Keys.Count();
         #endregion
 
         #region Constructors
@@ -37,8 +43,18 @@
         }
         #endregion
 
+        #region Copy Functions
+        public override AttributeCollection CreateCopy()
+        {
+            AttributeCollection attributes = [];
+            foreach (string key in Keys)
+                attributes.Add(key, this[key]!);
+            return attributes;
+        }
+        #endregion
+
         #region Get Functions
-        public override IEnumerator<string> GetEnumerator() => BaseAttributes.Union(this).GetEnumerator();
+        public override IEnumerator<string> GetEnumerator() => BaseAttributes.Union(rawAttributesByName.Keys).GetEnumerator();
         
         public override T GetAttributeOrDefault<T>(string attributeName, T defaultTo, TryParse<T> tryParser)
         {
