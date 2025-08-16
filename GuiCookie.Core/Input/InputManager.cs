@@ -49,7 +49,7 @@ namespace GuiCookie.Core.Input
         /// <summary>
         /// The text input made in this frame.
         /// </summary>
-        public StringBuilder TextInput { get; } = new StringBuilder();
+        public StringBuilder TextInput { get; } = new StringBuilder(16);
 
         public bool IsLeftMouseDown => CurrentMouseState.LeftButtonDown;
 
@@ -112,6 +112,14 @@ namespace GuiCookie.Core.Input
         public virtual void PostUpdate(TimeSpan elapsedTime, TimeSpan totalTime)
         {
 
+        }
+
+        protected virtual void UpdateClickedProperties(TimeSpan elapsedTime, TimeSpan totalTime)
+        {
+            if (IsLeftMouseDown && WasLeftMouseUp)
+                MouseLeftClickPosition = CurrentMouseState.Position;
+            if (IsRightMouseDown && WasRightMouseUp)
+                MouseRightClickPosition = CurrentMouseState.Position;
         }
         #endregion
     }

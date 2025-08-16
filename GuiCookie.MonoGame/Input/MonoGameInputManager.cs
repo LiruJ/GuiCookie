@@ -51,6 +51,8 @@ namespace GuiCookie.MonoGame.Input
 
             previousMouseState.MouseState = currentMouseState.MouseState;
             currentMouseState.MouseState = Mouse.GetState();
+
+            UpdateClickedProperties(elapsedTime, totalTime);
         }
         #endregion
     }
