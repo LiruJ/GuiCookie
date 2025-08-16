@@ -1,6 +1,6 @@
 ﻿using GuiCookie.Core.Components;
 using GuiCookie.Core.Data;
-using System.Drawing;
+using GuiCookie.Core.Styles.DataStructures;
 
 namespace GuiCookie.Core.Elements
 {
@@ -15,7 +15,7 @@ namespace GuiCookie.Core.Elements
         public string Text { get => TextBlock.Text; set => TextBlock.Text = value; }
 
         /// <summary> The colour of the text. </summary>
-        public Color? Colour { get => TextBlock.Colour; }
+        public TintedColour? TintedColour => TextBlock.TintedColour;
         #endregion
 
         #region Initialisation Functions

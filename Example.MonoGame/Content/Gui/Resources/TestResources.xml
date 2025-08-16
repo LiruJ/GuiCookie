@@ -1,16 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Resources >
   <Colours>
-
+    <IndicatorColour Colour="#00FF00"/>
+    <IndicatorOffColour Colour="#FF0000"/>
   </Colours>
   <Fonts>
     <Default Source="Gui/Fonts/TestFont"/>
     <Small Source="Gui/Fonts/SmallFont"/>
   </Fonts>
   <Images>
-    <Icons Source="Gui/Images/Icons" Tilemap="3, 3">
+    <Icons Source="Gui/Images/Icons" Tilemap="6, 6">
       <RemoveButton Tile="0, 1"/>
       <AddButton Tile="0, 2"/>
+      <LightFrame Tile="3, 0"/>
+      <Light Tile="4, 0"/>
     </Icons>
   </Images>
 </Resources>

@@ -3,17 +3,20 @@
   <Styles>
 
     <Button>
-      <SliceFrame Image="Pane" NineSlice="Thirds" Colour="$MainColour" Tint="$MainTint" ShadowOffset="-2, 2" ShadowColour="#0002"/>
-      <Font Font="Default" Colour="#BBB" ShadowOffset="-1"/>
+      <SliceFrame Image="Button" NineSlice="Thirds" Colour="$GuiCookiePrimaryColour" Tint="$MainTint" ShadowOffset="-2, 2" ShadowColour="#0002"/>
+      <Font Font="Default" Colour="GuiCookieOnPrimaryColour" ShadowOffset="-1"/>
       
       <Hovered>
         <SliceFrame Tint="#FFF"/>
+        <Font Tint="#FFF"/>
       </Hovered>
       <Clicked>
-        <SliceFrame Tint="$ClickedTint"/>
+        <SliceFrame Image="ButtonPressed" Tint="$ClickedTint"/>
+        <Font Tint="$ClickedTint" Offset="0, 2"/>
       </Clicked>
       <Disabled>
-        <SliceFrame Tint="$DisabledTint"/>
+        <SliceFrame Image="ButtonPressed" Tint="$DisabledTint"/>
+        <Font Tint="$DisabledTint" Offset="0, 2"/>
       </Disabled>
     </Button>
   </Styles>

@@ -30,10 +30,10 @@ namespace GuiCookie.Core.Components
                 FrameImage = resourceManager.ImagesByName.TryGetValue(frameImageName!, out Image? image) ?
                     image : throw new Exception($"Image with name {frameImageName} has not been loaded.");
 
-            TintedColour tintedColour = new(resourceManager, attributes);
+            TintedColour tintedColour = new(resourceManager, attributes, "FrameColour", "FrameTint");
             if (tintedColour.HasData)
                 TintedColour = tintedColour;
-            DropShadow dropShadow = new(resourceManager, attributes);
+            DropShadow dropShadow = new(resourceManager, attributes, "FrameShadowOffset", "FrameShadowColour");
             if (dropShadow.HasData)
                 DropShadow = dropShadow;
         }
@@ -42,7 +42,7 @@ namespace GuiCookie.Core.Components
         #region Draw Functions
         public override void Draw(IGuiCamera guiCamera)
         {
-            StyleStateMachine?.CurrentSliceAttribute?.Draw(guiCamera, Bounds.AbsoluteTotalArea, FrameImage, TintedColour, DropShadow);
+            StyleStateMachine?.CurrentSliceAttribute?.DrawWithShadow(guiCamera, Bounds.AbsoluteTotalArea, FrameImage, TintedColour, DropShadow);
         }
         #endregion
     }

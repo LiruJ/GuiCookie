@@ -7,22 +7,24 @@
     <TemplateSheet Source="TestTemplates"/>
   </TemplateSheets>
 
-  <Root Padding="10">
-    <StackPanel Position="0, 0" Size="100%" LayoutDirection="Vertical" Spacing="1%">
-      <StackPanel Name="TabButtons" Position="0, 0" Size="100%, 5%">
-        <TextButton Size="80, 100%" Text="Test"/>
-      </StackPanel>
+  <Root Padding="5">
+    <StackPartition Position="0, 0" Size="100%" LayoutDirection="Vertical" Spacing="1%">
+      <StackPartition Name="TabButtons" Position="0, 0" Size="100%, 5%">
+        <TextButton Size="80, 100%" Text="Buttons"/>
+      </StackPartition>
 
       <Pane Name="TabContent" Size="100%, 94%" Padding="5" Tint="#555">
-        <StackPanel Name="ButtonsTab" Size="100%">
+        <StackPartition Name="ButtonsTab" Size="100%">
           <!--ClickType examples-->
-          <StackPanel Size="25%, 100%" LayoutDirection="Vertical" Spacing="5">
-            <TextBox Size="50%, 24" Text="ClickType"/>
-            <TextButton Size="50%, 24" Text="OnMouseDown" ClickType="OnMouseDown"/>
-            <TextButton Size="50%, 24" Text="OnMouseUp" ClickType="OnMouseUp"/>
+          <StackPanel Size="17.5%, 20%" LayoutDirection="Vertical" Spacing="5" Padding="5">
+            <TextLabel Size="100%, 24" Text="ClickType"/>
+            <StackPartition Size="100%, 100%" LayoutDirection="Vertical" Spacing="5">
+              <ButtonWithLight Text="OnMouseDown" ClickType="OnMouseDown"/>
+              <ButtonWithLight Text="OnMouseUp" ClickType="OnMouseUp"/>
+            </StackPartition>
           </StackPanel>
-        </StackPanel>
+        </StackPartition>
       </Pane>
-    </StackPanel>
+    </StackPartition>
   </Root>
 </Layout>

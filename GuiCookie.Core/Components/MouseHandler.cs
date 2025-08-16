@@ -14,7 +14,7 @@ namespace GuiCookie.Core.Components
     public class MouseHandler(ElementInputManager elementInputManager) : Component
     {
         #region Constants
-        private const string clickTypeAttributeName = "ClickType";
+        public const string ClickTypeAttributeName = "ClickType";
         #endregion
 
         #region Properties
@@ -79,7 +79,7 @@ namespace GuiCookie.Core.Components
         public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
             // Set the click type.
-            ClickType = attributes.GetEnumAttributeOrDefault(clickTypeAttributeName, ClickType.OnMouseUp);
+            ClickType = attributes.GetEnumAttributeOrDefault(ClickTypeAttributeName, ClickType.OnMouseUp);
         }
         #endregion
 

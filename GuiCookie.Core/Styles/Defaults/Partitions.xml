@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Main>
+  <Styles>
+
+    <Pane>
+      <SliceFrame Image="Pane" NineSlice="Thirds" Colour="$GuiCookieBackgroundColour" ShadowOffset="-2, 2" ShadowColour="#0002"/>
+      
+      <Disabled>
+        <SliceFrame Tint="$DisabledTint"/>
+      </Disabled>
+    </Pane>
+
+    <Inlay>
+      <SliceFrame Image="Inlay" NineSlice="Thirds" Colour="$GuiCookieSurfaceColour" ShadowOffset="-2, 2" ShadowColour="#0002"/>
+      
+      <Disabled>
+        <SliceFrame Tint="$DisabledTint"/>
+      </Disabled>
+    </Inlay>
+  </Styles>
+</Main>

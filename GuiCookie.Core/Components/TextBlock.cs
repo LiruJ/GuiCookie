@@ -2,6 +2,7 @@
 using GuiCookie.Core.DataStructures;
 using GuiCookie.Core.Helpers;
 using GuiCookie.Core.Rendering;
+using GuiCookie.Core.Resources;
 using GuiCookie.Core.Styles.Attributes;
 using GuiCookie.Core.Styles.DataStructures;
 using System.Drawing;
@@ -10,10 +11,10 @@ using System.Text;
 
 namespace GuiCookie.Core.Components
 {
-    public class TextBlock : StyledComponent
+    public class TextBlock(ResourceManager resourceManager) : StyledComponent
     {
         #region Constants
-        private const string textAttributeName = "Text";
+        public const string TextAttributeName = "Text";
         private const string resizeAttributeName = "ResizeDirection";
         #endregion
 
@@ -44,9 +45,7 @@ namespace GuiCookie.Core.Components
 
         public DropShadow? DropShadow { get; set; } = null;
 
-        public Color? Colour { get; set; } = null;
-
-        public Color? Tint { get; set; } = null;
+        public TintedColour? TintedColour { get; set; } = null;
 
         public Vector2? Offset { get; set; } = null;
 
@@ -76,17 +75,22 @@ namespace GuiCookie.Core.Components
             base.OnCreated(attributes);
 
             // Set the attributes.
-            text = attributes.GetAttributeOrDefault(textAttributeName, string.Empty)!;
+            text = attributes.GetAttributeOrDefault(TextAttributeName, string.Empty)!;
             ResizeDirection = attributes.GetEnumAttributeOrDefault(resizeAttributeName, DirectionMask.None);
             //if (attributes.TryGetAttribute(FontStyleAttribute.AnchorAttributeName, out Space anchor, Space.TryParse))
             //    TextAnchor = anchor;
             //if (attributes.TryGetAttribute(FontStyleAttribute.PivotAttributeName, out Space pivot, Space.TryParse))
             //    TextPivot = pivot;
-            //DropShadow = DropShadow.CreateCombination(DropShadow, new DropShadow(resourceManager, attributes));
+
             //if (attributes.TryGetAttribute(FontStyleAttribute.OffsetAttributeName, out Vector2 offset, ToVector.TryParse))
             //    Offset = offset;
-            //if (fontCache.TryGetVariantAttribute(StyleStateMachine?.Style?.BaseVariant, out FontStyleAttribute? font))
-            //    font!.TintedColour = TintedColour.CreateCombination(font.TintedColour, new TintedColour(resourceManager, attributes));
+
+            TintedColour tintedColour = new(resourceManager, attributes, "TextColour", "TextTint");
+            if (tintedColour.HasData)
+                TintedColour = tintedColour;
+            DropShadow dropShadow = new(resourceManager, attributes, "TextShadowOffset", "TextShadowColour");
+            if (dropShadow.HasData)
+                DropShadow = dropShadow;
 
             // Try load the font, if one was defined.
             //if (attributes.TryGetAttribute(FontStyleAttribute.FontAttributeName, out string? fontName))
@@ -135,7 +139,7 @@ namespace GuiCookie.Core.Components
             // Get the anchor and pivot, defaulting to the centre.
             Space textAnchor = fontVariant.TextAnchor ?? new Space(0.5f, Axes.Both);
             Space textPivot = fontVariant.TextPivot ?? new Space(0.5f, Axes.Both);
-            
+
             // Calculate the position based on the anchor and pivot. Round this down to avoid blurry text.
             Vector2 position = Bounds.AbsoluteContentPosition.ToVector2() + (textAnchor.GetScaledSpace(Bounds.ContentSize.ToVector2()) - textPivot.GetScaledSpace(textSize))
                                + (fontVariant.Offset ?? Vector2.Zero);
@@ -147,13 +151,13 @@ namespace GuiCookie.Core.Components
         public void DrawText(IGuiCamera guiCamera, string text)
         {
             // Ensure there is text and a font to draw.
-            if (string.IsNullOrWhiteSpace(text) || StyleStateMachine?.CurrentFontAttribute == null || UsedFont == null) 
+            if (string.IsNullOrWhiteSpace(text) || StyleStateMachine?.CurrentFontAttribute == null || UsedFont == null)
                 return;
 
             // Calculate the position of the text.
             Vector2 position = CalculateTextPosition(StyleStateMachine.CurrentFontAttribute, TextSize);
 
-            StyleStateMachine.CurrentFontAttribute.Draw(guiCamera, Bounds.AbsoluteContentArea, position, UsedFont, text, null, DropShadow);
+            StyleStateMachine.CurrentFontAttribute.Draw(guiCamera, Bounds.AbsoluteContentArea, position, UsedFont, text, TintedColour, DropShadow);
 
             //// If a drop shadow is to be drawn, draw it first.
             //if (StyleStateMachine.CurrentFontAttribute.DropShadow.HasData)

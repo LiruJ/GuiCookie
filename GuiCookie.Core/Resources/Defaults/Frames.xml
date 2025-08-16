@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Resources>
   <Images>
-    <DefaultFramesSheet Source="GuiCookie.Core.Styles.DefaultStyleImage.png" Embedded="True" Tilemap="4, 4">
+    <DefaultFramesSheet Source="GuiCookie.Core.Resources.DefaultGuiSpritesheet.png" Embedded="True" Tilemap="4, 4">
       <Button/>
+      <ButtonPressed/>
       <Pane/>
       <Inlay/>
       <VerticalSliderBar Bounds="0, 48, 16, 24"/>

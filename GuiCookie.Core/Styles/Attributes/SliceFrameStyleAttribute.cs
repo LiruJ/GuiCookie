@@ -107,31 +107,32 @@ namespace GuiCookie.Core.Styles.Attributes
         #endregion
 
         #region Draw Functions
-        public void Draw(IGuiCamera camera, Rectangle destination, Image? frameImage = null, TintedColour? tintedColour = null, DropShadow? dropShadow = null)
+        public void DrawWithShadow(IGuiCamera camera, Rectangle destination, Image? frameImage = null, TintedColour? tintedColour = null, DropShadow? dropShadow = null)
         {
+            frameImage ??= Image;
+
             dropShadow ??= DropShadow;
             if (dropShadow.Value.HasData)
             {
                 Rectangle shadowDestination = new(PointExtensions.Add(destination.Location, DropShadow.Offset!.Value.ToPoint()), destination.Size);
-                draw(camera, shadowDestination, frameImage, DropShadow.Colour!.Value);
+                Draw(camera, shadowDestination, NineSlice, frameImage, DropShadow.Colour!.Value);
             }
 
             Color colour = TintedColour.CalculateOverriddenColour(tintedColour);
-            draw(camera, destination, frameImage, colour);
+            Draw(camera, destination, NineSlice, frameImage, colour);
         }
 
-        private void draw(IGuiCamera camera, Rectangle destination, Image? frameImage, Color colour)
+        public static void Draw(IGuiCamera camera, Rectangle destination, NineSlice? nineSlice, Image? frameImage, Color colour)
         {
-            frameImage ??= Image;
             if (frameImage == null)
             {
                 camera.DrawStretched(camera.WhitePixel, destination, camera.WhitePixel.Source, colour);
                 return;
             }
 
-            if (NineSlice != null)
+            if (nineSlice != null)
             {
-                camera.DrawNineSlice(frameImage, destination, frameImage.Source, colour, NineSlice.Value.Values);
+                camera.DrawNineSlice(frameImage, destination, frameImage.Source, colour, nineSlice.Value.Values);
                 return;
             }
 

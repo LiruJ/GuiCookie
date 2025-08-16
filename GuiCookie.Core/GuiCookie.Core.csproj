@@ -20,10 +20,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Defaults\Colours.xml" />
     <EmbeddedResource Include="Resources\Defaults\Frames.xml" />
-    <EmbeddedResource Include="Styles\DefaultStyleImage.png" />
+    <EmbeddedResource Include="Resources\DefaultGuiSpritesheet.png" />
     <EmbeddedResource Include="Styles\Defaults\Labels.xml" />
     <EmbeddedResource Include="Styles\Defaults\Buttons.xml" />
-    <EmbeddedResource Include="Styles\Defaults\Styles.xml" />
+    <EmbeddedResource Include="Styles\Defaults\Partitions.xml" />
     <EmbeddedResource Include="Templates\Defaults\Buttons.xml" />
     <EmbeddedResource Include="Templates\Defaults\Partitions.xml" />
     <EmbeddedResource Include="Templates\Defaults\Sliders.xml" />

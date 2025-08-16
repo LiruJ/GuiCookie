@@ -1,4 +1,5 @@
-﻿using GuiCookie.Core.Screens;
+﻿using GuiCookie.Core.Resources;
+using GuiCookie.Core.Screens;
 using GuiCookie.MonoGame.Extensions;
 using GuiCookie.MonoGame.Rendering;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,8 +16,10 @@ namespace Example.MonoGame
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private GuiScreen root;
+        private GuiScreen screen;
         private MonoGameRenderManager guiCamera;
+
+        private Color backgroundColour;
 
         public Game1()
         {
@@ -27,8 +30,6 @@ namespace Example.MonoGame
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             _graphics.PreferredBackBufferWidth = 1280;
             _graphics.PreferredBackBufferHeight = 720;
             _graphics.ApplyChanges();
@@ -42,23 +43,28 @@ namespace Example.MonoGame
 
             guiCamera = new MonoGameRenderManager(GraphicsDevice);
 
-            ServiceCollection serviceProvider = new ServiceCollection()
+            ServiceCollection services = new ServiceCollection()
                 .AddMonoGameInput(Window)
                 .AddMonoGameWindow(Window)
                 .AddMonoGameResources(Content, GraphicsDevice);
 
-            root = GuiScreenBuilder<GuiScreen>.CreateWithDefaults(serviceProvider)
+            
+
+            screen = GuiScreenBuilder<GuiScreen>.CreateWithDefaults(services)
                 .With(Content)
                 .WithRandom()
 
                 // Use the example's elements.
                 .WithElementNamespace(Assembly.GetExecutingAssembly(), "Example.MonoGame.Elements")
+                .WithComponentNamespace(Assembly.GetExecutingAssembly(), "Example.MonoGame.Components")
 
                 // Use the layout sheet.
                 .WithLayoutSheet(Path.Combine(Content.RootDirectory, "Gui", "Layouts", "TestLayout.xml"))
                 .Build();
 
-            // TODO: use this.Content to load your game content here
+            ResourceManager resourceManager = screen.ServiceProvider.GetService<ResourceManager>();
+            if (resourceManager != null)
+                backgroundColour = resourceManager.GetColourOrDefault("$GuiCookieBackgroundColour", System.Drawing.Color.CornflowerBlue).Value.ToMonoGameColour();
         }
 
         protected override void Update(GameTime gameTime)
@@ -66,20 +72,17 @@ namespace Example.MonoGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            root.Update(gameTime.ElapsedGameTime, gameTime.TotalGameTime);
-
-            // TODO: Add your update logic here
+            screen.Update(gameTime.ElapsedGameTime, gameTime.TotalGameTime);
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
-            // TODO: Add your drawing code here
             guiCamera.Begin();
-            root.Draw(guiCamera);
+            screen.Draw(guiCamera);
             guiCamera.End();
 
             base.Draw(gameTime);

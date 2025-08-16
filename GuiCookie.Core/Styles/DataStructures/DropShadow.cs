@@ -46,15 +46,15 @@ namespace GuiCookie.Core.Styles.DataStructures
         /// <summary> Creates a new drop shadow loaded from the given <paramref name="attributes"/> and <paramref name="resourceManager"/>. </summary>
         /// <param name="resourceManager"> The resources used to link colour references. </param>
         /// <param name="attributes"> The attributes from which to take the shadow data. </param>
-        public DropShadow(ResourceManager resourceManager, IReadOnlyAttributeCollection attributes)
+        public DropShadow(ResourceManager resourceManager, IReadOnlyAttributeCollection attributes, string offsetAttributeName = ShadowColourAttributeName, string colourAttributeName = ShadowColourAttributeName)
         {
             // Ensure validity.
             ArgumentNullException.ThrowIfNull(resourceManager);
             ArgumentNullException.ThrowIfNull(attributes);
 
             // Set the properties.
-            Offset = attributes.GetAttributeOrDefault(ShadowOffsetAttributeName, (Vector2?)null, ToVector.TryParse);
-            Colour = resourceManager.GetColourOrDefault(attributes, ShadowColourAttributeName);
+            Offset = attributes.GetAttributeOrDefault(offsetAttributeName, (Vector2?)null, ToVector.TryParse);
+            Colour = resourceManager.GetColourOrDefault(attributes, colourAttributeName);
         }
 
         /// <summary> Creates a drop shadow with the given <paramref name="offset"/> and <paramref name="colour"/>. </summary>

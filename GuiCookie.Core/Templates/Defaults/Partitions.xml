@@ -5,7 +5,9 @@
     <Partition/>
     <Pane Components="StyleStateMachine, Frame" Style="Pane"/>
     <Square Components="StyleStateMachine, Frame, AspectRatioFitter" Style="Pane" Ratio="1" RatioMode="WidthControlsHeight"/>
-    <StackPanel Components="DirectionalLayout" LayoutDirection="Horizontal"/>
+    
+    <StackPartition Components="DirectionalLayout" LayoutDirection="Horizontal"/>
+    <StackPanel Components="StyleStateMachine, Frame, DirectionalLayout" LayoutDirection="Horizontal" Style="Inlay"/>
 
     <CellGrid Components="GridLayout, MouseHandler" Controller="CellGrid"/>
 

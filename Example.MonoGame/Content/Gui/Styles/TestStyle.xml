@@ -27,11 +27,6 @@
       </Disabled>
     </Default>
 
-    <Inlay Base="Default">
-      <SliceFrame Image="Inlay" NineSlice="Thirds" Colour="$InlayColour"/>
-      <Font Colour="#ddd"/>
-    </Inlay>
-
     <!--Buttons-->
     <!--<Button Base="Default">
       <SliceFrame Image="Button"/>

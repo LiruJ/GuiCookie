@@ -127,7 +127,7 @@ namespace GuiCookie.Core.Templates
                     throw new InvalidDataException($"Template \"{Name}\" defines a child \"{childNode.Name}\" which does not exist as a template");
 
                 DerivedAttributeCollection derivedAttributes = new(childTemplate!.Attributes, childNode.Attributes);
-
+                
                 Template derivedTemplate = new(childNode.Name, derivedAttributes);
                 children.Add(derivedTemplate);
 

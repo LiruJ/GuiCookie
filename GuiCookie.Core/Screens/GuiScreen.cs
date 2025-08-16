@@ -15,6 +15,8 @@ namespace GuiCookie.Core.Screens
         public ElementManager ElementManager { get; }
 
         public ElementInputManager? ElementInputManager { get; }
+
+        public IServiceProvider ServiceProvider { get; }
         #endregion
 
         #region Fields
@@ -41,6 +43,7 @@ namespace GuiCookie.Core.Screens
         #region Constructors
         public GuiScreen(ElementManager elementManager, IServiceProvider serviceProvider)
         {
+            ServiceProvider = serviceProvider;
             ElementManager = elementManager;
             ElementInputManager = serviceProvider.GetService<ElementInputManager>();
 

@@ -3,8 +3,13 @@
   <Styles>
 
     <Text>
-      <SliceFrame Image="Pane" NineSlice="Thirds" Colour="$MainColour" Tint="$MainTint" ShadowOffset="-2, 2" ShadowColour="#0002"/>
-      <Font Font="Default" Colour="#BBB" ShadowOffset="-1"/>
+      <SliceFrame Image="Pane" NineSlice="Thirds" Colour="$GuiCookiePrimaryColour" ShadowOffset="-2, 2" ShadowColour="#0002"/>
+      <Font Font="Default" Colour="$GuiCookieOnPrimaryColour" ShadowOffset="-1"/>
     </Text>
+
+    <Image>
+      <SliceFrame Image="Pane" NineSlice="Thirds" Colour="$GuiCookiePrimaryColour" ShadowOffset="-2, 2" ShadowColour="#0002"/>
+      
+    </Image>
   </Styles>
 </Main>

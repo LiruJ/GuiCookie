@@ -9,8 +9,8 @@ namespace GuiCookie.Core.Components
     {
         #region Constants
         private const float allowedDeviance = 2.5f;
-        private const string modeAttributeName = "RatioMode";
-        private const string valueAttributeName = "Ratio";
+        public const string RatioModeAttributeName = "AspectRatioMode";
+        public const string RatioValueAttributeName = "AspectRatio";
         #endregion
 
         #region Fields
@@ -35,15 +35,15 @@ namespace GuiCookie.Core.Components
         public override void OnCreated(IReadOnlyAttributeCollection attributes)
         {
             // Get the aspect ratio properties.
-            Mode = attributes.GetEnumAttributeOrDefault(modeAttributeName, AspectRatioMode.None);
-            ratio = attributes.GetAttributeOrDefault(valueAttributeName, (float?)null);
+            Mode = attributes.GetEnumAttributeOrDefault(RatioModeAttributeName, AspectRatioMode.None);
+            ratio = attributes.GetAttributeOrDefault(RatioValueAttributeName, (float?)null);
         }
 
         public override void OnSetup(IReadOnlyAttributeCollection attributes)
         {
             // Set the ratio to the supplied attribute, or if none exists, it's calculated from the bound size.
             if (!ratio.HasValue) 
-                ratio = attributes.GetAttributeOrDefault(valueAttributeName, (float)Bounds.TotalSize.X / Bounds.TotalSize.Y);
+                ratio = attributes.GetAttributeOrDefault(RatioValueAttributeName, (float)Bounds.TotalSize.X / Bounds.TotalSize.Y);
         }
 
         public override void OnPostSetup()
@@ -66,8 +66,8 @@ namespace GuiCookie.Core.Components
             {
                 AspectRatioMode.WidthControlsHeight => !AspectRatioHelpers.AdjustHeight(ref newSize, Ratio, allowedDeviance),
                 AspectRatioMode.HeightControlsWidth => !AspectRatioHelpers.AdjustWidth(ref newSize, Ratio, allowedDeviance),
-                AspectRatioMode.EnvelopeParent => !AspectRatioHelpers.FitAroundBounds(ref newSize, Bounds.Parent.TotalSize, Ratio, allowedDeviance),
-                AspectRatioMode.FitInParent => !AspectRatioHelpers.FitInBounds(ref newSize, Bounds.Parent.TotalSize, Ratio, allowedDeviance),
+                AspectRatioMode.EnvelopeParent => Bounds.Parent != null && !AspectRatioHelpers.FitAroundBounds(ref newSize, Bounds.Parent.TotalSize, Ratio, allowedDeviance),
+                AspectRatioMode.FitInParent => Bounds.Parent != null && !AspectRatioHelpers.FitInBounds(ref newSize, Bounds.Parent.TotalSize, Ratio, allowedDeviance),
                 _ => true,
             };
         }

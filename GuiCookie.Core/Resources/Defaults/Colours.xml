@@ -1,8 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Resources>
   <Colours>
-    <MainColour Colour="#5F628A"/>
-    <InlayColour Colour="#8488BC"/>
+    <GuiCookieBackgroundColour Colour="#A1B0F6"/>
+    <GuiCookieSurfaceColour Colour="#6780F4"/>
+
+    <GuiCookiePrimaryColour Colour="#3355F3"/>
+    <GuiCookiePrimaryVariantColour Colour="#042EF1"/>
+
+    <GuiCookieSecondaryColour Colour="#FFBB19"/>
+    <GuiCookieSecondaryVariantColour Colour="#FFB400"/>
+
+    <GuiCookieErrorColour Colour="#FF0000"/>
+    <GuiCookieWarningColour Colour="#FFBA00"/>
+    <GuiCookieSuccessColour Colour="#00FF00"/>
+    
+    <GuiCookieOnPrimaryColour Colour="#BBB"/>
+    <GuiCookieOnSecondaryColour Colour="#111"/>
+    <GuiCookieOnBackgroundColour Colour="#111"/>
+    <GuiCookieOnSurfaceColour Colour="#111"/>
+    <GuiCookieOnErrorColour Colour="#BBB"/>
+
+    <LovebirbFeatherGreenColour Colour="#57AA4B"/>
+    <LovebirbFeatherOrangeColour Colour="#FF6D00"/>
+    <LovebirbBeakYellowColour Colour="#F4CA0E"/>
+    
+    <MainColour Colour="#6780F4"/>
+    <InlayColour Colour="#A1B0F6"/>
+    
     <MainTint Colour="#DDD"/>
     <ClickedTint Colour="#AAA"/>
     <DisabledTint Colour="#222"/>
